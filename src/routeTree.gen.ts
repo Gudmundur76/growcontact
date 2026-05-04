@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as CustomersRouteImport } from './routes/customers'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -31,6 +32,11 @@ const PricingRoute = PricingRouteImport.update({
 const CustomersRoute = CustomersRouteImport.update({
   id: '/customers',
   path: '/customers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChangelogRoute = ChangelogRouteImport.update({
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
+  '/contact': typeof ContactRoute
   '/customers': typeof CustomersRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
+  '/contact': typeof ContactRoute
   '/customers': typeof CustomersRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
+  '/contact': typeof ContactRoute
   '/customers': typeof CustomersRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/careers'
     | '/changelog'
+    | '/contact'
     | '/customers'
     | '/pricing'
     | '/signup'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/careers'
     | '/changelog'
+    | '/contact'
     | '/customers'
     | '/pricing'
     | '/signup'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/careers'
     | '/changelog'
+    | '/contact'
     | '/customers'
     | '/pricing'
     | '/signup'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   CareersRoute: typeof CareersRoute
   ChangelogRoute: typeof ChangelogRoute
+  ContactRoute: typeof ContactRoute
   CustomersRoute: typeof CustomersRoute
   PricingRoute: typeof PricingRoute
   SignupRoute: typeof SignupRoute
@@ -155,6 +168,13 @@ declare module '@tanstack/react-router' {
       path: '/customers'
       fullPath: '/customers'
       preLoaderRoute: typeof CustomersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/changelog': {
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   CareersRoute: CareersRoute,
   ChangelogRoute: ChangelogRoute,
+  ContactRoute: ContactRoute,
   CustomersRoute: CustomersRoute,
   PricingRoute: PricingRoute,
   SignupRoute: SignupRoute,
