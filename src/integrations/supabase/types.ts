@@ -134,6 +134,142 @@ export type Database = {
         }
         Relationships: []
       }
+      interview_events: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          kind: string
+          metadata: Json | null
+          session_id: string
+          speaker: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          kind: string
+          metadata?: Json | null
+          session_id: string
+          speaker?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          metadata?: Json | null
+          session_id?: string
+          speaker?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "interview_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interview_scorecards: {
+        Row: {
+          competencies: Json
+          concerns: Json
+          created_at: string
+          follow_ups: Json
+          id: string
+          overall_rating: number | null
+          recommendation: string | null
+          session_id: string
+          strengths: Json
+          summary: string
+          updated_at: string
+        }
+        Insert: {
+          competencies?: Json
+          concerns?: Json
+          created_at?: string
+          follow_ups?: Json
+          id?: string
+          overall_rating?: number | null
+          recommendation?: string | null
+          session_id: string
+          strengths?: Json
+          summary: string
+          updated_at?: string
+        }
+        Update: {
+          competencies?: Json
+          concerns?: Json
+          created_at?: string
+          follow_ups?: Json
+          id?: string
+          overall_rating?: number | null
+          recommendation?: string | null
+          session_id?: string
+          strengths?: Json
+          summary?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_scorecards_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "interview_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interview_sessions: {
+        Row: {
+          candidate_name: string
+          created_at: string
+          ended_at: string | null
+          id: string
+          job_description: string | null
+          meeting_platform: string
+          meeting_url: string
+          recall_bot_id: string | null
+          role_title: string
+          started_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          candidate_name: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          job_description?: string | null
+          meeting_platform: string
+          meeting_url: string
+          recall_bot_id?: string | null
+          role_title: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          candidate_name?: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          job_description?: string | null
+          meeting_platform?: string
+          meeting_url?: string
+          recall_bot_id?: string | null
+          role_title?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           company: string | null

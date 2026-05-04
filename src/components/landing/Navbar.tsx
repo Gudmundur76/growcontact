@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, X, LogOut, User as UserIcon, Shield } from "lucide-react";
+import { Menu, X, LogOut, User as UserIcon, Shield, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -137,6 +137,12 @@ export function Navbar() {
                   <Link to="/account" className="cursor-pointer">
                     <UserIcon className="mr-2 h-4 w-4" />
                     Account settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/interview" className="cursor-pointer">
+                    <Video className="mr-2 h-4 w-4" />
+                    Interview Copilot
                   </Link>
                 </DropdownMenuItem>
                 {profile?.isAdmin ? (
