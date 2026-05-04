@@ -1,86 +1,106 @@
-import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import logo from "@/assets/logo.png";
 
-const featuresItems = [
-  { label: "AI Sourcing", desc: "Find top talent automatically" },
-  { label: "Smart Screening", desc: "Filter candidates with AI" },
-  { label: "Interview Copilot", desc: "Live guidance during interviews" },
-  { label: "Analytics", desc: "Hiring insights at a glance" },
+type NavTo = "/pricing" | "/customers" | "/blog" | "/about" | "/careers";
+
+const links: { label: string; to: NavTo }[] = [
+  { label: "Pricing", to: "/pricing" },
+  { label: "Customers", to: "/customers" },
+  { label: "Blog", to: "/blog" },
+  { label: "About", to: "/about" },
+  { label: "Careers", to: "/careers" },
 ];
-
-const learningItems = [
-  { label: "Documentation", desc: "Guides and API reference" },
-  { label: "Tutorials", desc: "Step-by-step walkthroughs" },
-  { label: "Webinars", desc: "Live sessions with experts" },
-  { label: "Blog", desc: "Latest news and insights" },
-];
-
-const simpleItems = ["Solutions", "Plans"];
-
-function NavDropdown({
-  label,
-  items,
-}: {
-  label: string;
-  items: { label: string; desc: string }[];
-}) {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="inline-flex items-center gap-1 text-foreground/90 text-base px-3 py-2 rounded-md hover:bg-white/5 transition-colors outline-none data-[state=open]:bg-white/5">
-        {label}
-        <ChevronDown className="h-4 w-4 opacity-70 transition-transform data-[state=open]:rotate-180" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="center"
-        sideOffset={10}
-        className="liquid-glass bg-card/60 border-0 rounded-2xl p-2 min-w-[280px] text-foreground"
-      >
-        {items.map((item) => (
-          <DropdownMenuItem
-            key={item.label}
-            className="flex flex-col items-start gap-0.5 rounded-xl px-3 py-2.5 cursor-pointer focus:bg-white/5 focus:text-foreground"
-          >
-            <span className="text-sm font-medium text-foreground">{item.label}</span>
-            <span className="text-xs text-muted-foreground">{item.desc}</span>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
 
 export function Navbar() {
+  const [open, setOpen] = useState(false);
+
   return (
     <>
-      <nav className="w-full py-5 px-8 flex flex-row justify-between items-center relative z-20">
-        <Link to="/" className="flex items-center">
-          <img src={logo} alt="Logo" className="h-8 w-auto" width={32} height={32} />
+      <nav
+        aria-label="Primary"
+        className="relative z-20 flex w-full flex-row items-center justify-between px-6 py-5 md:px-8"
+      >
+        <Link to="/" className="flex items-center gap-2" aria-label="Grow home">
+          <img
+            src={logo}
+            alt="Grow"
+            className="h-8 w-auto"
+            width={32}
+            height={32}
+          />
+          <span className="text-base font-semibold tracking-tight text-foreground">
+            Grow
+          </span>
         </Link>
-        <div className="hidden md:flex items-center gap-1">
-          <NavDropdown label="Features" items={featuresItems} />
-          {simpleItems.map((label) => (
-            <button
-              key={label}
-              className="inline-flex items-center text-foreground/90 text-base px-3 py-2 rounded-md hover:bg-white/5 transition-colors"
+
+        <div className="hidden items-center gap-1 md:flex">
+          {links.map((l) => (
+            <Link
+              key={l.to}
+              to={l.to}
+              className="rounded-md px-3 py-2 text-sm text-foreground/80 transition-colors hover:bg-white/5 hover:text-foreground"
+              activeProps={{ className: "text-foreground bg-white/5" }}
             >
-              {label}
-            </button>
+              {l.label}
+            </Link>
           ))}
-          <NavDropdown label="Learning" items={learningItems} />
         </div>
-        <Button asChild variant="heroSecondary" size="sm" className="rounded-full px-4 py-2">
-          <Link to="/signup">Sign Up</Link>
-        </Button>
+
+        <div className="flex items-center gap-2">
+          <Button
+            asChild
+            variant="heroSecondary"
+            size="sm"
+            className="hidden rounded-full px-4 py-2 md:inline-flex"
+          >
+            <Link to="/signup">Start free trial</Link>
+          </Button>
+          <button
+            type="button"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex items-center justify-center rounded-md p-2 text-foreground hover:bg-white/5 md:hidden"
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </nav>
-      <div className="mt-[3px] w-full h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
+      <div className="mt-[3px] h-px w-full bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
+
+      {open && (
+        <div className="md:hidden">
+          <div className="liquid-glass mx-4 mt-3 rounded-2xl bg-card/60 p-3">
+            <ul className="flex flex-col">
+              {links.map((l) => (
+                <li key={l.to}>
+                  <Link
+                    to={l.to}
+                    onClick={() => setOpen(false)}
+                    className="block rounded-xl px-4 py-3 text-base text-foreground/90 hover:bg-white/5"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-2 px-1 pb-1">
+              <Button
+                asChild
+                variant="hero"
+                className="w-full justify-center rounded-full"
+              >
+                <Link to="/signup" onClick={() => setOpen(false)}>
+                  Start free trial
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

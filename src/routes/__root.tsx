@@ -29,20 +29,41 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      {
+        title: "Grow — The talent operating system for high-growth teams",
+      },
+      {
+        name: "description",
+        content:
+          "Grow is the AI talent operating system. Source, screen, interview and hire your next 10 people from one calibrated platform.",
+      },
+      { name: "author", content: "Grow Labs, Inc." },
+      { name: "theme-color", content: "#0b0b10" },
+      {
+        property: "og:title",
+        content: "Grow — The talent operating system",
+      },
+      {
+        property: "og:description",
+        content:
+          "Source, screen, interview and hire from one calibrated AI platform. 14-day free trial.",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { property: "og:site_name", content: "Grow" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Grow — The talent operating system" },
+      {
+        name: "twitter:description",
+        content:
+          "Source, screen, interview and hire from one calibrated AI platform.",
+      },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
     ],
   }),
   shellComponent: RootShell,
