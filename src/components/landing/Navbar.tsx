@@ -1,10 +1,20 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User as UserIcon, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 type NavTo = "/pricing" | "/customers" | "/blog" | "/about" | "/careers";
@@ -20,6 +30,36 @@ const links: { label: string; to: NavTo }[] = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const { user, loading } = useAuth();
+
+  const { data: profile } = useQuery({
+    queryKey: ["nav-profile", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const [{ data: p }, { data: roles }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("name, company")
+          .eq("user_id", user!.id)
+          .maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", user!.id),
+      ]);
+      return {
+        name: p?.name ?? "",
+        company: p?.company ?? "",
+        isAdmin: !!roles?.some((r) => r.role === "admin"),
+      };
+    },
+  });
+
+  const displayName =
+    profile?.name?.trim() || user?.email?.split("@")[0] || "Account";
+  const initials = displayName
+    .split(/\s+/)
+    .map((s) => s[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   async function handleSignOut() {
     const { error } = await supabase.auth.signOut();
@@ -61,24 +101,62 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           {!loading && user ? (
-            <>
-              <Button
-                asChild
-                variant="heroSecondary"
-                size="sm"
-                className="hidden rounded-full px-4 py-2 md:inline-flex"
-              >
-                <Link to="/account">Account</Link>
-              </Button>
-              <Button
-                variant="heroSecondary"
-                size="sm"
-                className="hidden rounded-full px-4 py-2 md:inline-flex"
-                onClick={handleSignOut}
-              >
-                Sign out
-              </Button>
-            </>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Open account menu"
+                  className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 py-1 pr-3 pl-1 text-sm text-foreground transition-colors hover:bg-white/10 md:inline-flex"
+                >
+                  <Avatar className="h-7 w-7">
+                    <AvatarFallback className="bg-primary/20 text-xs font-medium text-foreground">
+                      {initials || "?"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="max-w-[140px] truncate">{displayName}</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="truncate text-sm font-medium">
+                      {displayName}
+                    </span>
+                    <span className="truncate text-xs text-muted-foreground">
+                      {user.email}
+                    </span>
+                    {profile?.company ? (
+                      <span className="truncate text-xs text-muted-foreground">
+                        {profile.company}
+                      </span>
+                    ) : null}
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/account" className="cursor-pointer">
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    Account settings
+                  </Link>
+                </DropdownMenuItem>
+                {profile?.isAdmin ? (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin/contacts" className="cursor-pointer">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Admin · Contacts
+                    </Link>
+                  </DropdownMenuItem>
+                ) : null}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : !loading ? (
             <>
               <Link
