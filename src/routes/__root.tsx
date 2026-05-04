@@ -52,12 +52,19 @@ export const Route = createRootRoute({
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Grow" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Grow — The talent operating system" },
+      { name: "twitter:title", content: "Grow contact" },
       {
         name: "twitter:description",
         content:
           "Source, screen, interview and hire from one calibrated AI platform.",
       },
+      { title: "Grow contact" },
+      { property: "og:title", content: "Grow contact" },
+      { name: "description", content: "A dark-themed landing page with a dynamic hero section, interactive navbar, and a scrolling logo marquee." },
+      { property: "og:description", content: "A dark-themed landing page with a dynamic hero section, interactive navbar, and a scrolling logo marquee." },
+      { name: "twitter:description", content: "A dark-themed landing page with a dynamic hero section, interactive navbar, and a scrolling logo marquee." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/619b56c4-eb2b-476b-80fb-b55a066ffc5f/id-preview-d21d0f50--e1107b25-62a7-46ae-ab03-790d77a20251.lovable.app-1777895398072.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/619b56c4-eb2b-476b-80fb-b55a066ffc5f/id-preview-d21d0f50--e1107b25-62a7-46ae-ab03-790d77a20251.lovable.app-1777895398072.png" },
     ],
     links: [
       {
