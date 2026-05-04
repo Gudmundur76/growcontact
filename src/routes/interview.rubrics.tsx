@@ -8,9 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { upsertRubric, deleteRubric } from "@/server/interviews.functions";
+import { upsertRubric, deleteRubric, seedRubricTemplates } from "@/server/interviews.functions";
 import { toast } from "sonner";
-import { Plus, Trash2, ArrowLeft, Star } from "lucide-react";
+import { Plus, Trash2, ArrowLeft, Star, Sparkles } from "lucide-react";
 
 type Rubric = {
   id: string;
@@ -45,6 +45,7 @@ function RubricsPage() {
   const [rubrics, setRubrics] = useState<Rubric[]>([]);
   const [editing, setEditing] = useState<Partial<Rubric> | null>(null);
   const [saving, setSaving] = useState(false);
+  const [seeding, setSeeding] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/login" });
@@ -111,6 +112,25 @@ function RubricsPage() {
     load();
   }
 
+  async function seedAll() {
+    setSeeding(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const r = await seedRubricTemplates({
+        data: { templates: ["engineering", "sales", "product", "design"] },
+        headers: session?.access_token
+          ? { Authorization: `Bearer ${session.access_token}` }
+          : undefined,
+      });
+      toast.success(`Added ${r.count} starter rubrics`);
+      load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to seed");
+    } finally {
+      setSeeding(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -129,6 +149,14 @@ function RubricsPage() {
               the final scorecard.
             </p>
           </div>
+          <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={seedAll}
+            disabled={seeding}
+          >
+            <Sparkles className="size-4" /> {seeding ? "Adding…" : "Seed templates"}
+          </Button>
           <Button
             onClick={() =>
               setEditing({
@@ -142,6 +170,7 @@ function RubricsPage() {
           >
             <Plus className="size-4" /> New rubric
           </Button>
+          </div>
         </div>
 
         {editing && (
