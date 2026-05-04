@@ -1,10 +1,9 @@
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Navbar } from "./Navbar";
 
 export function HeroSection() {
   return (
     <section className="bg-background relative overflow-hidden">
-      <Navbar />
       <div className="flex flex-col items-center pt-20 px-4 text-center">
         <h1
           className="font-normal bg-clip-text text-transparent"
@@ -23,13 +22,22 @@ export function HeroSection() {
           <br />
           in talent acquisition
         </p>
-        <div className="mt-8 mb-[66px]">
+        <div className="mt-8 mb-[66px] flex flex-col items-center gap-3 sm:flex-row">
           <Button
+            asChild
+            variant="hero"
+            className="rounded-full"
+            style={{ padding: "24px 29px" }}
+          >
+            <Link to="/signup">Start free trial</Link>
+          </Button>
+          <Button
+            asChild
             variant="heroSecondary"
             className="rounded-full"
             style={{ padding: "24px 29px" }}
           >
-            Schedule a Consult
+            <Link to="/customers">See customer stories</Link>
           </Button>
         </div>
       </div>
