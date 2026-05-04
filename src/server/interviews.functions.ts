@@ -520,6 +520,7 @@ const ScorecardEditSchema = z.object({
         name: z.string().min(1).max(120),
         rating: z.number().int().min(1).max(5),
         notes: z.string().max(1000).default(""),
+        evidence: z.array(z.string().max(400)).max(5).default([]),
       }),
     )
     .max(20),
