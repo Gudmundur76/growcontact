@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as CustomersRouteImport } from './routes/customers'
+import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AboutRouteImport } from './routes/about'
@@ -30,6 +31,11 @@ const PricingRoute = PricingRouteImport.update({
 const CustomersRoute = CustomersRouteImport.update({
   id: '/customers',
   path: '/customers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangelogRoute = ChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CareersRoute = CareersRouteImport.update({
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
   '/careers': typeof CareersRoute
+  '/changelog': typeof ChangelogRoute
   '/customers': typeof CustomersRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
   '/careers': typeof CareersRoute
+  '/changelog': typeof ChangelogRoute
   '/customers': typeof CustomersRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
   '/careers': typeof CareersRoute
+  '/changelog': typeof ChangelogRoute
   '/customers': typeof CustomersRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/blog'
     | '/careers'
+    | '/changelog'
     | '/customers'
     | '/pricing'
     | '/signup'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/blog'
     | '/careers'
+    | '/changelog'
     | '/customers'
     | '/pricing'
     | '/signup'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/blog'
     | '/careers'
+    | '/changelog'
     | '/customers'
     | '/pricing'
     | '/signup'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   BlogRoute: typeof BlogRoute
   CareersRoute: typeof CareersRoute
+  ChangelogRoute: typeof ChangelogRoute
   CustomersRoute: typeof CustomersRoute
   PricingRoute: typeof PricingRoute
   SignupRoute: typeof SignupRoute
@@ -142,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/customers'
       fullPath: '/customers'
       preLoaderRoute: typeof CustomersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/changelog': {
+      id: '/changelog'
+      path: '/changelog'
+      fullPath: '/changelog'
+      preLoaderRoute: typeof ChangelogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/careers': {
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   BlogRoute: BlogRoute,
   CareersRoute: CareersRoute,
+  ChangelogRoute: ChangelogRoute,
   CustomersRoute: CustomersRoute,
   PricingRoute: PricingRoute,
   SignupRoute: SignupRoute,
