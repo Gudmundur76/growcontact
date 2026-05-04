@@ -222,6 +222,52 @@ function ContactPage() {
             </div>
           </div>
         </div>
+
+        <section className="mt-24">
+          <div className="mb-10 max-w-2xl">
+            <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              Common questions
+            </p>
+            <h2 className="text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-4xl">
+              Quick answers before you write.
+            </h2>
+          </div>
+          <div className="space-y-3">
+            {[
+              {
+                q: "How fast do you respond?",
+                a: "Sales and partnerships within one business day. Existing-customer support typically under two hours during business hours.",
+              },
+              {
+                q: "Do you do live demos?",
+                a: "Yes — 30 minutes, tailored to your hiring funnel. Bring two real open roles and we'll show you Sourcing AI on them live.",
+              },
+              {
+                q: "Can we get a security review packet?",
+                a: "Email security@grow.example. We share our SOC 2 report, ISO 27001 cert, DPA, SCCs and pen-test summary under MTNDA.",
+              },
+              {
+                q: "Do you offer custom integrations?",
+                a: "Scale customers get a dedicated forward-deployed engineer who can build custom ATS, HRIS or assessment integrations on request.",
+              },
+            ].map((f) => (
+              <details
+                key={f.q}
+                className="group rounded-2xl border border-white/5 bg-card/30 px-6 py-5 backdrop-blur-xl [&_summary::-webkit-details-marker]:hidden"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-base font-semibold text-foreground">
+                  {f.q}
+                  <span className="text-2xl leading-none text-muted-foreground transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                  {f.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
       </main>
       <Footer />
     </div>
