@@ -11,10 +11,14 @@ export const Route = createFileRoute("/api/public/scorecard/$token")({
         }
         const { data: session } = await supabaseAdmin
           .from("interview_sessions")
-          .select("id, candidate_name, role_title, ended_at")
+          .select("id, candidate_name, role_title, ended_at, share_expires_at, deleted_at")
           .eq("share_token", token)
           .maybeSingle();
         if (!session) return new Response("Not found", { status: 404 });
+        if (session.deleted_at) return new Response("Not found", { status: 404 });
+        if (session.share_expires_at && new Date(session.share_expires_at) < new Date()) {
+          return new Response("Link expired", { status: 410 });
+        }
 
         const { data: card } = await supabaseAdmin
           .from("interview_scorecards")
