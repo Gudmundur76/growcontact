@@ -10,6 +10,7 @@ const StartSchema = z.object({
   roleTitle: z.string().min(1).max(200),
   jobDescription: z.string().max(20000).optional().nullable(),
   meetingUrl: z.string().url().max(2000),
+  rubricId: z.string().uuid().optional().nullable(),
 });
 
 export const startInterview = createServerFn({ method: "POST" })
@@ -30,6 +31,7 @@ export const startInterview = createServerFn({ method: "POST" })
         meeting_url: data.meetingUrl,
         meeting_platform: platform,
         status: "pending",
+        rubric_id: data.rubricId ?? null,
       })
       .select("id")
       .single();
