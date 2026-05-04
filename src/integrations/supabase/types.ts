@@ -260,8 +260,10 @@ export type Database = {
       }
       interview_sessions: {
         Row: {
+          archived: boolean
           candidate_name: string
           created_at: string
+          deleted_at: string | null
           ended_at: string | null
           id: string
           job_description: string | null
@@ -270,6 +272,7 @@ export type Database = {
           recall_bot_id: string | null
           role_title: string
           rubric_id: string | null
+          share_expires_at: string | null
           share_token: string | null
           started_at: string | null
           status: string
@@ -277,8 +280,10 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          archived?: boolean
           candidate_name: string
           created_at?: string
+          deleted_at?: string | null
           ended_at?: string | null
           id?: string
           job_description?: string | null
@@ -287,6 +292,7 @@ export type Database = {
           recall_bot_id?: string | null
           role_title: string
           rubric_id?: string | null
+          share_expires_at?: string | null
           share_token?: string | null
           started_at?: string | null
           status?: string
@@ -294,8 +300,10 @@ export type Database = {
           user_id: string
         }
         Update: {
+          archived?: boolean
           candidate_name?: string
           created_at?: string
+          deleted_at?: string | null
           ended_at?: string | null
           id?: string
           job_description?: string | null
@@ -304,6 +312,7 @@ export type Database = {
           recall_bot_id?: string | null
           role_title?: string
           rubric_id?: string | null
+          share_expires_at?: string | null
           share_token?: string | null
           started_at?: string | null
           status?: string
