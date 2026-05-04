@@ -37,6 +37,7 @@ export async function generateLiveSuggestions(opts: {
   jobDescription: string | null;
   candidateName: string;
   transcriptSoFar: string;
+  rubric?: { name: string; focus: string | null; competencies: string[] } | null;
 }): Promise<SuggestionsResult> {
   const sys = `You are an expert interview copilot helping a hiring manager assess a candidate in real time.
 You receive a partial interview transcript and must surface:
@@ -50,6 +51,11 @@ CANDIDATE: ${opts.candidateName}
 JOB DESCRIPTION:
 ${opts.jobDescription || "(none provided)"}
 
+${opts.rubric ? `RUBRIC: ${opts.rubric.name}
+FOCUS: ${opts.rubric.focus || "(none)"}
+COMPETENCIES TO ASSESS: ${opts.rubric.competencies.join(", ")}
+
+` : ""}
 TRANSCRIPT SO FAR:
 ${opts.transcriptSoFar.slice(-8000)}
 
@@ -112,6 +118,7 @@ export async function generateScorecard(opts: {
   jobDescription: string | null;
   candidateName: string;
   transcript: string;
+  rubric?: { name: string; focus: string | null; competencies: string[] } | null;
 }): Promise<ScorecardResult> {
   const sys = `You are an expert interviewer producing a calibrated post-interview scorecard.
 Be honest, specific, evidence-based. Cite behaviors from the transcript. Avoid generic praise.
@@ -122,6 +129,11 @@ CANDIDATE: ${opts.candidateName}
 JOB DESCRIPTION:
 ${opts.jobDescription || "(none provided)"}
 
+${opts.rubric ? `RUBRIC: ${opts.rubric.name}
+FOCUS: ${opts.rubric.focus || "(none)"}
+REQUIRED COMPETENCIES (rate ALL of these): ${opts.rubric.competencies.join(", ")}
+
+` : ""}
 FULL TRANSCRIPT:
 ${opts.transcript.slice(-30000)}
 
