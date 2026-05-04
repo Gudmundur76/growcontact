@@ -5,6 +5,23 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createRecallBot, leaveRecallBot, detectPlatform } from "./recall.server";
 import { generateScorecard } from "./interview-ai.server";
 
+// ---------- In-memory rate limiter ----------
+// Best-effort per-instance throttle. Acceptable for abuse prevention; resets on cold start.
+const rateBuckets = new Map<string, { count: number; reset: number }>();
+function rateLimit(key: string, limit: number, windowMs: number) {
+  const now = Date.now();
+  const b = rateBuckets.get(key);
+  if (!b || b.reset < now) {
+    rateBuckets.set(key, { count: 1, reset: now + windowMs });
+    return;
+  }
+  if (b.count >= limit) {
+    const wait = Math.ceil((b.reset - now) / 1000);
+    throw new Error(`Rate limit exceeded — try again in ${wait}s`);
+  }
+  b.count += 1;
+}
+
 const StartSchema = z.object({
   candidateName: z.string().min(1).max(200),
   roleTitle: z.string().min(1).max(200),
