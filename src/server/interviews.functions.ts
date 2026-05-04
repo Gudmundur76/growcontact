@@ -119,10 +119,12 @@ export const finalizeScorecard = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: session } = await supabase
       .from("interview_sessions")
-      .select("id, user_id, candidate_name, role_title, job_description")
+      .select("id, user_id, candidate_name, role_title, job_description, rubric_id")
       .eq("id", data.sessionId)
       .maybeSingle();
     if (!session || session.user_id !== userId) throw new Error("Not found");
+
+    const rubric = await loadRubric(session.rubric_id);
 
     const { data: events } = await supabaseAdmin
       .from("interview_events")
@@ -141,6 +143,7 @@ export const finalizeScorecard = createServerFn({ method: "POST" })
       jobDescription: session.job_description,
       candidateName: session.candidate_name,
       transcript,
+      rubric,
     });
 
     await supabaseAdmin
@@ -169,10 +172,12 @@ export const generateLiveSuggestionsFn = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: session } = await supabase
       .from("interview_sessions")
-      .select("id, user_id, candidate_name, role_title, job_description")
+      .select("id, user_id, candidate_name, role_title, job_description, rubric_id")
       .eq("id", data.sessionId)
       .maybeSingle();
     if (!session || session.user_id !== userId) throw new Error("Not found");
+
+    const rubric = await loadRubric(session.rubric_id);
 
     const { data: events } = await supabaseAdmin
       .from("interview_events")
@@ -191,6 +196,7 @@ export const generateLiveSuggestionsFn = createServerFn({ method: "POST" })
       jobDescription: session.job_description,
       candidateName: session.candidate_name,
       transcriptSoFar: transcript,
+      rubric,
     });
 
     const rows = [
