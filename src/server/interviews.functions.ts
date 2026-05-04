@@ -357,6 +357,88 @@ export const addManualTranscript = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+const BulkSchema = z.object({
+  sessionId: z.string().uuid(),
+  text: z.string().min(1).max(200000),
+});
+
+export const addBulkTranscript = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => BulkSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: session } = await supabase
+      .from("interview_sessions")
+      .select("id, user_id, status")
+      .eq("id", data.sessionId)
+      .maybeSingle();
+    if (!session || session.user_id !== userId) throw new Error("Not found");
+
+    // Parse "Speaker: content" per line. Lines without a speaker prefix are
+    // appended to the previous speaker's content.
+    const lines = data.text.split(/\r?\n/);
+    const rows: { session_id: string; kind: "transcript"; speaker: string; content: string }[] = [];
+    let current: { speaker: string; parts: string[] } | null = null;
+    const flush = () => {
+      if (current && current.parts.join(" ").trim()) {
+        rows.push({
+          session_id: session.id,
+          kind: "transcript",
+          speaker: current.speaker,
+          content: current.parts.join(" ").trim().slice(0, 8000),
+        });
+      }
+    };
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line) {
+        flush();
+        current = null;
+        continue;
+      }
+      const m = line.match(/^([\w .'-]{1,80}):\s*(.*)$/);
+      if (m) {
+        flush();
+        current = { speaker: m[1].trim(), parts: m[2] ? [m[2]] : [] };
+      } else if (current) {
+        current.parts.push(line);
+      } else {
+        current = { speaker: "Speaker", parts: [line] };
+      }
+    }
+    flush();
+    if (rows.length === 0) throw new Error("No transcript lines detected");
+    if (rows.length > 500) throw new Error("Too many lines (max 500)");
+
+    if (session.status === "pending" || session.status === "failed") {
+      await supabaseAdmin
+        .from("interview_sessions")
+        .update({ status: "in_call", started_at: new Date().toISOString() })
+        .eq("id", session.id);
+    }
+    const { error } = await supabaseAdmin.from("interview_events").insert(rows);
+    if (error) throw new Error(error.message);
+    return { ok: true, count: rows.length };
+  });
+
+export const deleteSession = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ sessionId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: session } = await supabase
+      .from("interview_sessions")
+      .select("id, user_id")
+      .eq("id", data.sessionId)
+      .maybeSingle();
+    if (!session || session.user_id !== userId) throw new Error("Not found");
+    await supabaseAdmin.from("interview_events").delete().eq("session_id", session.id);
+    await supabaseAdmin.from("interview_scorecards").delete().eq("session_id", session.id);
+    const { error } = await supabase.from("interview_sessions").delete().eq("id", session.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 // ---------- Rubric templates ----------
 
 const TEMPLATES: Record<string, { name: string; focus: string; competencies: string[] }> = {
