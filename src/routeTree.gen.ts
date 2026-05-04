@@ -34,6 +34,7 @@ import { Route as InterviewIdRouteImport } from './routes/interview.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminContactsRouteImport } from './routes/admin/contacts'
+import { Route as ShareScorecardTokenRouteImport } from './routes/share.scorecard.$token'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicRecallWebhookRouteImport } from './routes/api/public/recall-webhook'
 import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
@@ -169,6 +170,11 @@ const AdminContactsRoute = AdminContactsRouteImport.update({
   path: '/admin/contacts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShareScorecardTokenRoute = ShareScorecardTokenRouteImport.update({
+  id: '/share/scorecard/$token',
+  path: '/share/scorecard/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/share/scorecard/$token': typeof ShareScorecardTokenRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -283,6 +290,7 @@ export interface FileRoutesByTo {
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/share/scorecard/$token': typeof ShareScorecardTokenRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -320,6 +328,7 @@ export interface FileRoutesById {
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/share/scorecard/$token': typeof ShareScorecardTokenRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -358,6 +367,7 @@ export interface FileRouteTypes {
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
+    | '/share/scorecard/$token'
     | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -394,6 +404,7 @@ export interface FileRouteTypes {
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
+    | '/share/scorecard/$token'
     | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -430,6 +441,7 @@ export interface FileRouteTypes {
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
+    | '/share/scorecard/$token'
     | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -466,6 +478,7 @@ export interface RootRouteChildren {
   ApiPublicContactRoute: typeof ApiPublicContactRoute
   ApiPublicRecallWebhookRoute: typeof ApiPublicRecallWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ShareScorecardTokenRoute: typeof ShareScorecardTokenRoute
   ApiPublicScorecardTokenRoute: typeof ApiPublicScorecardTokenRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -651,6 +664,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContactsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/share/scorecard/$token': {
+      id: '/share/scorecard/$token'
+      path: '/share/scorecard/$token'
+      fullPath: '/share/scorecard/$token'
+      preLoaderRoute: typeof ShareScorecardTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -755,6 +775,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicContactRoute: ApiPublicContactRoute,
   ApiPublicRecallWebhookRoute: ApiPublicRecallWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ShareScorecardTokenRoute: ShareScorecardTokenRoute,
   ApiPublicScorecardTokenRoute: ApiPublicScorecardTokenRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
