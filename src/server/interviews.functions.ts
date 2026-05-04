@@ -320,3 +320,130 @@ export const setSessionShare = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { token: newToken };
   });
+
+// ---------- Manual transcript entry (no-bot fallback) ----------
+
+const ManualTranscriptSchema = z.object({
+  sessionId: z.string().uuid(),
+  speaker: z.string().min(1).max(120),
+  content: z.string().min(1).max(8000),
+});
+
+export const addManualTranscript = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ManualTranscriptSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: session } = await supabase
+      .from("interview_sessions")
+      .select("id, user_id, status")
+      .eq("id", data.sessionId)
+      .maybeSingle();
+    if (!session || session.user_id !== userId) throw new Error("Not found");
+
+    if (session.status === "pending" || session.status === "failed") {
+      await supabaseAdmin
+        .from("interview_sessions")
+        .update({ status: "in_call", started_at: new Date().toISOString() })
+        .eq("id", session.id);
+    }
+    const { error } = await supabaseAdmin.from("interview_events").insert({
+      session_id: session.id,
+      kind: "transcript",
+      speaker: data.speaker,
+      content: data.content,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// ---------- Rubric templates ----------
+
+const TEMPLATES: Record<string, { name: string; focus: string; competencies: string[] }> = {
+  engineering: {
+    name: "Software Engineer",
+    focus:
+      "System design depth, debugging instincts, ability to defend tradeoffs, ownership of production systems.",
+    competencies: [
+      "Technical depth",
+      "System design",
+      "Problem solving",
+      "Code quality",
+      "Communication",
+      "Ownership",
+      "Collaboration",
+    ],
+  },
+  sales: {
+    name: "Account Executive",
+    focus:
+      "Discovery quality, multi-threading, handling objections, closing rigor, pipeline hygiene.",
+    competencies: [
+      "Discovery",
+      "Objection handling",
+      "Closing",
+      "Forecasting",
+      "Communication",
+      "Coachability",
+    ],
+  },
+  product: {
+    name: "Product Manager",
+    focus:
+      "Customer insight, prioritization framework, cross-functional leadership, metric ownership.",
+    competencies: [
+      "Customer insight",
+      "Prioritization",
+      "Strategy",
+      "Execution",
+      "Stakeholder management",
+      "Communication",
+    ],
+  },
+  design: {
+    name: "Product Designer",
+    focus:
+      "Craft quality, design rationale, systems thinking, partnership with engineering and PM.",
+    competencies: [
+      "Craft",
+      "Design rationale",
+      "Systems thinking",
+      "Research",
+      "Collaboration",
+      "Communication",
+    ],
+  },
+};
+
+const SeedSchema = z.object({
+  templates: z.array(z.enum(["engineering", "sales", "product", "design"])).min(1),
+});
+
+export const seedRubricTemplates = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => SeedSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: existing } = await supabase
+      .from("interview_rubrics")
+      .select("id")
+      .limit(1);
+    const hasAny = (existing ?? []).length > 0;
+    const rows = data.templates.map((key, i) => {
+      const t = TEMPLATES[key];
+      return {
+        user_id: userId,
+        name: t.name,
+        role_title: t.name,
+        focus: t.focus,
+        competencies: t.competencies,
+        is_default: !hasAny && i === 0,
+      };
+    });
+    const { error, data: inserted } = await supabase
+      .from("interview_rubrics")
+      .insert(rows)
+      .select("id");
+    if (error) throw new Error(error.message);
+    return { count: inserted?.length ?? 0 };
+  });
