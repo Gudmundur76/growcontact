@@ -5,7 +5,9 @@ import { Footer } from "@/components/landing/Footer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Video } from "lucide-react";
+import { Plus, Video, Trash2 } from "lucide-react";
+import { deleteSession } from "@/server/interviews.functions";
+import { toast } from "sonner";
 
 type Session = {
   id: string;
@@ -80,6 +82,23 @@ function InterviewListPage() {
     })();
   }, [user, authLoading, navigate]);
 
+  async function onDelete(e: React.MouseEvent, sid: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm("Delete this interview and all its transcripts?")) return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      await deleteSession({
+        data: { sessionId: sid },
+        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
+      });
+      setSessions((prev) => prev.filter((s) => s.id !== sid));
+      toast.success("Interview deleted");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -124,11 +143,11 @@ function InterviewListPage() {
           ) : (
             <ul className="divide-y">
               {sessions.map((s) => (
-                <li key={s.id}>
+                <li key={s.id} className="group flex items-center hover:bg-muted/40">
                   <Link
                     to="/interview/$id"
                     params={{ id: s.id }}
-                    className="flex items-center justify-between gap-4 p-4 hover:bg-muted/40"
+                    className="flex flex-1 items-center justify-between gap-4 p-4"
                   >
                     <div>
                       <div className="font-medium">{s.candidate_name}</div>
@@ -143,6 +162,15 @@ function InterviewListPage() {
                       </span>
                     </div>
                   </Link>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="mr-2 opacity-0 group-hover:opacity-100"
+                    aria-label="Delete interview"
+                    onClick={(e) => onDelete(e, s.id)}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
                 </li>
               ))}
             </ul>
