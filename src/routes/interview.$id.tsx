@@ -676,6 +676,11 @@ function LiveInterviewPage() {
                 <Button variant="outline" size="sm" onClick={onDownloadMarkdown}>
                   <Download className="size-4" /> Download .md
                 </Button>
+                {session.share_token && (
+                  <Button variant="outline" size="sm" onClick={onEmailShareLink}>
+                    <Mail className="size-4" /> Email link
+                  </Button>
+                )}
               </div>
             </div>
             {session.share_token && (
