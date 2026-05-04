@@ -409,6 +409,11 @@ function LiveInterviewPage() {
                 <StopCircle className="size-4" /> End interview
               </Button>
             )}
+            {!completed && (
+              <Button variant="outline" onClick={() => setBulkOpen((v) => !v)}>
+                <Plus className="size-4" /> Paste full transcript
+              </Button>
+            )}
             <Button onClick={onFinalize} disabled={busy !== null}>
               <FileText className="size-4" /> {busy === "finalize" ? "Generating…" : "Generate scorecard"}
             </Button>
@@ -416,6 +421,26 @@ function LiveInterviewPage() {
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
+          {bulkOpen && !completed && (
+            <div className="lg:col-span-2 rounded-xl border bg-card p-4 space-y-3">
+              <div className="text-sm font-medium">Paste full transcript</div>
+              <p className="text-xs text-muted-foreground">
+                Format: one speaker per line, e.g. <code>Alex: I led the migration…</code>. Blank lines split turns.
+              </p>
+              <Textarea
+                value={bulkText}
+                onChange={(e) => setBulkText(e.target.value)}
+                rows={10}
+                placeholder={"Interviewer: Walk me through your last project.\n\nCandidate: I led the migration from…"}
+              />
+              <div className="flex gap-2">
+                <Button onClick={onBulkPaste} disabled={bulkBusy || !bulkText.trim()}>
+                  {bulkBusy ? "Importing…" : "Import"}
+                </Button>
+                <Button variant="ghost" onClick={() => setBulkOpen(false)}>Cancel</Button>
+              </div>
+            </div>
+          )}
           <section className="rounded-xl border bg-card">
             <header className="flex items-center gap-2 border-b px-4 py-3 text-sm font-medium">
               <CircleDot className={`size-3 ${inCall ? "text-emerald-500" : "text-muted-foreground"}`} />
