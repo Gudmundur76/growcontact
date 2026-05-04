@@ -26,6 +26,7 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InterviewIndexRouteImport } from './routes/interview.index'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminContactsRouteImport } from './routes/admin/contacts'
@@ -123,6 +124,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InterviewIndexRoute = InterviewIndexRouteImport.update({
+  id: '/interview/',
+  path: '/interview/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
@@ -203,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/admin/contacts': typeof AdminContactsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/interview/': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -233,6 +240,7 @@ export interface FileRoutesByTo {
   '/admin/contacts': typeof AdminContactsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/interview': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -264,6 +272,7 @@ export interface FileRoutesById {
   '/admin/contacts': typeof AdminContactsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/interview/': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -296,6 +305,7 @@ export interface FileRouteTypes {
     | '/admin/contacts'
     | '/blog/$slug'
     | '/email/unsubscribe'
+    | '/interview/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
@@ -326,6 +336,7 @@ export interface FileRouteTypes {
     | '/admin/contacts'
     | '/blog/$slug'
     | '/email/unsubscribe'
+    | '/interview'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
@@ -356,6 +367,7 @@ export interface FileRouteTypes {
     | '/admin/contacts'
     | '/blog/$slug'
     | '/email/unsubscribe'
+    | '/interview/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
@@ -386,6 +398,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   AdminContactsRoute: typeof AdminContactsRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  InterviewIndexRoute: typeof InterviewIndexRoute
   ApiPublicContactRoute: typeof ApiPublicContactRoute
   ApiPublicRecallWebhookRoute: typeof ApiPublicRecallWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -517,6 +530,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/interview/': {
+      id: '/interview/'
+      path: '/interview'
+      fullPath: '/interview/'
+      preLoaderRoute: typeof InterviewIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
       path: '/email/unsubscribe'
@@ -627,6 +647,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   AdminContactsRoute: AdminContactsRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  InterviewIndexRoute: InterviewIndexRoute,
   ApiPublicContactRoute: ApiPublicContactRoute,
   ApiPublicRecallWebhookRoute: ApiPublicRecallWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
