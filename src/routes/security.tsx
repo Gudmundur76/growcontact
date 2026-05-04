@@ -136,3 +136,38 @@ function SecurityPage() {
     </div>
   );
 }
+
+const subprocessors = [
+  { name: "AWS", purpose: "Primary infrastructure & data hosting", region: "US-East, EU-Central" },
+  { name: "Cloudflare", purpose: "Edge network, WAF, DDoS protection", region: "Global" },
+  { name: "Supabase", purpose: "Managed Postgres & auth", region: "US, EU" },
+  { name: "OpenAI", purpose: "LLM inference (zero-retention)", region: "US" },
+  { name: "Google Cloud", purpose: "Gemini inference (zero-retention)", region: "US, EU" },
+  { name: "Resend", purpose: "Transactional email delivery", region: "US, EU" },
+  { name: "Stripe", purpose: "Billing & payments", region: "US, EU" },
+  { name: "Datadog", purpose: "Application monitoring & logs", region: "US" },
+];
+
+const dataPractices = [
+  {
+    title: "Customer data ownership",
+    body: "You own all data you upload. We process it solely to provide the service, never to train shared models.",
+  },
+  {
+    title: "Candidate data minimization",
+    body: "We collect only what's needed for the role. Public profile data is refreshed on a 90-day cycle and purged on candidate request within 30 days.",
+  },
+  {
+    title: "Retention & deletion",
+    body: "Production data is retained for the life of your contract plus 30 days. Backups roll off after 35 days. Hard-delete on request, with audit receipt.",
+  },
+  {
+    title: "Regional data residency",
+    body: "EU and US data residency available on Scale. Data never leaves the elected region for storage or primary processing.",
+  },
+];
+
+function _SecurityExtras() {
+  // Reserved for future inline embeds — kept to avoid unused-warning on data tables.
+  return { subprocessors, dataPractices };
+}
