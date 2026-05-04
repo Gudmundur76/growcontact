@@ -28,6 +28,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InterviewIndexRouteImport } from './routes/interview.index'
 import { Route as InterviewNewRouteImport } from './routes/interview.new'
+import { Route as InterviewIdRouteImport } from './routes/interview.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminContactsRouteImport } from './routes/admin/contacts'
@@ -135,6 +136,11 @@ const InterviewNewRoute = InterviewNewRouteImport.update({
   path: '/interview/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InterviewIdRoute = InterviewIdRouteImport.update({
+  id: '/interview/$id',
+  path: '/interview/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
@@ -215,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/admin/contacts': typeof AdminContactsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
@@ -247,6 +254,7 @@ export interface FileRoutesByTo {
   '/admin/contacts': typeof AdminContactsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
@@ -280,6 +288,7 @@ export interface FileRoutesById {
   '/admin/contacts': typeof AdminContactsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
@@ -314,6 +323,7 @@ export interface FileRouteTypes {
     | '/admin/contacts'
     | '/blog/$slug'
     | '/email/unsubscribe'
+    | '/interview/$id'
     | '/interview/new'
     | '/interview/'
     | '/api/public/contact'
@@ -346,6 +356,7 @@ export interface FileRouteTypes {
     | '/admin/contacts'
     | '/blog/$slug'
     | '/email/unsubscribe'
+    | '/interview/$id'
     | '/interview/new'
     | '/interview'
     | '/api/public/contact'
@@ -378,6 +389,7 @@ export interface FileRouteTypes {
     | '/admin/contacts'
     | '/blog/$slug'
     | '/email/unsubscribe'
+    | '/interview/$id'
     | '/interview/new'
     | '/interview/'
     | '/api/public/contact'
@@ -410,6 +422,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   AdminContactsRoute: typeof AdminContactsRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  InterviewIdRoute: typeof InterviewIdRoute
   InterviewNewRoute: typeof InterviewNewRoute
   InterviewIndexRoute: typeof InterviewIndexRoute
   ApiPublicContactRoute: typeof ApiPublicContactRoute
@@ -557,6 +570,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InterviewNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/interview/$id': {
+      id: '/interview/$id'
+      path: '/interview/$id'
+      fullPath: '/interview/$id'
+      preLoaderRoute: typeof InterviewIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
       path: '/email/unsubscribe'
@@ -667,6 +687,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   AdminContactsRoute: AdminContactsRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  InterviewIdRoute: InterviewIdRoute,
   InterviewNewRoute: InterviewNewRoute,
   InterviewIndexRoute: InterviewIndexRoute,
   ApiPublicContactRoute: ApiPublicContactRoute,
