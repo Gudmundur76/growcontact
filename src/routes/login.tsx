@@ -120,12 +120,22 @@ function LoginPage() {
               >
                 {loading ? "Signing in…" : "Sign in"}
               </Button>
-              <p className="text-center text-xs text-muted-foreground">
-                No account yet?{" "}
-                <Link to="/signup" className="text-foreground hover:underline">
-                  Start free trial
-                </Link>
-              </p>
+              <div className="space-y-2 text-center text-xs text-muted-foreground">
+                <p>
+                  <Link
+                    to="/forgot-password"
+                    className="text-foreground hover:underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                </p>
+                <p>
+                  No account yet?{" "}
+                  <Link to="/signup" className="text-foreground hover:underline">
+                    Start free trial
+                  </Link>
+                </p>
+              </div>
             </form>
           </div>
         </div>
