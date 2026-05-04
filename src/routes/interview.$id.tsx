@@ -439,6 +439,34 @@ function LiveInterviewPage() {
     URL.revokeObjectURL(url);
   }
 
+  async function onEmailShareLink() {
+    if (!session?.share_token) return;
+    const recipient = window.prompt("Send scorecard link to email:");
+    if (!recipient) return;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(recipient)) {
+      toast.error("Invalid email address");
+      return;
+    }
+    const shareUrl = `${window.location.origin}/share/scorecard/${session.share_token}`;
+    try {
+      await sendTransactionalEmail({
+        templateName: "scorecard-share",
+        recipientEmail: recipient,
+        idempotencyKey: `scorecard-share-${session.id}-${recipient}-${Date.now()}`,
+        templateData: {
+          candidateName: session.candidate_name,
+          roleTitle: session.role_title,
+          shareUrl,
+          senderName: user?.email ?? null,
+          expiresAt: session.share_expires_at ?? null,
+        },
+      });
+      toast.success(`Sent to ${recipient}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to send email");
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
