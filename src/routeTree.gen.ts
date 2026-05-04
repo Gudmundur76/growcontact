@@ -27,6 +27,7 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InterviewIndexRouteImport } from './routes/interview.index'
+import { Route as InterviewNewRouteImport } from './routes/interview.new'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminContactsRouteImport } from './routes/admin/contacts'
@@ -129,6 +130,11 @@ const InterviewIndexRoute = InterviewIndexRouteImport.update({
   path: '/interview/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InterviewNewRoute = InterviewNewRouteImport.update({
+  id: '/interview/new',
+  path: '/interview/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
@@ -209,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/admin/contacts': typeof AdminContactsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/interview/new': typeof InterviewNewRoute
   '/interview/': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
@@ -240,6 +247,7 @@ export interface FileRoutesByTo {
   '/admin/contacts': typeof AdminContactsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/interview/new': typeof InterviewNewRoute
   '/interview': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
@@ -272,6 +280,7 @@ export interface FileRoutesById {
   '/admin/contacts': typeof AdminContactsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/interview/new': typeof InterviewNewRoute
   '/interview/': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
@@ -305,6 +314,7 @@ export interface FileRouteTypes {
     | '/admin/contacts'
     | '/blog/$slug'
     | '/email/unsubscribe'
+    | '/interview/new'
     | '/interview/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
     | '/admin/contacts'
     | '/blog/$slug'
     | '/email/unsubscribe'
+    | '/interview/new'
     | '/interview'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
@@ -367,6 +378,7 @@ export interface FileRouteTypes {
     | '/admin/contacts'
     | '/blog/$slug'
     | '/email/unsubscribe'
+    | '/interview/new'
     | '/interview/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
@@ -398,6 +410,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   AdminContactsRoute: typeof AdminContactsRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  InterviewNewRoute: typeof InterviewNewRoute
   InterviewIndexRoute: typeof InterviewIndexRoute
   ApiPublicContactRoute: typeof ApiPublicContactRoute
   ApiPublicRecallWebhookRoute: typeof ApiPublicRecallWebhookRoute
@@ -537,6 +550,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InterviewIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/interview/new': {
+      id: '/interview/new'
+      path: '/interview/new'
+      fullPath: '/interview/new'
+      preLoaderRoute: typeof InterviewNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
       path: '/email/unsubscribe'
@@ -647,6 +667,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   AdminContactsRoute: AdminContactsRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  InterviewNewRoute: InterviewNewRoute,
   InterviewIndexRoute: InterviewIndexRoute,
   ApiPublicContactRoute: ApiPublicContactRoute,
   ApiPublicRecallWebhookRoute: ApiPublicRecallWebhookRoute,
