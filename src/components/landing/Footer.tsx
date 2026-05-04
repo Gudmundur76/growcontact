@@ -10,7 +10,11 @@ type FooterLink = {
     | "/customers"
     | "/careers"
     | "/blog"
-    | "/changelog";
+    | "/changelog"
+    | "/contact"
+    | "/privacy"
+    | "/terms"
+    | "/security";
 };
 
 const columns: { title: string; links: FooterLink[] }[] = [
@@ -29,7 +33,7 @@ const columns: { title: string; links: FooterLink[] }[] = [
       { label: "About", to: "/about" },
       { label: "Customers", to: "/customers" },
       { label: "Careers", to: "/careers" },
-      { label: "Press" },
+      { label: "Contact", to: "/contact" },
     ],
   },
   {
@@ -90,9 +94,9 @@ export function Footer() {
         <div className="mt-12 flex flex-col items-start justify-between gap-4 text-xs text-muted-foreground sm:flex-row sm:items-center">
           <div>© {new Date().getFullYear()} Grow Labs, Inc.</div>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-foreground">Privacy</a>
-            <a href="#" className="hover:text-foreground">Terms</a>
-            <a href="#" className="hover:text-foreground">Security</a>
+            <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
+            <Link to="/terms" className="hover:text-foreground">Terms</Link>
+            <Link to="/security" className="hover:text-foreground">Security</Link>
           </div>
         </div>
       </div>
