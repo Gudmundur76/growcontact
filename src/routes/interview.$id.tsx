@@ -231,6 +231,66 @@ function LiveInterviewPage() {
       setBusy(null);
     }
   }
+
+  // Keyboard shortcuts: Cmd/Ctrl+K → suggest follow-ups
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        if (busy === null && !completedRef.current) void onSuggest();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busy]);
+
+  function jumpToLatest() {
+    transcriptEnd.current?.scrollIntoView({ behavior: "smooth" });
+    setShowJumpToLatest(false);
+  }
+
+  function startEdit() {
+    if (!scorecard) return;
+    setDraft(JSON.parse(JSON.stringify(scorecard)) as ScorecardRow);
+    setEditing(true);
+  }
+  function cancelEdit() {
+    setEditing(false);
+    setDraft(null);
+  }
+  async function saveEdit() {
+    if (!draft) return;
+    setSavingEdit(true);
+    try {
+      const { data: { session: s } } = await supabase.auth.getSession();
+      const comps = asCompetencies(draft.competencies);
+      await updateScorecard({
+        data: {
+          sessionId: id,
+          summary: draft.summary,
+          overall_rating: draft.overall_rating,
+          recommendation: (draft.recommendation as
+            | "strong_hire" | "hire" | "no_hire" | "strong_no_hire" | "more_info"
+            | null) ?? null,
+          strengths: asArray(draft.strengths).map((x) => x.trim()).filter(Boolean),
+          concerns: asArray(draft.concerns).map((x) => x.trim()).filter(Boolean),
+          competencies: comps.map((c) => ({ name: c.name, rating: c.rating, notes: c.notes })),
+          follow_ups: asArray(draft.follow_ups).map((x) => x.trim()).filter(Boolean),
+        },
+        headers: s?.access_token ? { Authorization: `Bearer ${s.access_token}` } : undefined,
+      });
+      setScorecard(draft);
+      setEditing(false);
+      setDraft(null);
+      toast.success("Scorecard saved");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to save");
+    } finally {
+      setSavingEdit(false);
+    }
+  }
+
   async function onEnd() {
     setBusy("end");
     try {
