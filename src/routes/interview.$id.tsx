@@ -278,7 +278,12 @@ function LiveInterviewPage() {
             | null) ?? null,
           strengths: asArray(draft.strengths).map((x) => x.trim()).filter(Boolean),
           concerns: asArray(draft.concerns).map((x) => x.trim()).filter(Boolean),
-          competencies: comps.map((c) => ({ name: c.name, rating: c.rating, notes: c.notes })),
+          competencies: comps.map((c) => ({
+            name: c.name,
+            rating: c.rating,
+            notes: c.notes,
+            evidence: c.evidence.map((e) => e.trim()).filter(Boolean).slice(0, 5),
+          })),
           follow_ups: asArray(draft.follow_ups).map((x) => x.trim()).filter(Boolean),
         },
         headers: s?.access_token ? { Authorization: `Bearer ${s.access_token}` } : undefined,
