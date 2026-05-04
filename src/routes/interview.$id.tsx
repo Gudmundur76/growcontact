@@ -84,6 +84,7 @@ function asCompetencies(x: unknown): { name: string; rating: number; notes: stri
       name: String(c.name ?? ""),
       rating: Number(c.rating ?? 0),
       notes: String(c.notes ?? ""),
+      evidence: Array.isArray(c.evidence) ? (c.evidence as unknown[]).map((e) => String(e)) : [],
     }));
 }
 
