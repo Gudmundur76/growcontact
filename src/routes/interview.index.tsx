@@ -5,8 +5,14 @@ import { Footer } from "@/components/landing/Footer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Video, Trash2 } from "lucide-react";
-import { deleteSession } from "@/server/interviews.functions";
+import { Plus, Video, Trash2, Archive, ArchiveRestore, RotateCcw } from "lucide-react";
+import {
+  deleteSession,
+  listSessions,
+  restoreSession,
+  setSessionArchived,
+} from "@/server/interviews.functions";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 type Session = {
@@ -16,6 +22,8 @@ type Session = {
   meeting_platform: string;
   status: string;
   created_at: string;
+  archived: boolean;
+  deleted_at: string | null;
 };
 
 export const Route = createFileRoute("/interview/")({
@@ -65,6 +73,11 @@ function InterviewListPage() {
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
+  const [scope, setScope] = useState<"active" | "archived" | "trash">("active");
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [q, setQ] = useState("");
+  const pageSize = 20;
 
   useEffect(() => {
     if (authLoading) return;
@@ -72,32 +85,71 @@ function InterviewListPage() {
       navigate({ to: "/login" });
       return;
     }
+    setLoading(true);
     (async () => {
-      const { data } = await supabase
-        .from("interview_sessions")
-        .select("id, candidate_name, role_title, meeting_platform, status, created_at")
-        .order("created_at", { ascending: false });
-      setSessions((data ?? []) as Session[]);
-      setLoading(false);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const r = await listSessions({
+          data: { page, pageSize, scope, q: q || undefined },
+          headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
+        });
+        setSessions(r.rows as Session[]);
+        setTotal(r.total);
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Failed to load");
+      } finally {
+        setLoading(false);
+      }
     })();
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, navigate, page, scope, q]);
+
+  async function authedHeaders() {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined;
+  }
 
   async function onDelete(e: React.MouseEvent, sid: string) {
     e.preventDefault();
     e.stopPropagation();
-    if (!confirm("Delete this interview and all its transcripts?")) return;
+    const isTrash = scope === "trash";
+    if (!confirm(isTrash ? "Move to trash (recoverable for 30 days)?" : "Move to trash?")) return;
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      await deleteSession({
-        data: { sessionId: sid },
-        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
-      });
+      await deleteSession({ data: { sessionId: sid }, headers: await authedHeaders() });
       setSessions((prev) => prev.filter((s) => s.id !== sid));
-      toast.success("Interview deleted");
+      toast.success("Moved to trash");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed");
     }
   }
+
+  async function onRestore(e: React.MouseEvent, sid: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await restoreSession({ data: { sessionId: sid }, headers: await authedHeaders() });
+      setSessions((prev) => prev.filter((s) => s.id !== sid));
+      toast.success("Restored");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed");
+    }
+  }
+
+  async function onToggleArchive(e: React.MouseEvent, sid: string, archived: boolean) {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await setSessionArchived({
+        data: { sessionId: sid, archived: !archived },
+        headers: await authedHeaders(),
+      });
+      setSessions((prev) => prev.filter((s) => s.id !== sid));
+      toast.success(archived ? "Unarchived" : "Archived");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed");
+    }
+  }
+
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
     <div className="min-h-screen bg-background">
@@ -126,19 +178,45 @@ function InterviewListPage() {
           </Link>
         </div>
 
-        <div className="mt-10 rounded-xl border bg-card">
+        <div className="mt-8 flex flex-wrap items-center gap-2">
+          <div className="inline-flex rounded-md border bg-card p-0.5 text-sm">
+            {(["active", "archived", "trash"] as const).map((s) => (
+              <button
+                key={s}
+                onClick={() => { setScope(s); setPage(0); }}
+                className={`rounded px-3 py-1 capitalize ${scope === s ? "bg-muted font-medium" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+          <Input
+            value={q}
+            onChange={(e) => { setPage(0); setQ(e.target.value); }}
+            placeholder="Search candidate or role…"
+            className="ml-auto max-w-xs"
+          />
+        </div>
+
+        <div className="mt-4 rounded-xl border bg-card">
           {loading ? (
             <div className="p-10 text-center text-muted-foreground">Loading…</div>
           ) : sessions.length === 0 ? (
             <div className="flex flex-col items-center gap-3 p-16 text-center">
               <Video className="size-8 text-muted-foreground" />
-              <p className="text-lg">No interviews yet</p>
-              <p className="text-sm text-muted-foreground">
-                Start by dispatching a copilot bot to your next interview.
+              <p className="text-lg">
+                {scope === "active" ? "No interviews yet" : scope === "archived" ? "Nothing archived" : "Trash is empty"}
               </p>
-              <Button asChild className="mt-2">
-                <Link to="/interview/new">Start your first interview</Link>
-              </Button>
+              <p className="text-sm text-muted-foreground">
+                {scope === "active"
+                  ? "Start by dispatching a copilot bot to your next interview."
+                  : "Items here won't appear in your active list."}
+              </p>
+              {scope === "active" && (
+                <Button asChild className="mt-2">
+                  <Link to="/interview/new">Start your first interview</Link>
+                </Button>
+              )}
             </div>
           ) : (
             <ul className="divide-y">
@@ -162,20 +240,53 @@ function InterviewListPage() {
                       </span>
                     </div>
                   </Link>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="mr-2 opacity-0 group-hover:opacity-100"
-                    aria-label="Delete interview"
-                    onClick={(e) => onDelete(e, s.id)}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
+                  <div className="mr-2 flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                    {scope === "trash" ? (
+                      <Button variant="ghost" size="icon" aria-label="Restore" onClick={(e) => onRestore(e, s.id)}>
+                        <RotateCcw className="size-4" />
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={s.archived ? "Unarchive" : "Archive"}
+                          onClick={(e) => onToggleArchive(e, s.id, s.archived)}
+                        >
+                          {s.archived ? <ArchiveRestore className="size-4" /> : <Archive className="size-4" />}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Delete interview"
+                          onClick={(e) => onDelete(e, s.id)}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>
           )}
         </div>
+
+        {total > pageSize && (
+          <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+            <div>
+              Page {page + 1} of {totalPages} · {total} total
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>
+                Previous
+              </Button>
+              <Button variant="outline" size="sm" disabled={page + 1 >= totalPages} onClick={() => setPage((p) => p + 1)}>
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </main>
       <Footer />
     </div>
