@@ -829,7 +829,8 @@ function ScorecardEditor({
         <div className="mb-2 text-sm font-semibold">Competencies</div>
         <ul className="space-y-2">
           {comps.map((c, i) => (
-            <li key={i} className="grid grid-cols-[1fr_80px_1fr_auto] items-start gap-2">
+            <li key={i} className="space-y-2 rounded-md border p-2">
+              <div className="grid grid-cols-[1fr_80px_1fr_auto] items-start gap-2">
               <Input
                 value={c.name}
                 onChange={(e) => {
@@ -865,6 +866,21 @@ function ScorecardEditor({
               >
                 Remove
               </Button>
+              </div>
+              <Textarea
+                value={c.evidence.join("\n")}
+                onChange={(e) => {
+                  const next = [...comps];
+                  next[i] = {
+                    ...c,
+                    evidence: e.target.value.split("\n").map((s) => s.slice(0, 400)),
+                  };
+                  update({ competencies: next });
+                }}
+                rows={2}
+                placeholder="Evidence quotes (one per line)"
+                className="text-xs"
+              />
             </li>
           ))}
         </ul>
@@ -873,7 +889,12 @@ function ScorecardEditor({
           size="sm"
           className="mt-2"
           onClick={() =>
-            update({ competencies: [...comps, { name: "New competency", rating: 3, notes: "" }] })
+            update({
+              competencies: [
+                ...comps,
+                { name: "New competency", rating: 3, notes: "", evidence: [] },
+              ],
+            })
           }
         >
           <Plus className="size-4" /> Add competency
