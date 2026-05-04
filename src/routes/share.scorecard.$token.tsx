@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Footer } from "@/components/landing/Footer";
+import { Button } from "@/components/ui/button";
+import { Printer } from "lucide-react";
 
 type Card = {
   summary: string;
@@ -92,6 +94,11 @@ function SharedScorecard() {
             Interviewed {new Date(data.ended_at).toLocaleDateString()}
           </p>
         )}
+        <div className="mt-4 print:hidden">
+          <Button variant="outline" size="sm" onClick={() => window.print()}>
+            <Printer className="size-4" /> Print / Save as PDF
+          </Button>
+        </div>
 
         <section className="mt-8 rounded-xl border bg-card p-6">
           <div className="grid gap-6 md:grid-cols-[200px_1fr]">
