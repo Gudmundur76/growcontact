@@ -11,6 +11,7 @@ import {
   generateLiveSuggestionsFn,
   setSessionShare,
   addManualTranscript,
+  addBulkTranscript,
 } from "@/server/interviews.functions";
 import { toast } from "sonner";
 import {
@@ -95,6 +96,9 @@ function LiveInterviewPage() {
   const [manualSpeaker, setManualSpeaker] = useState("Candidate");
   const [manualText, setManualText] = useState("");
   const [addingTranscript, setAddingTranscript] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkText, setBulkText] = useState("");
+  const [bulkBusy, setBulkBusy] = useState(false);
   const transcriptEnd = useRef<HTMLDivElement>(null);
 
   const transcript = useMemo(() => events.filter((e) => e.kind === "transcript"), [events]);
@@ -266,6 +270,25 @@ function LiveInterviewPage() {
       toast.error(e instanceof Error ? e.message : "Failed to add line");
     } finally {
       setAddingTranscript(false);
+    }
+  }
+
+  async function onBulkPaste() {
+    if (!bulkText.trim()) return;
+    setBulkBusy(true);
+    try {
+      const { data: { session: s } } = await supabase.auth.getSession();
+      const r = await addBulkTranscript({
+        data: { sessionId: id, text: bulkText },
+        headers: s?.access_token ? { Authorization: `Bearer ${s.access_token}` } : undefined,
+      });
+      toast.success(`Imported ${r.count} lines`);
+      setBulkText("");
+      setBulkOpen(false);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed");
+    } finally {
+      setBulkBusy(false);
     }
   }
 
