@@ -9,7 +9,8 @@ import {
   endInterview,
   finalizeScorecard,
   generateLiveSuggestionsFn,
-  setSessionShare,
+  setSessionShareV2,
+  updateScorecard,
   addManualTranscript,
   addBulkTranscript,
 } from "@/server/interviews.functions";
@@ -26,6 +27,8 @@ import {
   Download,
   Zap,
   Plus,
+  Pencil,
+  RefreshCw,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,6 +43,7 @@ type SessionRow = {
   status: string;
   recall_bot_id: string | null;
   share_token?: string | null;
+  share_expires_at?: string | null;
 };
 type EventRow = {
   id: string;
@@ -99,7 +103,13 @@ function LiveInterviewPage() {
   const [bulkOpen, setBulkOpen] = useState(false);
   const [bulkText, setBulkText] = useState("");
   const [bulkBusy, setBulkBusy] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<ScorecardRow | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [showJumpToLatest, setShowJumpToLatest] = useState(false);
   const transcriptEnd = useRef<HTMLDivElement>(null);
+  const transcriptScroll = useRef<HTMLDivElement>(null);
+  const completedRef = useRef(false);
 
   const transcript = useMemo(() => events.filter((e) => e.kind === "transcript"), [events]);
   const suggestions = useMemo(() => events.filter((e) => e.kind === "suggestion"), [events]);
@@ -119,7 +129,7 @@ function LiveInterviewPage() {
         supabase
           .from("interview_sessions")
           .select(
-            "id, candidate_name, role_title, job_description, meeting_url, meeting_platform, status, recall_bot_id, share_token",
+            "id, candidate_name, role_title, job_description, meeting_url, meeting_platform, status, recall_bot_id, share_token, share_expires_at",
           )
           .eq("id", id)
           .maybeSingle(),
@@ -170,9 +180,20 @@ function LiveInterviewPage() {
     };
   }, [id, user]);
 
-  // Auto-scroll transcript
+  // Auto-scroll transcript when user is near bottom; otherwise show jump pill
   useEffect(() => {
-    transcriptEnd.current?.scrollIntoView({ behavior: "smooth" });
+    const el = transcriptScroll.current;
+    if (!el) {
+      transcriptEnd.current?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    if (nearBottom) {
+      transcriptEnd.current?.scrollIntoView({ behavior: "smooth" });
+      setShowJumpToLatest(false);
+    } else {
+      setShowJumpToLatest(true);
+    }
   }, [transcript.length]);
 
   // Auto-suggestions every 60s while toggled on and the call is live
@@ -238,15 +259,15 @@ function LiveInterviewPage() {
     const enabled = !session?.share_token;
     try {
       const { data: { session: s } } = await supabase.auth.getSession();
-      const r = await setSessionShare({
-        data: { sessionId: id, enabled },
+      const r = await setSessionShareV2({
+        data: { sessionId: id, enabled, expiresInDays: 14 },
         headers: s?.access_token ? { Authorization: `Bearer ${s.access_token}` } : undefined,
       });
-      setSession((prev) => (prev ? { ...prev, share_token: r.token } : prev));
+      setSession((prev) => (prev ? { ...prev, share_token: r.token, share_expires_at: r.expiresAt } : prev));
       if (r.token) {
         const url = `${window.location.origin}/share/scorecard/${r.token}`;
         await navigator.clipboard.writeText(url).catch(() => {});
-        toast.success("Share link copied", { description: url });
+        toast.success("Share link copied (expires in 14 days)", { description: url });
       } else {
         toast.success("Share link revoked");
       }
