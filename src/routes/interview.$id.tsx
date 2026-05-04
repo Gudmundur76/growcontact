@@ -10,6 +10,7 @@ import {
   finalizeScorecard,
   generateLiveSuggestionsFn,
   setSessionShare,
+  addManualTranscript,
 } from "@/server/interviews.functions";
 import { toast } from "sonner";
 import {
@@ -23,7 +24,10 @@ import {
   Copy,
   Download,
   Zap,
+  Plus,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 type SessionRow = {
   id: string;
@@ -88,6 +92,9 @@ function LiveInterviewPage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<"end" | "finalize" | "suggest" | null>(null);
   const [autoSuggest, setAutoSuggest] = useState(false);
+  const [manualSpeaker, setManualSpeaker] = useState("Candidate");
+  const [manualText, setManualText] = useState("");
+  const [addingTranscript, setAddingTranscript] = useState(false);
   const transcriptEnd = useRef<HTMLDivElement>(null);
 
   const transcript = useMemo(() => events.filter((e) => e.kind === "transcript"), [events]);
@@ -244,6 +251,24 @@ function LiveInterviewPage() {
     }
   }
 
+  async function onAddManual(e: React.FormEvent) {
+    e.preventDefault();
+    if (!manualText.trim()) return;
+    setAddingTranscript(true);
+    try {
+      const { data: { session: s } } = await supabase.auth.getSession();
+      await addManualTranscript({
+        data: { sessionId: id, speaker: manualSpeaker.trim() || "Speaker", content: manualText.trim() },
+        headers: s?.access_token ? { Authorization: `Bearer ${s.access_token}` } : undefined,
+      });
+      setManualText("");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to add line");
+    } finally {
+      setAddingTranscript(false);
+    }
+  }
+
   function buildMarkdown(): string {
     if (!session || !scorecard) return "";
     const lines: string[] = [];
@@ -388,6 +413,31 @@ function LiveInterviewPage() {
               )}
               <div ref={transcriptEnd} />
             </div>
+            {!completed && (
+              <form
+                onSubmit={onAddManual}
+                className="flex flex-col gap-2 border-t bg-background/40 p-3 sm:flex-row"
+              >
+                <Input
+                  value={manualSpeaker}
+                  onChange={(e) => setManualSpeaker(e.target.value)}
+                  className="sm:w-32"
+                  placeholder="Speaker"
+                  maxLength={120}
+                />
+                <Textarea
+                  value={manualText}
+                  onChange={(e) => setManualText(e.target.value)}
+                  placeholder="Paste or type a transcript line… (use this if no bot is running)"
+                  rows={2}
+                  maxLength={8000}
+                  className="flex-1"
+                />
+                <Button type="submit" size="sm" disabled={addingTranscript || !manualText.trim()}>
+                  <Plus className="size-4" /> Add
+                </Button>
+              </form>
+            )}
           </section>
 
           <aside className="space-y-6">

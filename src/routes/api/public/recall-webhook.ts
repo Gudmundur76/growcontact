@@ -10,15 +10,15 @@ export const Route = createFileRoute("/api/public/recall-webhook")({
         const sessionId = url.searchParams.get("session_id");
         const rawBody = await request.text();
 
-        // Signature verification (skipped only if no secret is configured yet,
-        // so the user can wire things up before adding the webhook secret).
-        if (process.env.RECALL_WEBHOOK_SECRET) {
-          const sig =
-            request.headers.get("x-recall-signature") ??
-            request.headers.get("svix-signature");
-          if (!verifyRecallSignature(rawBody, sig)) {
-            return new Response("Invalid signature", { status: 401 });
-          }
+        // Fail closed: require a configured webhook secret AND a valid signature.
+        if (!process.env.RECALL_WEBHOOK_SECRET) {
+          return new Response("Webhook secret not configured", { status: 503 });
+        }
+        const sig =
+          request.headers.get("x-recall-signature") ??
+          request.headers.get("svix-signature");
+        if (!verifyRecallSignature(rawBody, sig)) {
+          return new Response("Invalid signature", { status: 401 });
         }
 
         if (!sessionId) return new Response("Missing session_id", { status: 400 });
