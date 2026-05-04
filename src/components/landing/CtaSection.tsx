@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 
 export function CtaSection() {
@@ -20,8 +21,12 @@ export function CtaSection() {
             Start a 14-day trial. No credit card. Cancel anytime.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button variant="hero">Start free trial</Button>
-            <Button variant="heroSecondary">Book a demo</Button>
+            <Button asChild variant="hero">
+              <Link to="/signup">Start free trial</Link>
+            </Button>
+            <Button asChild variant="heroSecondary">
+              <Link to="/pricing">See pricing</Link>
+            </Button>
           </div>
         </div>
       </div>

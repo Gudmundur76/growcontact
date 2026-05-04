@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -60,9 +61,9 @@ export function Navbar() {
   return (
     <>
       <nav className="w-full py-5 px-8 flex flex-row justify-between items-center relative z-20">
-        <a href="/" className="flex items-center">
+        <Link to="/" className="flex items-center">
           <img src={logo} alt="Logo" className="h-8 w-auto" width={32} height={32} />
-        </a>
+        </Link>
         <div className="hidden md:flex items-center gap-1">
           <NavDropdown label="Features" items={featuresItems} />
           {simpleItems.map((label) => (
@@ -75,8 +76,8 @@ export function Navbar() {
           ))}
           <NavDropdown label="Learning" items={learningItems} />
         </div>
-        <Button variant="heroSecondary" size="sm" className="rounded-full px-4 py-2">
-          Sign Up
+        <Button asChild variant="heroSecondary" size="sm" className="rounded-full px-4 py-2">
+          <Link to="/signup">Sign Up</Link>
         </Button>
       </nav>
       <div className="mt-[3px] w-full h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
