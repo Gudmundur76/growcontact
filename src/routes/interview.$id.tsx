@@ -440,7 +440,29 @@ function LiveInterviewPage() {
 
         {scorecard && (
           <section className="mt-10 rounded-xl border bg-card p-6">
-            <h2 className="text-2xl font-medium tracking-tight">Scorecard</h2>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-2xl font-medium tracking-tight">Scorecard</h2>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={onToggleShare}>
+                  <Share2 className="size-4" />
+                  {session.share_token ? "Revoke share link" : "Share link"}
+                </Button>
+                <Button variant="outline" size="sm" onClick={onCopyMarkdown}>
+                  <Copy className="size-4" /> Copy Markdown
+                </Button>
+                <Button variant="outline" size="sm" onClick={onDownloadMarkdown}>
+                  <Download className="size-4" /> Download .md
+                </Button>
+              </div>
+            </div>
+            {session.share_token && (
+              <p className="mt-2 break-all text-xs text-muted-foreground">
+                Public link:{" "}
+                <span className="text-primary">
+                  {`${typeof window !== "undefined" ? window.location.origin : ""}/share/scorecard/${session.share_token}`}
+                </span>
+              </p>
+            )}
             <div className="mt-4 grid gap-6 md:grid-cols-[200px_1fr]">
               <div>
                 <div className="text-5xl font-semibold">{scorecard.overall_rating ?? "—"}/5</div>
