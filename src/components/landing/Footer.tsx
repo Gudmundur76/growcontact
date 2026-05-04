@@ -2,7 +2,14 @@ import { Link } from "@tanstack/react-router";
 
 type FooterLink = {
   label: string;
-  to?: "/" | "/about" | "/pricing" | "/signup" | "/customers" | "/careers";
+  to?:
+    | "/"
+    | "/about"
+    | "/pricing"
+    | "/signup"
+    | "/customers"
+    | "/careers"
+    | "/blog";
 };
 
 const columns: { title: string; links: FooterLink[] }[] = [
@@ -28,9 +35,9 @@ const columns: { title: string; links: FooterLink[] }[] = [
     title: "Resources",
     links: [
       { label: "Docs" },
+      { label: "Blog", to: "/blog" },
       { label: "Hiring playbook" },
       { label: "Talent benchmarks" },
-      { label: "Support" },
     ],
   },
 ];
