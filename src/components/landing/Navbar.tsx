@@ -20,6 +20,7 @@ import { toast } from "sonner";
 type NavTo = "/pricing" | "/customers" | "/blog" | "/about" | "/careers";
 
 const links: { label: string; to: NavTo }[] = [
+  { label: "Interview Copilot", to: "/interview-copilot" as NavTo },
   { label: "Pricing", to: "/pricing" },
   { label: "Customers", to: "/customers" },
   { label: "Blog", to: "/blog" },

@@ -108,7 +108,7 @@ function LiveInterviewPage() {
         supabase
           .from("interview_sessions")
           .select(
-            "id, candidate_name, role_title, job_description, meeting_url, meeting_platform, status, recall_bot_id",
+            "id, candidate_name, role_title, job_description, meeting_url, meeting_platform, status, recall_bot_id, share_token",
           )
           .eq("id", id)
           .maybeSingle(),

@@ -98,6 +98,14 @@ function InterviewListPage() {
             </Link>
           </Button>
         </div>
+        <div className="mt-3">
+          <Link
+            to="/interview/rubrics"
+            className="text-sm text-primary hover:underline"
+          >
+            Manage rubrics →
+          </Link>
+        </div>
 
         <div className="mt-10 rounded-xl border bg-card">
           {loading ? (
