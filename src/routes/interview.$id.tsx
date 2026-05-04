@@ -527,7 +527,7 @@ function LiveInterviewPage() {
               <CircleDot className={`size-3 ${inCall ? "text-emerald-500" : "text-muted-foreground"}`} />
               Live transcript
             </header>
-            <div className="max-h-[60vh] space-y-3 overflow-y-auto p-4">
+            <div ref={transcriptScroll} className="relative max-h-[60vh] space-y-3 overflow-y-auto p-4">
               {transcript.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
                   Waiting for the bot to join and start transcribing…
@@ -542,6 +542,14 @@ function LiveInterviewPage() {
               )}
               <div ref={transcriptEnd} />
             </div>
+            {showJumpToLatest && (
+              <button
+                onClick={jumpToLatest}
+                className="pointer-events-auto mx-auto -mt-10 mb-2 block rounded-full border bg-background/90 px-3 py-1 text-xs shadow-sm hover:bg-background"
+              >
+                Jump to latest ↓
+              </button>
+            )}
             {!completed && (
               <form
                 onSubmit={onAddManual}
@@ -557,7 +565,13 @@ function LiveInterviewPage() {
                 <Textarea
                   value={manualText}
                   onChange={(e) => setManualText(e.target.value)}
-                  placeholder="Paste or type a transcript line… (use this if no bot is running)"
+                  onKeyDown={(e) => {
+                    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                      e.preventDefault();
+                      void onAddManual(e as unknown as React.FormEvent);
+                    }
+                  }}
+                  placeholder="Paste or type a transcript line… (⌘↵ to add, no bot needed)"
                   rows={2}
                   maxLength={8000}
                   className="flex-1"
@@ -622,6 +636,26 @@ function LiveInterviewPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-2xl font-medium tracking-tight">Scorecard</h2>
               <div className="flex flex-wrap gap-2">
+                {!editing && (
+                  <>
+                    <Button variant="outline" size="sm" onClick={onFinalize} disabled={busy !== null}>
+                      <RefreshCw className="size-4" /> {busy === "finalize" ? "Regenerating…" : "Regenerate"}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={startEdit}>
+                      <Pencil className="size-4" /> Edit
+                    </Button>
+                  </>
+                )}
+                {editing && (
+                  <>
+                    <Button size="sm" onClick={saveEdit} disabled={savingEdit}>
+                      {savingEdit ? "Saving…" : "Save"}
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={cancelEdit} disabled={savingEdit}>
+                      Cancel
+                    </Button>
+                  </>
+                )}
                 <Button variant="outline" size="sm" onClick={onToggleShare}>
                   <Share2 className="size-4" />
                   {session.share_token ? "Revoke share link" : "Share link"}
@@ -640,60 +674,246 @@ function LiveInterviewPage() {
                 <span className="text-primary">
                   {`${typeof window !== "undefined" ? window.location.origin : ""}/share/scorecard/${session.share_token}`}
                 </span>
+                {session.share_expires_at && (
+                  <span className="ml-2 text-muted-foreground">
+                    · expires {new Date(session.share_expires_at).toLocaleDateString()}
+                  </span>
+                )}
               </p>
             )}
-            <div className="mt-4 grid gap-6 md:grid-cols-[200px_1fr]">
-              <div>
-                <div className="text-5xl font-semibold">{scorecard.overall_rating ?? "—"}/5</div>
-                <div className="mt-1 text-sm capitalize text-muted-foreground">
-                  {(scorecard.recommendation ?? "").replace(/_/g, " ")}
-                </div>
-              </div>
-              <p className="text-sm leading-relaxed">{scorecard.summary}</p>
-            </div>
-
-            <div className="mt-6 grid gap-6 md:grid-cols-2">
-              <div>
-                <h3 className="text-sm font-semibold">Strengths</h3>
-                <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                  {asArray(scorecard.strengths).map((s, i) => <li key={i}>· {s}</li>)}
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold">Concerns</h3>
-                <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                  {asArray(scorecard.concerns).map((s, i) => <li key={i}>· {s}</li>)}
-                </ul>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <h3 className="text-sm font-semibold">Competencies</h3>
-              <ul className="mt-2 divide-y rounded-md border">
-                {asCompetencies(scorecard.competencies).map((c, i) => (
-                  <li key={i} className="flex items-start justify-between gap-4 p-3">
-                    <div>
-                      <div className="text-sm font-medium">{c.name}</div>
-                      <div className="text-xs text-muted-foreground">{c.notes}</div>
-                    </div>
-                    <div className="text-sm font-semibold">{c.rating}/5</div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {asArray(scorecard.follow_ups).length > 0 && (
-              <div className="mt-6">
-                <h3 className="text-sm font-semibold">Follow-up questions</h3>
-                <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                  {asArray(scorecard.follow_ups).map((s, i) => <li key={i}>· {s}</li>)}
-                </ul>
-              </div>
+            {editing && draft ? (
+              <ScorecardEditor draft={draft} setDraft={setDraft} />
+            ) : (
+              <ScorecardView card={scorecard} />
             )}
           </section>
         )}
       </main>
       <Footer />
+    </div>
+  );
+}
+
+function ScorecardView({ card }: { card: ScorecardRow }) {
+  return (
+    <>
+      <div className="mt-4 grid gap-6 md:grid-cols-[200px_1fr]">
+        <div>
+          <div className="text-5xl font-semibold">{card.overall_rating ?? "—"}/5</div>
+          <div className="mt-1 text-sm capitalize text-muted-foreground">
+            {(card.recommendation ?? "").replace(/_/g, " ")}
+          </div>
+        </div>
+        <p className="text-sm leading-relaxed">{card.summary}</p>
+      </div>
+      <div className="mt-6 grid gap-6 md:grid-cols-2">
+        <div>
+          <h3 className="text-sm font-semibold">Strengths</h3>
+          <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+            {asArray(card.strengths).map((s, i) => <li key={i}>· {s}</li>)}
+          </ul>
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold">Concerns</h3>
+          <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+            {asArray(card.concerns).map((s, i) => <li key={i}>· {s}</li>)}
+          </ul>
+        </div>
+      </div>
+      <div className="mt-6">
+        <h3 className="text-sm font-semibold">Competencies</h3>
+        <ul className="mt-2 divide-y rounded-md border">
+          {asCompetencies(card.competencies).map((c, i) => (
+            <li key={i} className="flex items-start justify-between gap-4 p-3">
+              <div>
+                <div className="text-sm font-medium">{c.name}</div>
+                <div className="text-xs text-muted-foreground">{c.notes}</div>
+              </div>
+              <div className="text-sm font-semibold">{c.rating}/5</div>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {asArray(card.follow_ups).length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold">Follow-up questions</h3>
+          <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+            {asArray(card.follow_ups).map((s, i) => <li key={i}>· {s}</li>)}
+          </ul>
+        </div>
+      )}
+    </>
+  );
+}
+
+function ScorecardEditor({
+  draft,
+  setDraft,
+}: {
+  draft: ScorecardRow;
+  setDraft: (c: ScorecardRow) => void;
+}) {
+  const update = (patch: Partial<ScorecardRow>) => setDraft({ ...draft, ...patch });
+  const strengths = asArray(draft.strengths);
+  const concerns = asArray(draft.concerns);
+  const followUps = asArray(draft.follow_ups);
+  const comps = asCompetencies(draft.competencies);
+  return (
+    <div className="mt-4 space-y-6">
+      <div className="grid gap-3 md:grid-cols-[200px_1fr]">
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-muted-foreground">Overall rating</label>
+          <Input
+            type="number"
+            min={1}
+            max={5}
+            value={draft.overall_rating ?? ""}
+            onChange={(e) => update({ overall_rating: e.target.value ? Number(e.target.value) : null })}
+          />
+          <label className="text-xs font-medium text-muted-foreground">Recommendation</label>
+          <select
+            value={draft.recommendation ?? ""}
+            onChange={(e) => update({ recommendation: e.target.value || null })}
+            className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+          >
+            <option value="">—</option>
+            <option value="strong_hire">strong hire</option>
+            <option value="hire">hire</option>
+            <option value="more_info">more info</option>
+            <option value="no_hire">no hire</option>
+            <option value="strong_no_hire">strong no hire</option>
+          </select>
+        </div>
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-muted-foreground">Summary</label>
+          <Textarea
+            value={draft.summary}
+            onChange={(e) => update({ summary: e.target.value })}
+            rows={5}
+            maxLength={8000}
+          />
+        </div>
+      </div>
+
+      <ListEditor
+        label="Strengths"
+        items={strengths}
+        onChange={(items) => update({ strengths: items })}
+      />
+      <ListEditor
+        label="Concerns"
+        items={concerns}
+        onChange={(items) => update({ concerns: items })}
+      />
+
+      <div>
+        <div className="mb-2 text-sm font-semibold">Competencies</div>
+        <ul className="space-y-2">
+          {comps.map((c, i) => (
+            <li key={i} className="grid grid-cols-[1fr_80px_1fr_auto] items-start gap-2">
+              <Input
+                value={c.name}
+                onChange={(e) => {
+                  const next = [...comps];
+                  next[i] = { ...c, name: e.target.value };
+                  update({ competencies: next });
+                }}
+              />
+              <Input
+                type="number"
+                min={1}
+                max={5}
+                value={c.rating}
+                onChange={(e) => {
+                  const next = [...comps];
+                  next[i] = { ...c, rating: Math.min(5, Math.max(1, Number(e.target.value) || 1)) };
+                  update({ competencies: next });
+                }}
+              />
+              <Input
+                value={c.notes}
+                onChange={(e) => {
+                  const next = [...comps];
+                  next[i] = { ...c, notes: e.target.value };
+                  update({ competencies: next });
+                }}
+                placeholder="Notes"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => update({ competencies: comps.filter((_, j) => j !== i) })}
+              >
+                Remove
+              </Button>
+            </li>
+          ))}
+        </ul>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-2"
+          onClick={() =>
+            update({ competencies: [...comps, { name: "New competency", rating: 3, notes: "" }] })
+          }
+        >
+          <Plus className="size-4" /> Add competency
+        </Button>
+      </div>
+
+      <ListEditor
+        label="Follow-up questions"
+        items={followUps}
+        onChange={(items) => update({ follow_ups: items })}
+      />
+    </div>
+  );
+}
+
+function ListEditor({
+  label,
+  items,
+  onChange,
+}: {
+  label: string;
+  items: string[];
+  onChange: (items: string[]) => void;
+}) {
+  return (
+    <div>
+      <div className="mb-2 text-sm font-semibold">{label}</div>
+      <ul className="space-y-2">
+        {items.map((s, i) => (
+          <li key={i} className="flex items-start gap-2">
+            <Textarea
+              value={s}
+              onChange={(e) => {
+                const next = [...items];
+                next[i] = e.target.value;
+                onChange(next);
+              }}
+              rows={2}
+              maxLength={500}
+              className="flex-1"
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onChange(items.filter((_, j) => j !== i))}
+            >
+              Remove
+            </Button>
+          </li>
+        ))}
+      </ul>
+      <Button
+        variant="outline"
+        size="sm"
+        className="mt-2"
+        onClick={() => onChange([...items, ""])}
+      >
+        <Plus className="size-4" /> Add
+      </Button>
     </div>
   );
 }
