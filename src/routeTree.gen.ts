@@ -17,6 +17,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as InterviewCopilotRouteImport } from './routes/interview-copilot'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as CustomersRouteImport } from './routes/customers'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -27,6 +28,7 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InterviewIndexRouteImport } from './routes/interview.index'
+import { Route as InterviewRubricsRouteImport } from './routes/interview.rubrics'
 import { Route as InterviewNewRouteImport } from './routes/interview.new'
 import { Route as InterviewIdRouteImport } from './routes/interview.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -82,6 +84,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InterviewCopilotRoute = InterviewCopilotRouteImport.update({
+  id: '/interview-copilot',
+  path: '/interview-copilot',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -130,6 +137,11 @@ const IndexRoute = IndexRouteImport.update({
 const InterviewIndexRoute = InterviewIndexRouteImport.update({
   id: '/interview/',
   path: '/interview/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InterviewRubricsRoute = InterviewRubricsRouteImport.update({
+  id: '/interview/rubrics',
+  path: '/interview/rubrics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InterviewNewRoute = InterviewNewRouteImport.update({
@@ -216,6 +228,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/customers': typeof CustomersRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/interview-copilot': typeof InterviewCopilotRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -229,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
+  '/interview/rubrics': typeof InterviewRubricsRoute
   '/interview/': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
@@ -250,6 +264,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/customers': typeof CustomersRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/interview-copilot': typeof InterviewCopilotRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -263,6 +278,7 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
+  '/interview/rubrics': typeof InterviewRubricsRoute
   '/interview': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
@@ -285,6 +301,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/customers': typeof CustomersRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/interview-copilot': typeof InterviewCopilotRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -298,6 +315,7 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
+  '/interview/rubrics': typeof InterviewRubricsRoute
   '/interview/': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
@@ -321,6 +339,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/customers'
     | '/forgot-password'
+    | '/interview-copilot'
     | '/login'
     | '/pricing'
     | '/privacy'
@@ -334,6 +353,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/interview/$id'
     | '/interview/new'
+    | '/interview/rubrics'
     | '/interview/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
@@ -355,6 +375,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/customers'
     | '/forgot-password'
+    | '/interview-copilot'
     | '/login'
     | '/pricing'
     | '/privacy'
@@ -368,6 +389,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/interview/$id'
     | '/interview/new'
+    | '/interview/rubrics'
     | '/interview'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
@@ -389,6 +411,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/customers'
     | '/forgot-password'
+    | '/interview-copilot'
     | '/login'
     | '/pricing'
     | '/privacy'
@@ -402,6 +425,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/interview/$id'
     | '/interview/new'
+    | '/interview/rubrics'
     | '/interview/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
@@ -424,6 +448,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CustomersRoute: typeof CustomersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  InterviewCopilotRoute: typeof InterviewCopilotRoute
   LoginRoute: typeof LoginRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -436,6 +461,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InterviewIdRoute: typeof InterviewIdRoute
   InterviewNewRoute: typeof InterviewNewRoute
+  InterviewRubricsRoute: typeof InterviewRubricsRoute
   InterviewIndexRoute: typeof InterviewIndexRoute
   ApiPublicContactRoute: typeof ApiPublicContactRoute
   ApiPublicRecallWebhookRoute: typeof ApiPublicRecallWebhookRoute
@@ -506,6 +532,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/interview-copilot': {
+      id: '/interview-copilot'
+      path: '/interview-copilot'
+      fullPath: '/interview-copilot'
+      preLoaderRoute: typeof InterviewCopilotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/forgot-password': {
       id: '/forgot-password'
       path: '/forgot-password'
@@ -574,6 +607,13 @@ declare module '@tanstack/react-router' {
       path: '/interview'
       fullPath: '/interview/'
       preLoaderRoute: typeof InterviewIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/interview/rubrics': {
+      id: '/interview/rubrics'
+      path: '/interview/rubrics'
+      fullPath: '/interview/rubrics'
+      preLoaderRoute: typeof InterviewRubricsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/interview/new': {
@@ -697,6 +737,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CustomersRoute: CustomersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  InterviewCopilotRoute: InterviewCopilotRoute,
   LoginRoute: LoginRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
@@ -709,6 +750,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InterviewIdRoute: InterviewIdRoute,
   InterviewNewRoute: InterviewNewRoute,
+  InterviewRubricsRoute: InterviewRubricsRoute,
   InterviewIndexRoute: InterviewIndexRoute,
   ApiPublicContactRoute: ApiPublicContactRoute,
   ApiPublicRecallWebhookRoute: ApiPublicRecallWebhookRoute,
