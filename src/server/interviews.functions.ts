@@ -351,6 +351,7 @@ export const addManualTranscript = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => ManualTranscriptSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    rateLimit(`manual:${userId}`, 60, 60_000);
     const { data: session } = await supabase
       .from("interview_sessions")
       .select("id, user_id, status")
@@ -384,6 +385,7 @@ export const addBulkTranscript = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => BulkSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    rateLimit(`bulk:${userId}`, 5, 60_000);
     const { data: session } = await supabase
       .from("interview_sessions")
       .select("id, user_id, status")
