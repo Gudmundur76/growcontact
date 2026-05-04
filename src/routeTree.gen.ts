@@ -30,6 +30,7 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminContactsRouteImport } from './routes/admin/contacts'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicRecallWebhookRouteImport } from './routes/api/public/recall-webhook'
 import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -142,6 +143,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRecallWebhookRoute = ApiPublicRecallWebhookRouteImport.update({
+  id: '/api/public/recall-webhook',
+  path: '/api/public/recall-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicContactRoute = ApiPublicContactRouteImport.update({
   id: '/api/public/contact',
   path: '/api/public/contact',
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -257,6 +265,7 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/api/public/contact'
+    | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/api/public/contact'
+    | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -346,6 +357,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/api/public/contact'
+    | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -375,6 +387,7 @@ export interface RootRouteChildren {
   AdminContactsRoute: typeof AdminContactsRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ApiPublicContactRoute: typeof ApiPublicContactRoute
+  ApiPublicRecallWebhookRoute: typeof ApiPublicRecallWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -532,6 +545,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/recall-webhook': {
+      id: '/api/public/recall-webhook'
+      path: '/api/public/recall-webhook'
+      fullPath: '/api/public/recall-webhook'
+      preLoaderRoute: typeof ApiPublicRecallWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/contact': {
       id: '/api/public/contact'
       path: '/api/public/contact'
@@ -608,6 +628,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminContactsRoute: AdminContactsRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ApiPublicContactRoute: ApiPublicContactRoute,
+  ApiPublicRecallWebhookRoute: ApiPublicRecallWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
