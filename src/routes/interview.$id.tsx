@@ -75,7 +75,9 @@ export const Route = createFileRoute("/interview/$id")({
 function asArray(x: unknown): string[] {
   return Array.isArray(x) ? x.map((v) => String(v)) : [];
 }
-function asCompetencies(x: unknown): { name: string; rating: number; notes: string }[] {
+function asCompetencies(
+  x: unknown,
+): { name: string; rating: number; notes: string; evidence: string[] }[] {
   if (!Array.isArray(x)) return [];
   return x
     .map((c) => (c && typeof c === "object" ? (c as Record<string, unknown>) : null))
