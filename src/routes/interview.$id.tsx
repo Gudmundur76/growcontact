@@ -9,6 +9,7 @@ import {
   endInterview,
   finalizeScorecard,
   generateLiveSuggestionsFn,
+  setSessionShare,
 } from "@/server/interviews.functions";
 import { toast } from "sonner";
 import {
@@ -18,6 +19,10 @@ import {
   StopCircle,
   FileText,
   ArrowLeft,
+  Share2,
+  Copy,
+  Download,
+  Zap,
 } from "lucide-react";
 
 type SessionRow = {
@@ -29,6 +34,7 @@ type SessionRow = {
   meeting_platform: string;
   status: string;
   recall_bot_id: string | null;
+  share_token?: string | null;
 };
 type EventRow = {
   id: string;
@@ -81,6 +87,7 @@ function LiveInterviewPage() {
   const [scorecard, setScorecard] = useState<ScorecardRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<"end" | "finalize" | "suggest" | null>(null);
+  const [autoSuggest, setAutoSuggest] = useState(false);
   const transcriptEnd = useRef<HTMLDivElement>(null);
 
   const transcript = useMemo(() => events.filter((e) => e.kind === "transcript"), [events]);
@@ -101,7 +108,7 @@ function LiveInterviewPage() {
         supabase
           .from("interview_sessions")
           .select(
-            "id, candidate_name, role_title, job_description, meeting_url, meeting_platform, status, recall_bot_id",
+            "id, candidate_name, role_title, job_description, meeting_url, meeting_platform, status, recall_bot_id, share_token",
           )
           .eq("id", id)
           .maybeSingle(),
@@ -157,6 +164,22 @@ function LiveInterviewPage() {
     transcriptEnd.current?.scrollIntoView({ behavior: "smooth" });
   }, [transcript.length]);
 
+  // Auto-suggestions every 60s while toggled on and the call is live
+  useEffect(() => {
+    if (!autoSuggest) return;
+    const tick = async () => {
+      try {
+        await callServer(generateLiveSuggestionsFn);
+      } catch (e) {
+        console.error("auto-suggest failed", e);
+      }
+    };
+    tick();
+    const handle = window.setInterval(tick, 60_000);
+    return () => window.clearInterval(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSuggest, id]);
+
   async function callServer<T>(fn: (args: { data: { sessionId: string }; headers?: Record<string, string> }) => Promise<T>) {
     const { data: { session: s } } = await supabase.auth.getSession();
     return fn({
@@ -198,6 +221,83 @@ function LiveInterviewPage() {
     } finally {
       setBusy(null);
     }
+  }
+
+  async function onToggleShare() {
+    const enabled = !session?.share_token;
+    try {
+      const { data: { session: s } } = await supabase.auth.getSession();
+      const r = await setSessionShare({
+        data: { sessionId: id, enabled },
+        headers: s?.access_token ? { Authorization: `Bearer ${s.access_token}` } : undefined,
+      });
+      setSession((prev) => (prev ? { ...prev, share_token: r.token } : prev));
+      if (r.token) {
+        const url = `${window.location.origin}/share/scorecard/${r.token}`;
+        await navigator.clipboard.writeText(url).catch(() => {});
+        toast.success("Share link copied", { description: url });
+      } else {
+        toast.success("Share link revoked");
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed");
+    }
+  }
+
+  function buildMarkdown(): string {
+    if (!session || !scorecard) return "";
+    const lines: string[] = [];
+    lines.push(`# Interview scorecard — ${session.candidate_name}`);
+    lines.push(`**Role:** ${session.role_title}`);
+    lines.push(
+      `**Overall:** ${scorecard.overall_rating ?? "—"}/5 · ${(scorecard.recommendation ?? "").replace(/_/g, " ")}`,
+    );
+    lines.push("");
+    lines.push("## Summary");
+    lines.push(scorecard.summary);
+    lines.push("");
+    const strengths = asArray(scorecard.strengths);
+    if (strengths.length) {
+      lines.push("## Strengths");
+      strengths.forEach((s) => lines.push(`- ${s}`));
+      lines.push("");
+    }
+    const concerns = asArray(scorecard.concerns);
+    if (concerns.length) {
+      lines.push("## Concerns");
+      concerns.forEach((s) => lines.push(`- ${s}`));
+      lines.push("");
+    }
+    const comps = asCompetencies(scorecard.competencies);
+    if (comps.length) {
+      lines.push("## Competencies");
+      comps.forEach((c) => lines.push(`- **${c.name}** — ${c.rating}/5 · ${c.notes}`));
+      lines.push("");
+    }
+    const fups = asArray(scorecard.follow_ups);
+    if (fups.length) {
+      lines.push("## Follow-up questions");
+      fups.forEach((s) => lines.push(`- ${s}`));
+    }
+    return lines.join("\n");
+  }
+
+  async function onCopyMarkdown() {
+    const md = buildMarkdown();
+    if (!md) return;
+    await navigator.clipboard.writeText(md);
+    toast.success("Markdown copied to clipboard");
+  }
+  function onDownloadMarkdown() {
+    const md = buildMarkdown();
+    if (!md || !session) return;
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${session.candidate_name.replace(/\s+/g, "_")}_scorecard.md`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   if (loading) {
@@ -246,6 +346,13 @@ function LiveInterviewPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Button
+              variant={autoSuggest ? "default" : "outline"}
+              onClick={() => setAutoSuggest((v) => !v)}
+              disabled={completed}
+            >
+              <Zap className="size-4" /> {autoSuggest ? "Auto-suggest on" : "Auto-suggest"}
+            </Button>
             <Button variant="outline" onClick={onSuggest} disabled={busy !== null}>
               <Sparkles className="size-4" /> {busy === "suggest" ? "Thinking…" : "Suggest follow-ups"}
             </Button>
@@ -333,7 +440,29 @@ function LiveInterviewPage() {
 
         {scorecard && (
           <section className="mt-10 rounded-xl border bg-card p-6">
-            <h2 className="text-2xl font-medium tracking-tight">Scorecard</h2>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-2xl font-medium tracking-tight">Scorecard</h2>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={onToggleShare}>
+                  <Share2 className="size-4" />
+                  {session.share_token ? "Revoke share link" : "Share link"}
+                </Button>
+                <Button variant="outline" size="sm" onClick={onCopyMarkdown}>
+                  <Copy className="size-4" /> Copy Markdown
+                </Button>
+                <Button variant="outline" size="sm" onClick={onDownloadMarkdown}>
+                  <Download className="size-4" /> Download .md
+                </Button>
+              </div>
+            </div>
+            {session.share_token && (
+              <p className="mt-2 break-all text-xs text-muted-foreground">
+                Public link:{" "}
+                <span className="text-primary">
+                  {`${typeof window !== "undefined" ? window.location.origin : ""}/share/scorecard/${session.share_token}`}
+                </span>
+              </p>
+            )}
             <div className="mt-4 grid gap-6 md:grid-cols-[200px_1fr]">
               <div>
                 <div className="text-5xl font-semibold">{scorecard.overall_rating ?? "—"}/5</div>

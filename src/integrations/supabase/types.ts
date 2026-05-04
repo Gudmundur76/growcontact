@@ -172,6 +172,42 @@ export type Database = {
           },
         ]
       }
+      interview_rubrics: {
+        Row: {
+          competencies: Json
+          created_at: string
+          focus: string | null
+          id: string
+          is_default: boolean
+          name: string
+          role_title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          competencies?: Json
+          created_at?: string
+          focus?: string | null
+          id?: string
+          is_default?: boolean
+          name: string
+          role_title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          competencies?: Json
+          created_at?: string
+          focus?: string | null
+          id?: string
+          is_default?: boolean
+          name?: string
+          role_title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       interview_scorecards: {
         Row: {
           competencies: Json
@@ -233,6 +269,8 @@ export type Database = {
           meeting_url: string
           recall_bot_id: string | null
           role_title: string
+          rubric_id: string | null
+          share_token: string | null
           started_at: string | null
           status: string
           updated_at: string
@@ -248,6 +286,8 @@ export type Database = {
           meeting_url: string
           recall_bot_id?: string | null
           role_title: string
+          rubric_id?: string | null
+          share_token?: string | null
           started_at?: string | null
           status?: string
           updated_at?: string
@@ -263,12 +303,22 @@ export type Database = {
           meeting_url?: string
           recall_bot_id?: string | null
           role_title?: string
+          rubric_id?: string | null
+          share_token?: string | null
           started_at?: string | null
           status?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "interview_sessions_rubric_id_fkey"
+            columns: ["rubric_id"]
+            isOneToOne: false
+            referencedRelation: "interview_rubrics"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

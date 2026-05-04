@@ -10,6 +10,7 @@ const StartSchema = z.object({
   roleTitle: z.string().min(1).max(200),
   jobDescription: z.string().max(20000).optional().nullable(),
   meetingUrl: z.string().url().max(2000),
+  rubricId: z.string().uuid().optional().nullable(),
 });
 
 export const startInterview = createServerFn({ method: "POST" })
@@ -30,6 +31,7 @@ export const startInterview = createServerFn({ method: "POST" })
         meeting_url: data.meetingUrl,
         meeting_platform: platform,
         status: "pending",
+        rubric_id: data.rubricId ?? null,
       })
       .select("id")
       .single();
@@ -117,10 +119,12 @@ export const finalizeScorecard = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: session } = await supabase
       .from("interview_sessions")
-      .select("id, user_id, candidate_name, role_title, job_description")
+      .select("id, user_id, candidate_name, role_title, job_description, rubric_id")
       .eq("id", data.sessionId)
       .maybeSingle();
     if (!session || session.user_id !== userId) throw new Error("Not found");
+
+    const rubric = await loadRubric(session.rubric_id);
 
     const { data: events } = await supabaseAdmin
       .from("interview_events")
@@ -139,6 +143,7 @@ export const finalizeScorecard = createServerFn({ method: "POST" })
       jobDescription: session.job_description,
       candidateName: session.candidate_name,
       transcript,
+      rubric,
     });
 
     await supabaseAdmin
@@ -167,10 +172,12 @@ export const generateLiveSuggestionsFn = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: session } = await supabase
       .from("interview_sessions")
-      .select("id, user_id, candidate_name, role_title, job_description")
+      .select("id, user_id, candidate_name, role_title, job_description, rubric_id")
       .eq("id", data.sessionId)
       .maybeSingle();
     if (!session || session.user_id !== userId) throw new Error("Not found");
+
+    const rubric = await loadRubric(session.rubric_id);
 
     const { data: events } = await supabaseAdmin
       .from("interview_events")
@@ -189,6 +196,7 @@ export const generateLiveSuggestionsFn = createServerFn({ method: "POST" })
       jobDescription: session.job_description,
       candidateName: session.candidate_name,
       transcriptSoFar: transcript,
+      rubric,
     });
 
     const rows = [
@@ -198,4 +206,117 @@ export const generateLiveSuggestionsFn = createServerFn({ method: "POST" })
     ];
     if (rows.length) await supabaseAdmin.from("interview_events").insert(rows);
     return { ok: true, ...result };
+  });
+
+// ---------- Rubric helpers ----------
+
+async function loadRubric(
+  rubricId: string | null | undefined,
+): Promise<{ name: string; focus: string | null; competencies: string[] } | null> {
+  if (!rubricId) return null;
+  const { data } = await supabaseAdmin
+    .from("interview_rubrics")
+    .select("name, focus, competencies")
+    .eq("id", rubricId)
+    .maybeSingle();
+  if (!data) return null;
+  const comps = Array.isArray(data.competencies)
+    ? (data.competencies as unknown[]).map((c) => String(c)).filter(Boolean)
+    : [];
+  return { name: data.name, focus: data.focus, competencies: comps };
+}
+
+// ---------- Rubric CRUD ----------
+
+const RubricUpsertSchema = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string().min(1).max(200),
+  roleTitle: z.string().max(200).optional().nullable(),
+  focus: z.string().max(2000).optional().nullable(),
+  competencies: z.array(z.string().min(1).max(120)).max(20),
+  isDefault: z.boolean().optional(),
+});
+
+export const upsertRubric = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => RubricUpsertSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    if (data.isDefault) {
+      await supabase
+        .from("interview_rubrics")
+        .update({ is_default: false })
+        .eq("user_id", userId);
+    }
+    const row = {
+      user_id: userId,
+      name: data.name,
+      role_title: data.roleTitle ?? null,
+      focus: data.focus ?? null,
+      competencies: data.competencies,
+      is_default: !!data.isDefault,
+    };
+    if (data.id) {
+      const { data: updated, error } = await supabase
+        .from("interview_rubrics")
+        .update(row)
+        .eq("id", data.id)
+        .select("id")
+        .single();
+      if (error) throw new Error(error.message);
+      return { id: updated.id };
+    }
+    const { data: inserted, error } = await supabase
+      .from("interview_rubrics")
+      .insert(row)
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { id: inserted.id };
+  });
+
+const IdSchema = z.object({ id: z.string().uuid() });
+
+export const deleteRubric = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => IdSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase.from("interview_rubrics").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// ---------- Sharing ----------
+
+function randomToken(): string {
+  const arr = new Uint8Array(24);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+const ShareSchema = z.object({
+  sessionId: z.string().uuid(),
+  enabled: z.boolean(),
+});
+
+export const setSessionShare = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ShareSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: session } = await supabase
+      .from("interview_sessions")
+      .select("id, user_id, share_token")
+      .eq("id", data.sessionId)
+      .maybeSingle();
+    if (!session || session.user_id !== userId) throw new Error("Not found");
+
+    const newToken = data.enabled ? session.share_token ?? randomToken() : null;
+    const { error } = await supabaseAdmin
+      .from("interview_sessions")
+      .update({ share_token: newToken })
+      .eq("id", session.id);
+    if (error) throw new Error(error.message);
+    return { token: newToken };
   });

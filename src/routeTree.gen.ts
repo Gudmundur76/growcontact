@@ -17,6 +17,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as InterviewCopilotRouteImport } from './routes/interview-copilot'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as CustomersRouteImport } from './routes/customers'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -27,11 +28,13 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InterviewIndexRouteImport } from './routes/interview.index'
+import { Route as InterviewRubricsRouteImport } from './routes/interview.rubrics'
 import { Route as InterviewNewRouteImport } from './routes/interview.new'
 import { Route as InterviewIdRouteImport } from './routes/interview.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminContactsRouteImport } from './routes/admin/contacts'
+import { Route as ShareScorecardTokenRouteImport } from './routes/share.scorecard.$token'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicRecallWebhookRouteImport } from './routes/api/public/recall-webhook'
 import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
@@ -40,6 +43,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicScorecardTokenRouteImport } from './routes/api/public/scorecard.$token'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -79,6 +83,11 @@ const PricingRoute = PricingRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InterviewCopilotRoute = InterviewCopilotRouteImport.update({
+  id: '/interview-copilot',
+  path: '/interview-copilot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -131,6 +140,11 @@ const InterviewIndexRoute = InterviewIndexRouteImport.update({
   path: '/interview/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InterviewRubricsRoute = InterviewRubricsRouteImport.update({
+  id: '/interview/rubrics',
+  path: '/interview/rubrics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InterviewNewRoute = InterviewNewRouteImport.update({
   id: '/interview/new',
   path: '/interview/new',
@@ -154,6 +168,11 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
 const AdminContactsRoute = AdminContactsRouteImport.update({
   id: '/admin/contacts',
   path: '/admin/contacts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShareScorecardTokenRoute = ShareScorecardTokenRouteImport.update({
+  id: '/share/scorecard/$token',
+  path: '/share/scorecard/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
@@ -199,6 +218,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicScorecardTokenRoute = ApiPublicScorecardTokenRouteImport.update({
+  id: '/api/public/scorecard/$token',
+  path: '/api/public/scorecard/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -210,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/customers': typeof CustomersRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/interview-copilot': typeof InterviewCopilotRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -223,10 +248,13 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
+  '/interview/rubrics': typeof InterviewRubricsRoute
   '/interview/': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/share/scorecard/$token': typeof ShareScorecardTokenRoute
+  '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -243,6 +271,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/customers': typeof CustomersRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/interview-copilot': typeof InterviewCopilotRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -256,10 +285,13 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
+  '/interview/rubrics': typeof InterviewRubricsRoute
   '/interview': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/share/scorecard/$token': typeof ShareScorecardTokenRoute
+  '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -277,6 +309,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/customers': typeof CustomersRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/interview-copilot': typeof InterviewCopilotRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -290,10 +323,13 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
+  '/interview/rubrics': typeof InterviewRubricsRoute
   '/interview/': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/share/scorecard/$token': typeof ShareScorecardTokenRoute
+  '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -312,6 +348,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/customers'
     | '/forgot-password'
+    | '/interview-copilot'
     | '/login'
     | '/pricing'
     | '/privacy'
@@ -325,10 +362,13 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/interview/$id'
     | '/interview/new'
+    | '/interview/rubrics'
     | '/interview/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
+    | '/share/scorecard/$token'
+    | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -345,6 +385,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/customers'
     | '/forgot-password'
+    | '/interview-copilot'
     | '/login'
     | '/pricing'
     | '/privacy'
@@ -358,10 +399,13 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/interview/$id'
     | '/interview/new'
+    | '/interview/rubrics'
     | '/interview'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
+    | '/share/scorecard/$token'
+    | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -378,6 +422,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/customers'
     | '/forgot-password'
+    | '/interview-copilot'
     | '/login'
     | '/pricing'
     | '/privacy'
@@ -391,10 +436,13 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/interview/$id'
     | '/interview/new'
+    | '/interview/rubrics'
     | '/interview/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
+    | '/share/scorecard/$token'
+    | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -412,6 +460,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CustomersRoute: typeof CustomersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  InterviewCopilotRoute: typeof InterviewCopilotRoute
   LoginRoute: typeof LoginRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -424,10 +473,13 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InterviewIdRoute: typeof InterviewIdRoute
   InterviewNewRoute: typeof InterviewNewRoute
+  InterviewRubricsRoute: typeof InterviewRubricsRoute
   InterviewIndexRoute: typeof InterviewIndexRoute
   ApiPublicContactRoute: typeof ApiPublicContactRoute
   ApiPublicRecallWebhookRoute: typeof ApiPublicRecallWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ShareScorecardTokenRoute: typeof ShareScorecardTokenRoute
+  ApiPublicScorecardTokenRoute: typeof ApiPublicScorecardTokenRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -491,6 +543,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/interview-copilot': {
+      id: '/interview-copilot'
+      path: '/interview-copilot'
+      fullPath: '/interview-copilot'
+      preLoaderRoute: typeof InterviewCopilotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -563,6 +622,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InterviewIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/interview/rubrics': {
+      id: '/interview/rubrics'
+      path: '/interview/rubrics'
+      fullPath: '/interview/rubrics'
+      preLoaderRoute: typeof InterviewRubricsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/interview/new': {
       id: '/interview/new'
       path: '/interview/new'
@@ -596,6 +662,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/contacts'
       fullPath: '/admin/contacts'
       preLoaderRoute: typeof AdminContactsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share/scorecard/$token': {
+      id: '/share/scorecard/$token'
+      path: '/share/scorecard/$token'
+      fullPath: '/share/scorecard/$token'
+      preLoaderRoute: typeof ShareScorecardTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/suppression': {
@@ -654,6 +727,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/scorecard/$token': {
+      id: '/api/public/scorecard/$token'
+      path: '/api/public/scorecard/$token'
+      fullPath: '/api/public/scorecard/$token'
+      preLoaderRoute: typeof ApiPublicScorecardTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -677,6 +757,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CustomersRoute: CustomersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  InterviewCopilotRoute: InterviewCopilotRoute,
   LoginRoute: LoginRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
@@ -689,10 +770,13 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InterviewIdRoute: InterviewIdRoute,
   InterviewNewRoute: InterviewNewRoute,
+  InterviewRubricsRoute: InterviewRubricsRoute,
   InterviewIndexRoute: InterviewIndexRoute,
   ApiPublicContactRoute: ApiPublicContactRoute,
   ApiPublicRecallWebhookRoute: ApiPublicRecallWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ShareScorecardTokenRoute: ShareScorecardTokenRoute,
+  ApiPublicScorecardTokenRoute: ApiPublicScorecardTokenRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,

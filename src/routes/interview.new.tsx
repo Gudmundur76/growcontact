@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
@@ -29,10 +29,26 @@ function NewInterviewPage() {
   const [jobDescription, setJobDescription] = useState("");
   const [meetingUrl, setMeetingUrl] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [rubrics, setRubrics] = useState<{ id: string; name: string; is_default: boolean }[]>([]);
+  const [rubricId, setRubricId] = useState<string>("");
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/login" });
   }, [authLoading, user, navigate]);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("interview_rubrics")
+        .select("id, name, is_default")
+        .order("created_at", { ascending: false });
+      const list = (data ?? []) as { id: string; name: string; is_default: boolean }[];
+      setRubrics(list);
+      const def = list.find((r) => r.is_default);
+      if (def) setRubricId(def.id);
+    })();
+  }, [user]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -45,6 +61,7 @@ function NewInterviewPage() {
           roleTitle,
           jobDescription: jobDescription || null,
           meetingUrl,
+          rubricId: rubricId || null,
         },
         headers: session?.access_token
           ? { Authorization: `Bearer ${session.access_token}` }
@@ -110,6 +127,28 @@ function NewInterviewPage() {
               onChange={(e) => setJobDescription(e.target.value)}
               placeholder="Paste the JD or rubric. The copilot uses this to calibrate suggestions."
             />
+          </div>
+          <div className="grid gap-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="rubric">Rubric (optional)</Label>
+              <Link to="/interview/rubrics" className="text-xs text-primary hover:underline">
+                Manage rubrics →
+              </Link>
+            </div>
+            <select
+              id="rubric"
+              value={rubricId}
+              onChange={(e) => setRubricId(e.target.value)}
+              className="h-10 rounded-md border bg-background px-3 text-sm"
+            >
+              <option value="">No rubric</option>
+              {rubrics.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                  {r.is_default ? " · default" : ""}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="url">Meeting link</Label>
