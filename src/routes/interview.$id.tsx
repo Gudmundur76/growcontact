@@ -413,6 +413,31 @@ function LiveInterviewPage() {
               )}
               <div ref={transcriptEnd} />
             </div>
+            {!completed && (
+              <form
+                onSubmit={onAddManual}
+                className="flex flex-col gap-2 border-t bg-background/40 p-3 sm:flex-row"
+              >
+                <Input
+                  value={manualSpeaker}
+                  onChange={(e) => setManualSpeaker(e.target.value)}
+                  className="sm:w-32"
+                  placeholder="Speaker"
+                  maxLength={120}
+                />
+                <Textarea
+                  value={manualText}
+                  onChange={(e) => setManualText(e.target.value)}
+                  placeholder="Paste or type a transcript line… (use this if no bot is running)"
+                  rows={2}
+                  maxLength={8000}
+                  className="flex-1"
+                />
+                <Button type="submit" size="sm" disabled={addingTranscript || !manualText.trim()}>
+                  <Plus className="size-4" /> Add
+                </Button>
+              </form>
+            )}
           </section>
 
           <aside className="space-y-6">
