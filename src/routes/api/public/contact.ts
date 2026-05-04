@@ -9,6 +9,27 @@ const SITE_NAME = 'Grow'
 const SENDER_DOMAIN = 'notify.grow.contact'
 const FROM_DOMAIN = 'grow.contact'
 
+// Best-effort in-memory rate limit (per Worker instance).
+// Caps abuse from any single IP and any single recipient address.
+const ipBuckets = new Map<string, { count: number; reset: number }>()
+const emailBuckets = new Map<string, { count: number; reset: number }>()
+function hit(
+  bucket: Map<string, { count: number; reset: number }>,
+  key: string,
+  limit: number,
+  windowMs: number,
+): boolean {
+  const now = Date.now()
+  const b = bucket.get(key)
+  if (!b || b.reset < now) {
+    bucket.set(key, { count: 1, reset: now + windowMs })
+    return true
+  }
+  if (b.count >= limit) return false
+  b.count += 1
+  return true
+}
+
 const schema = z.object({
   name: z.string().trim().min(1).max(100),
   email: z.string().trim().email().max(255),
@@ -34,6 +55,15 @@ export const Route = createFileRoute('/api/public/contact')({
           return Response.json({ error: 'Server configuration error' }, { status: 500 })
         }
 
+        const ip =
+          request.headers.get('cf-connecting-ip') ??
+          request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+          'unknown'
+        // Cap: 5 submissions / IP / hour
+        if (!hit(ipBuckets, ip, 5, 60 * 60 * 1000)) {
+          return Response.json({ error: 'Too many requests' }, { status: 429 })
+        }
+
         let body: unknown
         try {
           body = await request.json()
@@ -49,6 +79,10 @@ export const Route = createFileRoute('/api/public/contact')({
           )
         }
         const data = parsed.data
+        // Cap: 3 confirmation emails / recipient / day (anti-harassment)
+        if (!hit(emailBuckets, data.email.toLowerCase(), 3, 24 * 60 * 60 * 1000)) {
+          return Response.json({ error: 'Too many requests' }, { status: 429 })
+        }
         const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
         // 1. Persist submission
