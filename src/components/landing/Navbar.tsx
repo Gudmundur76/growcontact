@@ -61,14 +61,24 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           {!loading && user ? (
-            <Button
-              variant="heroSecondary"
-              size="sm"
-              className="hidden rounded-full px-4 py-2 md:inline-flex"
-              onClick={handleSignOut}
-            >
-              Sign out
-            </Button>
+            <>
+              <Button
+                asChild
+                variant="heroSecondary"
+                size="sm"
+                className="hidden rounded-full px-4 py-2 md:inline-flex"
+              >
+                <Link to="/account">Account</Link>
+              </Button>
+              <Button
+                variant="heroSecondary"
+                size="sm"
+                className="hidden rounded-full px-4 py-2 md:inline-flex"
+                onClick={handleSignOut}
+              >
+                Sign out
+              </Button>
+            </>
           ) : !loading ? (
             <>
               <Link
@@ -118,16 +128,27 @@ export function Navbar() {
             </ul>
             <div className="mt-2 px-1 pb-1">
               {user ? (
-                <Button
-                  variant="hero"
-                  className="w-full justify-center rounded-full"
-                  onClick={() => {
-                    setOpen(false);
-                    handleSignOut();
-                  }}
-                >
-                  Sign out
-                </Button>
+                <div className="space-y-2">
+                  <Button
+                    asChild
+                    variant="hero"
+                    className="w-full justify-center rounded-full"
+                  >
+                    <Link to="/account" onClick={() => setOpen(false)}>
+                      Account
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="heroSecondary"
+                    className="w-full justify-center rounded-full"
+                    onClick={() => {
+                      setOpen(false);
+                      handleSignOut();
+                    }}
+                  >
+                    Sign out
+                  </Button>
+                </div>
               ) : (
                 <div className="space-y-2">
                   <Button
