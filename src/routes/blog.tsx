@@ -3,6 +3,7 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { CtaSection } from "@/components/landing/CtaSection";
 import { ArrowUpRight } from "lucide-react";
+import { posts } from "@/content/blog-posts";
 
 export const Route = createFileRoute("/blog")({
   head: () => ({
@@ -23,74 +24,6 @@ export const Route = createFileRoute("/blog")({
   }),
   component: BlogPage,
 });
-
-type Post = {
-  title: string;
-  excerpt: string;
-  category: "Essay" | "Benchmark" | "Product" | "Playbook";
-  author: string;
-  date: string;
-  readTime: string;
-  featured?: boolean;
-};
-
-const posts: Post[] = [
-  {
-    title: "The end of the resume funnel",
-    excerpt:
-      "Why we stopped optimizing for application volume and started optimizing for calibrated, time-bound shortlists — and what changed in our pipelines six months in.",
-    category: "Essay",
-    author: "Maya Okafor",
-    date: "April 18, 2026",
-    readTime: "9 min read",
-    featured: true,
-  },
-  {
-    title: "Q1 2026 hiring benchmarks: time-to-hire by stage",
-    excerpt:
-      "We analyzed 41,200 hires across 280 high-growth teams. Median time-to-hire dropped 22% YoY — but the variance between top and bottom quartile widened.",
-    category: "Benchmark",
-    author: "Grow Research",
-    date: "April 9, 2026",
-    readTime: "12 min read",
-  },
-  {
-    title: "Interview Copilot now drafts scorecards in real time",
-    excerpt:
-      "Our newest model writes structured, signal-anchored scorecards while the interview is still happening. Here's the shape of the system.",
-    category: "Product",
-    author: "Engineering at Grow",
-    date: "March 27, 2026",
-    readTime: "6 min read",
-  },
-  {
-    title: "How Vortex hired 14 engineers in 47 days without an agency",
-    excerpt:
-      "A play-by-play of the sourcing strategy, calibration loop and offer cadence that took Vortex from Series A to fully staffed platform team.",
-    category: "Playbook",
-    author: "Liam Chen",
-    date: "March 14, 2026",
-    readTime: "11 min read",
-  },
-  {
-    title: "Calibrated, not vibes: writing rubrics that actually predict",
-    excerpt:
-      "A practical guide to behaviorally-anchored rating scales for technical and GTM roles, with templates from teams running them in production.",
-    category: "Playbook",
-    author: "Priya Raman",
-    date: "February 28, 2026",
-    readTime: "14 min read",
-  },
-  {
-    title: "Retention is a hiring metric",
-    excerpt:
-      "Why we report 12-month retention on every hire — and how surfacing it inside the loop changed the calibration conversations leadership teams actually have.",
-    category: "Essay",
-    author: "Maya Okafor",
-    date: "February 6, 2026",
-    readTime: "8 min read",
-  },
-];
 
 function BlogPage() {
   const featured = posts.find((p) => p.featured) ?? posts[0];
@@ -117,8 +50,9 @@ function BlogPage() {
 
       <section className="relative px-6 pb-20">
         <div className="mx-auto max-w-6xl">
-          <a
-            href="#"
+          <Link
+            to="/blog/$slug"
+            params={{ slug: featured.slug }}
             className="liquid-glass group block overflow-hidden rounded-3xl bg-card/40 p-8 transition-colors hover:bg-card/60 md:p-12"
           >
             <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.18em] text-primary">
@@ -144,7 +78,7 @@ function BlogPage() {
                 Read essay <ArrowUpRight className="h-4 w-4" />
               </span>
             </div>
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -164,9 +98,10 @@ function BlogPage() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {rest.map((p) => (
-              <a
-                key={p.title}
-                href="#"
+              <Link
+                key={p.slug}
+                to="/blog/$slug"
+                params={{ slug: p.slug }}
                 className="liquid-glass group flex h-full flex-col rounded-3xl bg-card/40 p-7 transition-colors hover:bg-card/60"
               >
                 <div className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
@@ -185,7 +120,7 @@ function BlogPage() {
                   <span className="mx-2">·</span>
                   {p.readTime}
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
