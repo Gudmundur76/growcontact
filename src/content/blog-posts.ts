@@ -213,6 +213,100 @@ The leadership conversations get more honest. "We hired six PMs last year and th
 
 Retention is a hiring metric. We report it because we believe what gets measured gets calibrated.`,
   },
+  {
+    slug: "ats-is-not-a-strategy",
+    title: "Your ATS is not a hiring strategy",
+    excerpt:
+      "Applicant tracking systems were built to be systems of record, not systems of decision. Here's where the boundary should sit — and what belongs above it.",
+    category: "Essay",
+    author: "Daniel Reyes",
+    authorRole: "Head of Talent Ops, Grow",
+    date: "January 22, 2026",
+    readTime: "7 min read",
+    body: `Every few years, a hiring leader walks into a vendor evaluation convinced that the next ATS will fix the problem. It won't. Not because the ATS is bad — most of them are fine — but because the ATS was never the layer where the problem lives.
+
+## What an ATS is for
+
+An ATS is a system of record. It stores candidates, statuses, stages, dispositions and audit trails. It is excellent at compliance and reporting and middling at everything else, which is exactly the right scope for a system of record.
+
+## What an ATS is not for
+
+Calibration. Sourcing prioritization. Interviewer enablement. Loop design. Offer modeling. None of these belong in a system of record — they belong in a system of decision that sits above the ATS and writes back to it.
+
+## The pattern that works
+
+Treat the ATS as the durable layer. Treat the talent operating system as the live layer. Read from the ATS for state. Write back to it for compliance. Keep the daily work — the calibration meetings, the panel scorecards, the sourcing reviews — in a tool that was built for it.
+
+The teams that get this right stop arguing about ATSes entirely. The ATS becomes plumbing. The work happens above it.`,
+  },
+  {
+    slug: "remote-loops-that-actually-work",
+    title: "Designing remote interview loops that actually predict",
+    excerpt:
+      "Five anti-patterns we see in remote-first interview loops, and the structural fixes that took our customers' offer-acceptance rates from 61% to 84%.",
+    category: "Playbook",
+    author: "Priya Raman",
+    authorRole: "Calibration lead, Grow",
+    date: "January 9, 2026",
+    readTime: "10 min read",
+    body: `Remote loops fail in predictable ways. Here are the five we see most often, and the fixes that move the numbers.
+
+## 1. The marathon onsite
+
+A six-hour back-to-back over Zoom is not an onsite. It is a stress test of bandwidth and bladder capacity. Cap candidate time at four hours, split across two days if you must.
+
+## 2. The silent panel
+
+Remote panels go quiet between rounds. Interviewers forget to debrief, then write scorecards in isolation. Build a 15-minute synchronous debrief into the loop calendar. Non-negotiable.
+
+## 3. The vague take-home
+
+"Build something interesting" is not a brief. Specify the problem, the time budget, and the rubric the work will be scored against. Pay for the candidate's time when the budget exceeds two hours.
+
+## 4. The mystery interviewer
+
+Candidates show up to a Zoom with someone whose name they Googled in the elevator. Send a one-paragraph bio of every interviewer 24 hours before. It costs nothing and signals competence.
+
+## 5. The drifting offer
+
+Remote teams take longer to align on offers because the hallway conversation doesn't exist. Pre-commit comp bands and decision authority before the loop starts. Cut offer turnaround from 5 days to 48 hours.
+
+## What it adds up to
+
+These aren't novel. They're the boring discipline that distinguishes loops that predict from loops that perform. Fix all five and offer-accept rates climb 15-20 points.`,
+  },
+  {
+    slug: "sourcing-ai-retention-aware-ranking",
+    title: "Inside Sourcing AI: how retention-aware ranking works",
+    excerpt:
+      "A look at the model architecture behind our retention-aware ranker — what signals it uses, what it deliberately ignores, and why fairness audits ship with every release.",
+    category: "Product",
+    author: "Engineering at Grow",
+    authorRole: "Platform team, Grow",
+    date: "December 12, 2025",
+    readTime: "8 min read",
+    body: `Most sourcing tools rank candidates on relevance — how closely a profile matches a job description. Relevance is a useful signal. It is also an incomplete one.
+
+## Why we rank on retention
+
+The cost of a bad hire isn't the failed interview loop. It's the 9-month tenure that ends in a backfill and a damaged team. So we rank on the signal that actually matters to the customer: the probability that, conditional on hire, this candidate is still in the role and performing at month 12.
+
+## What the model uses
+
+Public, role-relevant signals only: career trajectory, tenure patterns, skill graph proximity, and explicit candidate preferences when available. Every input is documented and inspectable inside the product.
+
+## What the model ignores
+
+Demographic proxies. Names. Photos. School prestige. Anything that an audit would flag as a fairness risk gets stripped from the input layer before scoring. The model has never seen these features and cannot use them.
+
+## How we audit
+
+Every release ships with a fairness report: outcome rates by gender, ethnicity, age band and disability status across the eval set. If any cell drifts more than 3 points, the release is held until we understand why.
+
+## What's next
+
+We're publishing the eval methodology this quarter so customers and external researchers can reproduce it. Trustworthy AI in hiring isn't a marketing claim — it's a public method.`,
+  },
 ];
 
 export function getPost(slug: string): BlogPost | undefined {
