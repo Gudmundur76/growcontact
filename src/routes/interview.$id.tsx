@@ -15,6 +15,7 @@ import {
   addBulkTranscript,
 } from "@/server/interviews.functions";
 import { toast } from "sonner";
+import { sendTransactionalEmail } from "@/lib/email/send";
 import {
   Sparkles,
   AlertTriangle,
@@ -29,6 +30,7 @@ import {
   Plus,
   Pencil,
   RefreshCw,
+  Mail,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -75,7 +77,9 @@ export const Route = createFileRoute("/interview/$id")({
 function asArray(x: unknown): string[] {
   return Array.isArray(x) ? x.map((v) => String(v)) : [];
 }
-function asCompetencies(x: unknown): { name: string; rating: number; notes: string }[] {
+function asCompetencies(
+  x: unknown,
+): { name: string; rating: number; notes: string; evidence: string[] }[] {
   if (!Array.isArray(x)) return [];
   return x
     .map((c) => (c && typeof c === "object" ? (c as Record<string, unknown>) : null))
@@ -84,6 +88,7 @@ function asCompetencies(x: unknown): { name: string; rating: number; notes: stri
       name: String(c.name ?? ""),
       rating: Number(c.rating ?? 0),
       notes: String(c.notes ?? ""),
+      evidence: Array.isArray(c.evidence) ? (c.evidence as unknown[]).map((e) => String(e)) : [],
     }));
 }
 
@@ -275,7 +280,12 @@ function LiveInterviewPage() {
             | null) ?? null,
           strengths: asArray(draft.strengths).map((x) => x.trim()).filter(Boolean),
           concerns: asArray(draft.concerns).map((x) => x.trim()).filter(Boolean),
-          competencies: comps.map((c) => ({ name: c.name, rating: c.rating, notes: c.notes })),
+          competencies: comps.map((c) => ({
+            name: c.name,
+            rating: c.rating,
+            notes: c.notes,
+            evidence: c.evidence.map((e) => e.trim()).filter(Boolean).slice(0, 5),
+          })),
           follow_ups: asArray(draft.follow_ups).map((x) => x.trim()).filter(Boolean),
         },
         headers: s?.access_token ? { Authorization: `Bearer ${s.access_token}` } : undefined,
@@ -427,6 +437,34 @@ function LiveInterviewPage() {
     a.download = `${session.candidate_name.replace(/\s+/g, "_")}_scorecard.md`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function onEmailShareLink() {
+    if (!session?.share_token) return;
+    const recipient = window.prompt("Send scorecard link to email:");
+    if (!recipient) return;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(recipient)) {
+      toast.error("Invalid email address");
+      return;
+    }
+    const shareUrl = `${window.location.origin}/share/scorecard/${session.share_token}`;
+    try {
+      await sendTransactionalEmail({
+        templateName: "scorecard-share",
+        recipientEmail: recipient,
+        idempotencyKey: `scorecard-share-${session.id}-${recipient}-${Date.now()}`,
+        templateData: {
+          candidateName: session.candidate_name,
+          roleTitle: session.role_title,
+          shareUrl,
+          senderName: user?.email ?? null,
+          expiresAt: session.share_expires_at ?? null,
+        },
+      });
+      toast.success(`Sent to ${recipient}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to send email");
+    }
   }
 
   if (loading) {
@@ -666,6 +704,11 @@ function LiveInterviewPage() {
                 <Button variant="outline" size="sm" onClick={onDownloadMarkdown}>
                   <Download className="size-4" /> Download .md
                 </Button>
+                {session.share_token && (
+                  <Button variant="outline" size="sm" onClick={onEmailShareLink}>
+                    <Mail className="size-4" /> Email link
+                  </Button>
+                )}
               </div>
             </div>
             {session.share_token && (
@@ -724,12 +767,23 @@ function ScorecardView({ card }: { card: ScorecardRow }) {
         <h3 className="text-sm font-semibold">Competencies</h3>
         <ul className="mt-2 divide-y rounded-md border">
           {asCompetencies(card.competencies).map((c, i) => (
-            <li key={i} className="flex items-start justify-between gap-4 p-3">
-              <div>
-                <div className="text-sm font-medium">{c.name}</div>
-                <div className="text-xs text-muted-foreground">{c.notes}</div>
+            <li key={i} className="p-3">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="text-sm font-medium">{c.name}</div>
+                  <div className="text-xs text-muted-foreground">{c.notes}</div>
+                </div>
+                <div className="text-sm font-semibold">{c.rating}/5</div>
               </div>
-              <div className="text-sm font-semibold">{c.rating}/5</div>
+              {c.evidence.length > 0 && (
+                <ul className="mt-2 space-y-1 border-l-2 border-muted pl-3">
+                  {c.evidence.map((q, qi) => (
+                    <li key={qi} className="text-xs italic text-muted-foreground">
+                      "{q}"
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))}
         </ul>
@@ -810,7 +864,8 @@ function ScorecardEditor({
         <div className="mb-2 text-sm font-semibold">Competencies</div>
         <ul className="space-y-2">
           {comps.map((c, i) => (
-            <li key={i} className="grid grid-cols-[1fr_80px_1fr_auto] items-start gap-2">
+            <li key={i} className="space-y-2 rounded-md border p-2">
+              <div className="grid grid-cols-[1fr_80px_1fr_auto] items-start gap-2">
               <Input
                 value={c.name}
                 onChange={(e) => {
@@ -846,6 +901,21 @@ function ScorecardEditor({
               >
                 Remove
               </Button>
+              </div>
+              <Textarea
+                value={c.evidence.join("\n")}
+                onChange={(e) => {
+                  const next = [...comps];
+                  next[i] = {
+                    ...c,
+                    evidence: e.target.value.split("\n").map((s) => s.slice(0, 400)),
+                  };
+                  update({ competencies: next });
+                }}
+                rows={2}
+                placeholder="Evidence quotes (one per line)"
+                className="text-xs"
+              />
             </li>
           ))}
         </ul>
@@ -854,7 +924,12 @@ function ScorecardEditor({
           size="sm"
           className="mt-2"
           onClick={() =>
-            update({ competencies: [...comps, { name: "New competency", rating: 3, notes: "" }] })
+            update({
+              competencies: [
+                ...comps,
+                { name: "New competency", rating: 3, notes: "", evidence: [] },
+              ],
+            })
           }
         >
           <Plus className="size-4" /> Add competency

@@ -5,6 +5,23 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createRecallBot, leaveRecallBot, detectPlatform } from "./recall.server";
 import { generateScorecard } from "./interview-ai.server";
 
+// ---------- In-memory rate limiter ----------
+// Best-effort per-instance throttle. Acceptable for abuse prevention; resets on cold start.
+const rateBuckets = new Map<string, { count: number; reset: number }>();
+function rateLimit(key: string, limit: number, windowMs: number) {
+  const now = Date.now();
+  const b = rateBuckets.get(key);
+  if (!b || b.reset < now) {
+    rateBuckets.set(key, { count: 1, reset: now + windowMs });
+    return;
+  }
+  if (b.count >= limit) {
+    const wait = Math.ceil((b.reset - now) / 1000);
+    throw new Error(`Rate limit exceeded — try again in ${wait}s`);
+  }
+  b.count += 1;
+}
+
 const StartSchema = z.object({
   candidateName: z.string().min(1).max(200),
   roleTitle: z.string().min(1).max(200),
@@ -334,6 +351,7 @@ export const addManualTranscript = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => ManualTranscriptSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    rateLimit(`manual:${userId}`, 60, 60_000);
     const { data: session } = await supabase
       .from("interview_sessions")
       .select("id, user_id, status")
@@ -367,6 +385,7 @@ export const addBulkTranscript = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => BulkSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    rateLimit(`bulk:${userId}`, 5, 60_000);
     const { data: session } = await supabase
       .from("interview_sessions")
       .select("id, user_id, status")
@@ -520,6 +539,7 @@ const ScorecardEditSchema = z.object({
         name: z.string().min(1).max(120),
         rating: z.number().int().min(1).max(5),
         notes: z.string().max(1000).default(""),
+        evidence: z.array(z.string().max(400)).max(5).default([]),
       }),
     )
     .max(20),

@@ -33,7 +33,9 @@ export const Route = createFileRoute("/share/scorecard/$token")({
 function asArray(x: unknown): string[] {
   return Array.isArray(x) ? x.map((v) => String(v)) : [];
 }
-function asCompetencies(x: unknown): { name: string; rating: number; notes: string }[] {
+function asCompetencies(
+  x: unknown,
+): { name: string; rating: number; notes: string; evidence: string[] }[] {
   if (!Array.isArray(x)) return [];
   return x
     .map((c) => (c && typeof c === "object" ? (c as Record<string, unknown>) : null))
@@ -42,6 +44,7 @@ function asCompetencies(x: unknown): { name: string; rating: number; notes: stri
       name: String(c.name ?? ""),
       rating: Number(c.rating ?? 0),
       notes: String(c.notes ?? ""),
+      evidence: Array.isArray(c.evidence) ? (c.evidence as unknown[]).map((e) => String(e)) : [],
     }));
 }
 
@@ -135,12 +138,23 @@ function SharedScorecard() {
           <h2 className="text-sm font-semibold">Competencies</h2>
           <ul className="mt-2 divide-y rounded-md border">
             {asCompetencies(card.competencies).map((c, i) => (
-              <li key={i} className="flex items-start justify-between gap-4 p-3">
-                <div>
-                  <div className="text-sm font-medium">{c.name}</div>
-                  <div className="text-xs text-muted-foreground">{c.notes}</div>
+              <li key={i} className="p-3">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="text-sm font-medium">{c.name}</div>
+                    <div className="text-xs text-muted-foreground">{c.notes}</div>
+                  </div>
+                  <div className="text-sm font-semibold">{c.rating}/5</div>
                 </div>
-                <div className="text-sm font-semibold">{c.rating}/5</div>
+                {c.evidence.length > 0 && (
+                  <ul className="mt-2 space-y-1 border-l-2 border-muted pl-3">
+                    {c.evidence.map((q, qi) => (
+                      <li key={qi} className="text-xs italic text-muted-foreground">
+                        "{q}"
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>

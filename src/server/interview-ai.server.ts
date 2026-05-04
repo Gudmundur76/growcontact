@@ -109,7 +109,7 @@ export interface ScorecardResult {
   recommendation: "strong_hire" | "hire" | "no_hire" | "strong_no_hire" | "more_info";
   strengths: string[];
   concerns: string[];
-  competencies: { name: string; rating: number; notes: string }[];
+  competencies: { name: string; rating: number; notes: string; evidence: string[] }[];
   follow_ups: string[];
 }
 
@@ -122,7 +122,8 @@ export async function generateScorecard(opts: {
 }): Promise<ScorecardResult> {
   const sys = `You are an expert interviewer producing a calibrated post-interview scorecard.
 Be honest, specific, evidence-based. Cite behaviors from the transcript. Avoid generic praise.
-Rate competencies 1-5 (1=poor, 3=meets bar, 5=exceptional). Overall rating 1-5.`;
+Rate competencies 1-5 (1=poor, 3=meets bar, 5=exceptional). Overall rating 1-5.
+For EACH competency, include 1-3 short verbatim quotes from the transcript as 'evidence' to support the rating. Quotes must be exact substrings of the transcript, ≤200 chars each. If no relevant quote exists, return an empty evidence array.`;
 
   const user = `ROLE: ${opts.roleTitle}
 CANDIDATE: ${opts.candidateName}
@@ -170,8 +171,13 @@ Return your output via the build_scorecard tool.`;
                     name: { type: "string" },
                     rating: { type: "integer", minimum: 1, maximum: 5 },
                     notes: { type: "string" },
+                    evidence: {
+                      type: "array",
+                      items: { type: "string" },
+                      maxItems: 3,
+                    },
                   },
-                  required: ["name", "rating", "notes"],
+                  required: ["name", "rating", "notes", "evidence"],
                   additionalProperties: false,
                 },
               },
