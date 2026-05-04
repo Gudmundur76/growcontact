@@ -1,15 +1,34 @@
-const columns = [
+import { Link } from "@tanstack/react-router";
+
+type FooterLink = { label: string; to?: "/" | "/about" | "/pricing" | "/signup" };
+
+const columns: { title: string; links: FooterLink[] }[] = [
   {
     title: "Product",
-    links: ["Features", "Pricing", "Integrations", "Changelog"],
+    links: [
+      { label: "Features" },
+      { label: "Pricing", to: "/pricing" },
+      { label: "Integrations" },
+      { label: "Changelog" },
+    ],
   },
   {
     title: "Company",
-    links: ["About", "Customers", "Careers", "Press"],
+    links: [
+      { label: "About", to: "/about" },
+      { label: "Customers" },
+      { label: "Careers" },
+      { label: "Press" },
+    ],
   },
   {
     title: "Resources",
-    links: ["Docs", "Hiring playbook", "Talent benchmarks", "Support"],
+    links: [
+      { label: "Docs" },
+      { label: "Hiring playbook" },
+      { label: "Talent benchmarks" },
+      { label: "Support" },
+    ],
   },
 ];
 
@@ -34,13 +53,22 @@ export function Footer() {
                 </div>
                 <ul className="mt-4 space-y-3">
                   {col.links.map((l) => (
-                    <li key={l}>
-                      <a
-                        href="#"
-                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                      >
-                        {l}
-                      </a>
+                    <li key={l.label}>
+                      {l.to ? (
+                        <Link
+                          to={l.to}
+                          className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          {l.label}
+                        </Link>
+                      ) : (
+                        <a
+                          href="#"
+                          className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          {l.label}
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>
