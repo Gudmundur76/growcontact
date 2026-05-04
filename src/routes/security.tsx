@@ -130,6 +130,65 @@ function SecurityPage() {
           </p>
         </section>
 
+        <section className="mx-auto mt-24 max-w-6xl">
+          <div className="mb-10 max-w-2xl">
+            <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              Data handling
+            </p>
+            <h2 className="text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-4xl">
+              How we treat the data you trust us with.
+            </h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {dataPractices.map((d) => (
+              <div
+                key={d.title}
+                className="rounded-3xl border border-white/5 bg-card/40 p-6 backdrop-blur-xl"
+              >
+                <div className="text-lg font-semibold text-foreground">
+                  {d.title}
+                </div>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {d.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mx-auto mt-24 max-w-6xl">
+          <div className="mb-10 max-w-2xl">
+            <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              Subprocessors
+            </p>
+            <h2 className="text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-4xl">
+              Every vendor that touches your data.
+            </h2>
+            <p className="mt-3 text-sm text-muted-foreground">
+              We notify customers 30 days before adding any new subprocessor.
+            </p>
+          </div>
+          <div className="overflow-hidden rounded-3xl border border-white/5 bg-card/30 backdrop-blur-xl">
+            <div className="hidden grid-cols-3 gap-4 border-b border-white/5 px-6 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground md:grid">
+              <div>Vendor</div>
+              <div>Purpose</div>
+              <div>Region</div>
+            </div>
+            <ul className="divide-y divide-white/5">
+              {subprocessors.map((s) => (
+                <li
+                  key={s.name}
+                  className="grid grid-cols-1 gap-1 px-6 py-4 text-sm md:grid-cols-3 md:gap-4"
+                >
+                  <div className="font-semibold text-foreground">{s.name}</div>
+                  <div className="text-muted-foreground">{s.purpose}</div>
+                  <div className="text-muted-foreground">{s.region}</div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
         <CtaSection />
       </main>
       <Footer />
@@ -166,8 +225,3 @@ const dataPractices = [
     body: "EU and US data residency available on Scale. Data never leaves the elected region for storage or primary processing.",
   },
 ];
-
-function _SecurityExtras() {
-  // Reserved for future inline embeds — kept to avoid unused-warning on data tables.
-  return { subprocessors, dataPractices };
-}
