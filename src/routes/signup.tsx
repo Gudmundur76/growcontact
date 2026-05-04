@@ -1,8 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({
@@ -25,7 +28,52 @@ export const Route = createFileRoute("/signup")({
 });
 
 function SignupPage() {
+  const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const name = String(form.get("name") || "").trim();
+    const email = String(form.get("email") || "").trim();
+    const company = String(form.get("company") || "").trim();
+    const password = String(form.get("password") || "");
+
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`,
+        data: { name, company },
+      },
+    });
+    setLoading(false);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setSubmitted(true);
+  }
+
+  async function handleGoogle() {
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      toast.error(result.error.message ?? "Google sign-in failed");
+      return;
+    }
+    if (result.redirected) return;
+    navigate({ to: "/" });
+  }
 
   return (
     <>
@@ -54,11 +102,11 @@ function SignupPage() {
             {submitted ? (
               <div className="flex h-full flex-col items-start justify-center">
                 <h2 className="text-2xl font-semibold text-foreground">
-                  You're on the list.
+                  Check your inbox.
                 </h2>
                 <p className="mt-3 text-muted-foreground">
-                  Check your inbox — we just sent a magic link to finish setting
-                  up your workspace.
+                  We sent you a confirmation link. Click it to verify your
+                  email and finish setting up your workspace.
                 </p>
                 <Link
                   to="/"
@@ -68,13 +116,20 @@ function SignupPage() {
                 </Link>
               </div>
             ) : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setSubmitted(true);
-                }}
-                className="space-y-5"
-              >
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <Button
+                  type="button"
+                  variant="heroSecondary"
+                  className="w-full justify-center"
+                  onClick={handleGoogle}
+                >
+                  Continue with Google
+                </Button>
+                <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
+                  <span className="h-px flex-1 bg-white/10" />
+                  or
+                  <span className="h-px flex-1 bg-white/10" />
+                </div>
                 <div>
                   <label
                     htmlFor="name"
@@ -123,11 +178,43 @@ function SignupPage() {
                     placeholder="Vortex"
                   />
                 </div>
-                <Button type="submit" variant="hero" className="w-full justify-center">
-                  Start free trial
+                <div>
+                  <label
+                    htmlFor="password"
+                    className="mb-2 block text-sm font-medium text-foreground"
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    minLength={8}
+                    className="w-full rounded-xl bg-white/5 px-4 py-3 text-foreground placeholder:text-muted-foreground outline-none ring-1 ring-white/10 focus:ring-primary"
+                    placeholder="At least 8 characters"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  variant="hero"
+                  className="w-full justify-center"
+                  disabled={loading}
+                >
+                  {loading ? "Creating account…" : "Start free trial"}
                 </Button>
                 <p className="text-center text-xs text-muted-foreground">
-                  By signing up you agree to our Terms and Privacy policy.
+                  Already have an account?{" "}
+                  <Link to="/login" className="text-foreground hover:underline">
+                    Sign in
+                  </Link>
+                </p>
+                <p className="text-center text-xs text-muted-foreground">
+                  By signing up you agree to our{" "}
+                  <Link to="/terms" className="hover:underline">Terms</Link>{" "}
+                  and{" "}
+                  <Link to="/privacy" className="hover:underline">Privacy</Link>{" "}
+                  policy.
                 </p>
               </form>
             )}
