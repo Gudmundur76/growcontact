@@ -428,15 +428,161 @@ export const deleteSession = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: session } = await supabase
       .from("interview_sessions")
-      .select("id, user_id")
+      .select("id, user_id, deleted_at")
       .eq("id", data.sessionId)
       .maybeSingle();
     if (!session || session.user_id !== userId) throw new Error("Not found");
-    await supabaseAdmin.from("interview_events").delete().eq("session_id", session.id);
-    await supabaseAdmin.from("interview_scorecards").delete().eq("session_id", session.id);
-    const { error } = await supabase.from("interview_sessions").delete().eq("id", session.id);
+    // Soft-delete: keep transcripts recoverable for 30 days, then a future job can purge.
+    const { error } = await supabase
+      .from("interview_sessions")
+      .update({ deleted_at: new Date().toISOString(), share_token: null })
+      .eq("id", session.id);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+export const restoreSession = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ sessionId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase
+      .from("interview_sessions")
+      .update({ deleted_at: null })
+      .eq("id", data.sessionId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const setSessionArchived = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ sessionId: z.string().uuid(), archived: z.boolean() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase
+      .from("interview_sessions")
+      .update({ archived: data.archived })
+      .eq("id", data.sessionId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+const ListSchema = z.object({
+  page: z.number().int().min(0).max(10000).default(0),
+  pageSize: z.number().int().min(1).max(100).default(20),
+  scope: z.enum(["active", "archived", "trash"]).default("active"),
+  q: z.string().max(200).optional(),
+});
+
+export const listSessions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ListSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const from = data.page * data.pageSize;
+    const to = from + data.pageSize - 1;
+    let q = supabase
+      .from("interview_sessions")
+      .select(
+        "id, candidate_name, role_title, meeting_platform, status, created_at, archived, deleted_at",
+        { count: "exact" },
+      )
+      .order("created_at", { ascending: false })
+      .range(from, to);
+    if (data.scope === "active") q = q.is("deleted_at", null).eq("archived", false);
+    else if (data.scope === "archived") q = q.is("deleted_at", null).eq("archived", true);
+    else q = q.not("deleted_at", "is", null);
+    if (data.q && data.q.trim()) {
+      const term = data.q.trim().replace(/[%_]/g, "");
+      q = q.or(`candidate_name.ilike.%${term}%,role_title.ilike.%${term}%`);
+    }
+    const { data: rows, count, error } = await q;
+    if (error) throw new Error(error.message);
+    return { rows: rows ?? [], total: count ?? 0 };
+  });
+
+// ---------- Scorecard editing ----------
+
+const ScorecardEditSchema = z.object({
+  sessionId: z.string().uuid(),
+  summary: z.string().min(1).max(8000),
+  overall_rating: z.number().int().min(1).max(5).nullable(),
+  recommendation: z
+    .enum(["strong_hire", "hire", "no_hire", "strong_no_hire", "more_info"])
+    .nullable(),
+  strengths: z.array(z.string().min(1).max(500)).max(20),
+  concerns: z.array(z.string().min(1).max(500)).max(20),
+  competencies: z
+    .array(
+      z.object({
+        name: z.string().min(1).max(120),
+        rating: z.number().int().min(1).max(5),
+        notes: z.string().max(1000).default(""),
+      }),
+    )
+    .max(20),
+  follow_ups: z.array(z.string().min(1).max(500)).max(20),
+});
+
+export const updateScorecard = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ScorecardEditSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase
+      .from("interview_scorecards")
+      .update({
+        summary: data.summary,
+        overall_rating: data.overall_rating,
+        recommendation: data.recommendation,
+        strengths: data.strengths,
+        concerns: data.concerns,
+        competencies: data.competencies,
+        follow_ups: data.follow_ups,
+      })
+      .eq("session_id", data.sessionId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// ---------- Share token expiry ----------
+
+const ShareExpirySchema = z.object({
+  sessionId: z.string().uuid(),
+  enabled: z.boolean(),
+  expiresInDays: z.number().int().min(1).max(365).optional(),
+});
+
+export const setSessionShareV2 = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ShareExpirySchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: session } = await supabase
+      .from("interview_sessions")
+      .select("id, user_id, share_token")
+      .eq("id", data.sessionId)
+      .maybeSingle();
+    if (!session || session.user_id !== userId) throw new Error("Not found");
+    if (!data.enabled) {
+      const { error } = await supabaseAdmin
+        .from("interview_sessions")
+        .update({ share_token: null, share_expires_at: null })
+        .eq("id", session.id);
+      if (error) throw new Error(error.message);
+      return { token: null, expiresAt: null };
+    }
+    const token = session.share_token ?? randomToken();
+    const days = data.expiresInDays ?? 14;
+    const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+    const { error } = await supabaseAdmin
+      .from("interview_sessions")
+      .update({ share_token: token, share_expires_at: expiresAt })
+      .eq("id", session.id);
+    if (error) throw new Error(error.message);
+    return { token, expiresAt };
   });
 
 // ---------- Rubric templates ----------
