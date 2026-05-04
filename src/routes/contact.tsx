@@ -8,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { z } from "zod";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -96,22 +95,27 @@ function ContactPage() {
     }
 
     setSubmitting(true);
-    const { error } = await supabase.from("contact_submissions").insert({
-      name: parsed.data.name,
-      email: parsed.data.email,
-      company: parsed.data.company || null,
-      team_size: parsed.data.team_size || null,
-      message: parsed.data.message,
-      user_agent:
-        typeof navigator !== "undefined" ? navigator.userAgent : null,
-    });
-    setSubmitting(false);
-
-    if (error) {
-      console.error("contact_submissions insert error", error);
+    try {
+      const res = await fetch("/api/public/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...parsed.data,
+          user_agent:
+            typeof navigator !== "undefined" ? navigator.userAgent : null,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Request failed");
+      }
+    } catch (err) {
+      console.error("contact submit error", err);
+      setSubmitting(false);
       toast.error("Could not send your message. Please try again.");
       return;
     }
+    setSubmitting(false);
 
     toast.success("Message sent — we'll be in touch shortly.");
     setSubmitted(true);
