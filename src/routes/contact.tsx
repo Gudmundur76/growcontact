@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { z } from "zod";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -56,11 +59,61 @@ const offices = [
   { city: "London", address: "1 Finsbury Ave, EC2M 2PF" },
 ];
 
+const contactSchema = z.object({
+  name: z.string().trim().min(1, "Please enter your name").max(100),
+  email: z.string().trim().email("Enter a valid email").max(255),
+  company: z.string().trim().max(200).optional().or(z.literal("")),
+  team_size: z.string().trim().max(50).optional().or(z.literal("")),
+  message: z
+    .string()
+    .trim()
+    .min(1, "Please add a short message")
+    .max(5000, "Message is too long"),
+});
+
 function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (submitting) return;
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const raw = {
+      name: String(formData.get("name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      company: String(formData.get("company") ?? ""),
+      team_size: String(formData.get("size") ?? ""),
+      message: String(formData.get("message") ?? ""),
+    };
+
+    const parsed = contactSchema.safeParse(raw);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Please check the form");
+      return;
+    }
+
+    setSubmitting(true);
+    const { error } = await supabase.from("contact_submissions").insert({
+      name: parsed.data.name,
+      email: parsed.data.email,
+      company: parsed.data.company || null,
+      team_size: parsed.data.team_size || null,
+      message: parsed.data.message,
+      user_agent:
+        typeof navigator !== "undefined" ? navigator.userAgent : null,
+    });
+    setSubmitting(false);
+
+    if (error) {
+      console.error("contact_submissions insert error", error);
+      toast.error("Could not send your message. Please try again.");
+      return;
+    }
+
+    toast.success("Message sent — we'll be in touch shortly.");
     setSubmitted(true);
   };
 
@@ -121,8 +174,13 @@ function ContactPage() {
                   <Label htmlFor="message">What can we help with?</Label>
                   <Textarea id="message" rows={5} placeholder="A few sentences about your hiring goals…" />
                 </div>
-                <Button type="submit" variant="hero" className="rounded-full">
-                  Send message
+                <Button
+                  type="submit"
+                  variant="hero"
+                  className="rounded-full"
+                  disabled={submitting}
+                >
+                  {submitting ? "Sending…" : "Send message"}
                 </Button>
               </div>
             )}
