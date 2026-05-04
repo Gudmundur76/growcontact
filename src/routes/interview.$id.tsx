@@ -15,6 +15,7 @@ import {
   addBulkTranscript,
 } from "@/server/interviews.functions";
 import { toast } from "sonner";
+import { sendTransactionalEmail } from "@/lib/email/send";
 import {
   Sparkles,
   AlertTriangle,
@@ -29,6 +30,7 @@ import {
   Plus,
   Pencil,
   RefreshCw,
+  Mail,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
