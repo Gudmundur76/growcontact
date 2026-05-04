@@ -3,6 +3,9 @@ import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 type NavTo = "/pricing" | "/customers" | "/blog" | "/about" | "/careers";
 
@@ -16,6 +19,13 @@ const links: { label: string; to: NavTo }[] = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const { user, loading } = useAuth();
+
+  async function handleSignOut() {
+    const { error } = await supabase.auth.signOut();
+    if (error) toast.error(error.message);
+    else toast.success("Signed out");
+  }
 
   return (
     <>
@@ -50,14 +60,33 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            asChild
-            variant="heroSecondary"
-            size="sm"
-            className="hidden rounded-full px-4 py-2 md:inline-flex"
-          >
-            <Link to="/signup">Start free trial</Link>
-          </Button>
+          {!loading && user ? (
+            <Button
+              variant="heroSecondary"
+              size="sm"
+              className="hidden rounded-full px-4 py-2 md:inline-flex"
+              onClick={handleSignOut}
+            >
+              Sign out
+            </Button>
+          ) : !loading ? (
+            <>
+              <Link
+                to="/login"
+                className="hidden rounded-md px-3 py-2 text-sm text-foreground/80 transition-colors hover:bg-white/5 hover:text-foreground md:inline-flex"
+              >
+                Sign in
+              </Link>
+              <Button
+                asChild
+                variant="heroSecondary"
+                size="sm"
+                className="hidden rounded-full px-4 py-2 md:inline-flex"
+              >
+                <Link to="/signup">Start free trial</Link>
+              </Button>
+            </>
+          ) : null}
           <button
             type="button"
             aria-label={open ? "Close menu" : "Open menu"}
@@ -88,15 +117,39 @@ export function Navbar() {
               ))}
             </ul>
             <div className="mt-2 px-1 pb-1">
-              <Button
-                asChild
-                variant="hero"
-                className="w-full justify-center rounded-full"
-              >
-                <Link to="/signup" onClick={() => setOpen(false)}>
-                  Start free trial
-                </Link>
-              </Button>
+              {user ? (
+                <Button
+                  variant="hero"
+                  className="w-full justify-center rounded-full"
+                  onClick={() => {
+                    setOpen(false);
+                    handleSignOut();
+                  }}
+                >
+                  Sign out
+                </Button>
+              ) : (
+                <div className="space-y-2">
+                  <Button
+                    asChild
+                    variant="hero"
+                    className="w-full justify-center rounded-full"
+                  >
+                    <Link to="/signup" onClick={() => setOpen(false)}>
+                      Start free trial
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="heroSecondary"
+                    className="w-full justify-center rounded-full"
+                  >
+                    <Link to="/login" onClick={() => setOpen(false)}>
+                      Sign in
+                    </Link>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
