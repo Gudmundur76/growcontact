@@ -72,7 +72,7 @@ export const runSourcingSearch = createServerFn({ method: "POST" })
           name: data.saveAs,
           query: data.query,
           role_title: data.roleTitle ?? null,
-          filters: data.filters ?? {},
+          filters: (data.filters ?? {}) as Json,
           last_run_at: new Date().toISOString(),
         })
         .select("id")
