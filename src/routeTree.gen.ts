@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SourcingRouteImport } from './routes/sourcing'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SecurityRouteImport } from './routes/security'
@@ -29,8 +30,12 @@ import { Route as CareersRouteImport } from './routes/careers'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SourcingIndexRouteImport } from './routes/sourcing.index'
 import { Route as InterviewIndexRouteImport } from './routes/interview.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as SourcingShortlistsRouteImport } from './routes/sourcing.shortlists'
+import { Route as SourcingSequencesRouteImport } from './routes/sourcing.sequences'
+import { Route as SourcingSearchesRouteImport } from './routes/sourcing.searches'
 import { Route as InterviewRubricsRouteImport } from './routes/interview.rubrics'
 import { Route as InterviewNewRouteImport } from './routes/interview.new'
 import { Route as InterviewIdRouteImport } from './routes/interview.$id'
@@ -48,6 +53,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicScorecardTokenRouteImport } from './routes/api/public/scorecard.$token'
+import { Route as ApiPublicHooksSourcingAlertsRouteImport } from './routes/api/public/hooks/sourcing-alerts'
 import { Route as ApiPublicHooksGenerateBlogPostRouteImport } from './routes/api/public/hooks/generate-blog-post'
 import { Route as ApiPublicHooksAutoPublishBlogPostRouteImport } from './routes/api/public/hooks/auto-publish-blog-post'
 
@@ -59,6 +65,11 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SourcingRoute = SourcingRouteImport.update({
+  id: '/sourcing',
+  path: '/sourcing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -151,6 +162,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SourcingIndexRoute = SourcingIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SourcingRoute,
+} as any)
 const InterviewIndexRoute = InterviewIndexRouteImport.update({
   id: '/interview/',
   path: '/interview/',
@@ -160,6 +176,21 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SourcingShortlistsRoute = SourcingShortlistsRouteImport.update({
+  id: '/shortlists',
+  path: '/shortlists',
+  getParentRoute: () => SourcingRoute,
+} as any)
+const SourcingSequencesRoute = SourcingSequencesRouteImport.update({
+  id: '/sequences',
+  path: '/sequences',
+  getParentRoute: () => SourcingRoute,
+} as any)
+const SourcingSearchesRoute = SourcingSearchesRouteImport.update({
+  id: '/searches',
+  path: '/searches',
+  getParentRoute: () => SourcingRoute,
 } as any)
 const InterviewRubricsRoute = InterviewRubricsRouteImport.update({
   id: '/interview/rubrics',
@@ -249,6 +280,12 @@ const ApiPublicScorecardTokenRoute = ApiPublicScorecardTokenRouteImport.update({
   path: '/api/public/scorecard/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksSourcingAlertsRoute =
+  ApiPublicHooksSourcingAlertsRouteImport.update({
+    id: '/api/public/hooks/sourcing-alerts',
+    path: '/api/public/hooks/sourcing-alerts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksGenerateBlogPostRoute =
   ApiPublicHooksGenerateBlogPostRouteImport.update({
     id: '/api/public/hooks/generate-blog-post',
@@ -281,6 +318,7 @@ export interface FileRoutesByFullPath {
   '/security': typeof SecurityRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sourcing': typeof SourcingRouteWithChildren
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/blog': typeof AdminBlogRoute
@@ -290,14 +328,19 @@ export interface FileRoutesByFullPath {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/sourcing/searches': typeof SourcingSearchesRoute
+  '/sourcing/sequences': typeof SourcingSequencesRoute
+  '/sourcing/shortlists': typeof SourcingShortlistsRoute
   '/blog/': typeof BlogIndexRoute
   '/interview/': typeof InterviewIndexRoute
+  '/sourcing/': typeof SourcingIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/scorecard/$token': typeof ShareScorecardTokenRoute
   '/api/public/hooks/auto-publish-blog-post': typeof ApiPublicHooksAutoPublishBlogPostRoute
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
+  '/api/public/hooks/sourcing-alerts': typeof ApiPublicHooksSourcingAlertsRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -333,14 +376,19 @@ export interface FileRoutesByTo {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/sourcing/searches': typeof SourcingSearchesRoute
+  '/sourcing/sequences': typeof SourcingSequencesRoute
+  '/sourcing/shortlists': typeof SourcingShortlistsRoute
   '/blog': typeof BlogIndexRoute
   '/interview': typeof InterviewIndexRoute
+  '/sourcing': typeof SourcingIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/scorecard/$token': typeof ShareScorecardTokenRoute
   '/api/public/hooks/auto-publish-blog-post': typeof ApiPublicHooksAutoPublishBlogPostRoute
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
+  '/api/public/hooks/sourcing-alerts': typeof ApiPublicHooksSourcingAlertsRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -368,6 +416,7 @@ export interface FileRoutesById {
   '/security': typeof SecurityRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/sourcing': typeof SourcingRouteWithChildren
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/blog': typeof AdminBlogRoute
@@ -377,14 +426,19 @@ export interface FileRoutesById {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/sourcing/searches': typeof SourcingSearchesRoute
+  '/sourcing/sequences': typeof SourcingSequencesRoute
+  '/sourcing/shortlists': typeof SourcingShortlistsRoute
   '/blog/': typeof BlogIndexRoute
   '/interview/': typeof InterviewIndexRoute
+  '/sourcing/': typeof SourcingIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/scorecard/$token': typeof ShareScorecardTokenRoute
   '/api/public/hooks/auto-publish-blog-post': typeof ApiPublicHooksAutoPublishBlogPostRoute
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
+  '/api/public/hooks/sourcing-alerts': typeof ApiPublicHooksSourcingAlertsRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -413,6 +467,7 @@ export interface FileRouteTypes {
     | '/security'
     | '/signup'
     | '/sitemap.xml'
+    | '/sourcing'
     | '/terms'
     | '/unsubscribe'
     | '/admin/blog'
@@ -422,14 +477,19 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/sourcing/searches'
+    | '/sourcing/sequences'
+    | '/sourcing/shortlists'
     | '/blog/'
     | '/interview/'
+    | '/sourcing/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
     | '/share/scorecard/$token'
     | '/api/public/hooks/auto-publish-blog-post'
     | '/api/public/hooks/generate-blog-post'
+    | '/api/public/hooks/sourcing-alerts'
     | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -465,14 +525,19 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/sourcing/searches'
+    | '/sourcing/sequences'
+    | '/sourcing/shortlists'
     | '/blog'
     | '/interview'
+    | '/sourcing'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
     | '/share/scorecard/$token'
     | '/api/public/hooks/auto-publish-blog-post'
     | '/api/public/hooks/generate-blog-post'
+    | '/api/public/hooks/sourcing-alerts'
     | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -499,6 +564,7 @@ export interface FileRouteTypes {
     | '/security'
     | '/signup'
     | '/sitemap.xml'
+    | '/sourcing'
     | '/terms'
     | '/unsubscribe'
     | '/admin/blog'
@@ -508,14 +574,19 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/sourcing/searches'
+    | '/sourcing/sequences'
+    | '/sourcing/shortlists'
     | '/blog/'
     | '/interview/'
+    | '/sourcing/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
     | '/share/scorecard/$token'
     | '/api/public/hooks/auto-publish-blog-post'
     | '/api/public/hooks/generate-blog-post'
+    | '/api/public/hooks/sourcing-alerts'
     | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -543,6 +614,7 @@ export interface RootRouteChildren {
   SecurityRoute: typeof SecurityRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SourcingRoute: typeof SourcingRouteWithChildren
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   AdminBlogRoute: typeof AdminBlogRoute
@@ -560,6 +632,7 @@ export interface RootRouteChildren {
   ShareScorecardTokenRoute: typeof ShareScorecardTokenRoute
   ApiPublicHooksAutoPublishBlogPostRoute: typeof ApiPublicHooksAutoPublishBlogPostRoute
   ApiPublicHooksGenerateBlogPostRoute: typeof ApiPublicHooksGenerateBlogPostRoute
+  ApiPublicHooksSourcingAlertsRoute: typeof ApiPublicHooksSourcingAlertsRoute
   ApiPublicScorecardTokenRoute: typeof ApiPublicScorecardTokenRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -582,6 +655,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sourcing': {
+      id: '/sourcing'
+      path: '/sourcing'
+      fullPath: '/sourcing'
+      preLoaderRoute: typeof SourcingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -710,6 +790,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sourcing/': {
+      id: '/sourcing/'
+      path: '/'
+      fullPath: '/sourcing/'
+      preLoaderRoute: typeof SourcingIndexRouteImport
+      parentRoute: typeof SourcingRoute
+    }
     '/interview/': {
       id: '/interview/'
       path: '/interview'
@@ -723,6 +810,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/sourcing/shortlists': {
+      id: '/sourcing/shortlists'
+      path: '/shortlists'
+      fullPath: '/sourcing/shortlists'
+      preLoaderRoute: typeof SourcingShortlistsRouteImport
+      parentRoute: typeof SourcingRoute
+    }
+    '/sourcing/sequences': {
+      id: '/sourcing/sequences'
+      path: '/sequences'
+      fullPath: '/sourcing/sequences'
+      preLoaderRoute: typeof SourcingSequencesRouteImport
+      parentRoute: typeof SourcingRoute
+    }
+    '/sourcing/searches': {
+      id: '/sourcing/searches'
+      path: '/searches'
+      fullPath: '/sourcing/searches'
+      preLoaderRoute: typeof SourcingSearchesRouteImport
+      parentRoute: typeof SourcingRoute
     }
     '/interview/rubrics': {
       id: '/interview/rubrics'
@@ -843,6 +951,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicScorecardTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/sourcing-alerts': {
+      id: '/api/public/hooks/sourcing-alerts'
+      path: '/api/public/hooks/sourcing-alerts'
+      fullPath: '/api/public/hooks/sourcing-alerts'
+      preLoaderRoute: typeof ApiPublicHooksSourcingAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/generate-blog-post': {
       id: '/api/public/hooks/generate-blog-post'
       path: '/api/public/hooks/generate-blog-post'
@@ -859,6 +974,24 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface SourcingRouteChildren {
+  SourcingSearchesRoute: typeof SourcingSearchesRoute
+  SourcingSequencesRoute: typeof SourcingSequencesRoute
+  SourcingShortlistsRoute: typeof SourcingShortlistsRoute
+  SourcingIndexRoute: typeof SourcingIndexRoute
+}
+
+const SourcingRouteChildren: SourcingRouteChildren = {
+  SourcingSearchesRoute: SourcingSearchesRoute,
+  SourcingSequencesRoute: SourcingSequencesRoute,
+  SourcingShortlistsRoute: SourcingShortlistsRoute,
+  SourcingIndexRoute: SourcingIndexRoute,
+}
+
+const SourcingRouteWithChildren = SourcingRoute._addFileChildren(
+  SourcingRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -879,6 +1012,7 @@ const rootRouteChildren: RootRouteChildren = {
   SecurityRoute: SecurityRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SourcingRoute: SourcingRouteWithChildren,
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   AdminBlogRoute: AdminBlogRoute,
@@ -897,6 +1031,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksAutoPublishBlogPostRoute:
     ApiPublicHooksAutoPublishBlogPostRoute,
   ApiPublicHooksGenerateBlogPostRoute: ApiPublicHooksGenerateBlogPostRoute,
+  ApiPublicHooksSourcingAlertsRoute: ApiPublicHooksSourcingAlertsRoute,
   ApiPublicScorecardTokenRoute: ApiPublicScorecardTokenRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,

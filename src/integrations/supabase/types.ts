@@ -434,6 +434,284 @@ export type Database = {
         }
         Relationships: []
       }
+      sourcing_candidates: {
+        Row: {
+          ai_summary: string | null
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          external_id: string
+          first_seen_at: string
+          fit_score: number | null
+          headline: string | null
+          id: string
+          last_search_id: string | null
+          location: string | null
+          name: string
+          profile_url: string
+          signals: Json
+          source: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_summary?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          external_id: string
+          first_seen_at?: string
+          fit_score?: number | null
+          headline?: string | null
+          id?: string
+          last_search_id?: string | null
+          location?: string | null
+          name: string
+          profile_url: string
+          signals?: Json
+          source: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_summary?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          external_id?: string
+          first_seen_at?: string
+          fit_score?: number | null
+          headline?: string | null
+          id?: string
+          last_search_id?: string | null
+          location?: string | null
+          name?: string
+          profile_url?: string
+          signals?: Json
+          source?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sourcing_candidates_last_search_id_fkey"
+            columns: ["last_search_id"]
+            isOneToOne: false
+            referencedRelation: "sourcing_searches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sourcing_searches: {
+        Row: {
+          alert_enabled: boolean
+          alert_frequency: string
+          created_at: string
+          filters: Json
+          id: string
+          last_alert_at: string | null
+          last_run_at: string | null
+          name: string
+          query: string
+          role_title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_enabled?: boolean
+          alert_frequency?: string
+          created_at?: string
+          filters?: Json
+          id?: string
+          last_alert_at?: string | null
+          last_run_at?: string | null
+          name: string
+          query: string
+          role_title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_enabled?: boolean
+          alert_frequency?: string
+          created_at?: string
+          filters?: Json
+          id?: string
+          last_alert_at?: string | null
+          last_run_at?: string | null
+          name?: string
+          query?: string
+          role_title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sourcing_sends: {
+        Row: {
+          body: string
+          candidate_id: string
+          error_message: string | null
+          id: string
+          recipient_email: string
+          sent_at: string
+          sequence_id: string | null
+          status: string
+          subject: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          candidate_id: string
+          error_message?: string | null
+          id?: string
+          recipient_email: string
+          sent_at?: string
+          sequence_id?: string | null
+          status?: string
+          subject: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          candidate_id?: string
+          error_message?: string | null
+          id?: string
+          recipient_email?: string
+          sent_at?: string
+          sequence_id?: string | null
+          status?: string
+          subject?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sourcing_sends_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "sourcing_candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sourcing_sends_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "sourcing_sequences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sourcing_sequences: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          name: string
+          sender_name: string | null
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          name: string
+          sender_name?: string | null
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          name?: string
+          sender_name?: string | null
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sourcing_shortlist_members: {
+        Row: {
+          added_at: string
+          candidate_id: string
+          id: string
+          notes: string | null
+          shortlist_id: string
+          stage: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          candidate_id: string
+          id?: string
+          notes?: string | null
+          shortlist_id: string
+          stage?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          candidate_id?: string
+          id?: string
+          notes?: string | null
+          shortlist_id?: string
+          stage?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sourcing_shortlist_members_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "sourcing_candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sourcing_shortlist_members_shortlist_id_fkey"
+            columns: ["shortlist_id"]
+            isOneToOne: false
+            referencedRelation: "sourcing_shortlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sourcing_shortlists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          role_title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          role_title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          role_title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
