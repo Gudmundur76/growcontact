@@ -1,8 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { CtaSection } from "@/components/landing/CtaSection";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Linkedin, Link2, Twitter, Check } from "lucide-react";
 import { getPost, posts } from "@/content/blog-posts";
 import { getPublishedPosts } from "@/server/blog.functions";
 
@@ -129,12 +130,15 @@ function renderBody(body: string) {
   const blocks = body.split(/\n\n+/);
   return blocks.map((block, i) => {
     if (block.startsWith("## ")) {
+      const heading = block.replace(/^##\s+/, "");
+      const id = slugifyHeading(heading);
       return (
         <h2
           key={i}
+          id={id}
           className="mt-12 text-2xl font-semibold tracking-tight text-foreground md:text-3xl"
         >
-          {block.replace(/^##\s+/, "")}
+          {heading}
         </h2>
       );
     }
@@ -166,15 +170,102 @@ function renderInline(text: string) {
   return text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
 }
 
+function slugifyHeading(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .slice(0, 60);
+}
+
+function extractHeadings(body: string): { id: string; text: string }[] {
+  return body
+    .split(/\n\n+/)
+    .filter((b) => b.startsWith("## "))
+    .map((b) => {
+      const text = b.replace(/^##\s+/, "");
+      return { id: slugifyHeading(text), text };
+    });
+}
+
+function ReadingProgress() {
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement;
+      const scrolled = h.scrollTop;
+      const max = h.scrollHeight - h.clientHeight;
+      setProgress(max > 0 ? Math.min(100, (scrolled / max) * 100) : 0);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <div className="fixed left-0 right-0 top-0 z-50 h-0.5 bg-transparent">
+      <div
+        className="h-full bg-primary transition-[width] duration-150"
+        style={{ width: `${progress}%` }}
+      />
+    </div>
+  );
+}
+
+function ShareButtons({ url, title }: { url: string; title: string }) {
+  const [copied, setCopied] = useState(false);
+  const enc = encodeURIComponent;
+  const tw = `https://twitter.com/intent/tweet?text=${enc(title)}&url=${enc(url)}`;
+  const li = `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}`;
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      /* ignore */
+    }
+  }
+  const cls =
+    "inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-card/40 text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground";
+  return (
+    <div className="flex items-center gap-2">
+      <a href={tw} target="_blank" rel="noreferrer noopener" aria-label="Share on Twitter" className={cls}>
+        <Twitter className="h-4 w-4" />
+      </a>
+      <a href={li} target="_blank" rel="noreferrer noopener" aria-label="Share on LinkedIn" className={cls}>
+        <Linkedin className="h-4 w-4" />
+      </a>
+      <button type="button" onClick={copy} aria-label="Copy link" className={cls}>
+        {copied ? <Check className="h-4 w-4 text-primary" /> : <Link2 className="h-4 w-4" />}
+      </button>
+    </div>
+  );
+}
+
+function authorInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((s) => s[0]!.toUpperCase())
+    .join("");
+}
+
 function BlogPostPage() {
   const { post, others } = Route.useLoaderData();
+  const headings = useMemo(() => extractHeadings(post.body), [post.body]);
+  const url = `https://grow.contact/blog/${post.slug}`;
 
   return (
     <>
+      <ReadingProgress />
       <Navbar />
 
       <article className="relative px-6 pb-20 pt-24">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1fr_minmax(0,720px)_1fr]">
+          <div className="hidden lg:block" />
+          <div>
           <Link
             to="/blog"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -196,16 +287,48 @@ function BlogPostPage() {
             {post.excerpt}
           </p>
 
-          <div className="mt-8 flex items-center gap-3 border-t border-white/10 pt-6 text-sm text-muted-foreground">
-            <div>
-              <div className="text-foreground">{post.author}</div>
-              <div className="text-xs">
-                {post.authorRole} · {post.readTime}
+          <div className="mt-8 flex items-center justify-between gap-4 border-t border-white/10 pt-6 text-sm text-muted-foreground">
+            <div className="flex items-center gap-3">
+              <div
+                aria-hidden
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold uppercase tracking-wider text-primary"
+              >
+                {authorInitials(post.author)}
+              </div>
+              <div>
+                <div className="text-foreground">{post.author}</div>
+                <div className="text-xs">
+                  {post.authorRole} · {post.readTime}
+                </div>
               </div>
             </div>
+            <ShareButtons url={url} title={post.title} />
           </div>
 
           <div className="mt-12">{renderBody(post.body)}</div>
+          </div>
+
+          <aside className="hidden lg:block">
+            {headings.length > 0 && (
+              <div className="sticky top-24">
+                <p className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                  On this page
+                </p>
+                <ul className="space-y-2 border-l border-white/10 pl-4 text-sm">
+                  {headings.map((h) => (
+                    <li key={h.id}>
+                      <a
+                        href={`#${h.id}`}
+                        className="block text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        {h.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </aside>
         </div>
       </article>
 
