@@ -96,7 +96,7 @@ export const runSourcingSearch = createServerFn({ method: "POST" })
       profile_url: c.profile_url,
       avatar_url: c.avatar_url,
       email: c.email,
-      signals: c.signals,
+      signals: c.signals as unknown as never,
       ai_summary: c.ai_summary,
       fit_score: c.fit_score,
       last_search_id: searchId,
