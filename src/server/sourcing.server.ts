@@ -3,9 +3,10 @@ const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash";
 const GH_SEARCH = "https://api.github.com/search/users";
 const GH_USER = "https://api.github.com/users";
+const PDL_BASE = "https://api.peopledatalabs.com/v5";
 
 export interface RawCandidate {
-  source: "github";
+  source: "github" | "pdl";
   external_id: string;
   name: string;
   headline: string | null;
@@ -118,15 +119,244 @@ export async function searchGithubCandidates(opts: {
   }));
 }
 
+// ---------------- People Data Labs ----------------
+
+function pdlKey() {
+  const k = process.env.PDL_API_KEY;
+  if (!k) {
+    throw new Error(
+      "PDL_API_KEY is not configured. Add it in project secrets to enable People Data Labs sourcing.",
+    );
+  }
+  return k;
+}
+
+/** Translate a natural-language brief + filters into a PDL Elasticsearch query. */
+export function buildPdlQuery(opts: {
+  query: string;
+  filters?: {
+    location?: string | null;
+    jobTitle?: string | null;
+    skills?: string[] | null;
+    company?: string | null;
+    seniority?: string | null;
+  };
+}) {
+  const must: Record<string, unknown>[] = [];
+  const should: Record<string, unknown>[] = [];
+  const q = opts.query.trim();
+  if (q) {
+    should.push({ match: { job_title: q } });
+    should.push({ match: { headline: q } });
+    should.push({ match: { skills: q } });
+    should.push({ match: { summary: q } });
+  }
+  const f = opts.filters ?? {};
+  if (f.jobTitle) must.push({ match: { job_title: f.jobTitle } });
+  if (f.company) must.push({ match: { job_company_name: f.company } });
+  if (f.seniority) must.push({ term: { job_title_levels: f.seniority.toLowerCase() } });
+  if (f.location) must.push({ match: { location_name: f.location } });
+  for (const s of f.skills ?? []) {
+    if (s.trim()) must.push({ term: { skills: s.trim().toLowerCase() } });
+  }
+  return {
+    query: {
+      bool: {
+        must: must.length ? must : undefined,
+        should: should.length ? should : undefined,
+        minimum_should_match: should.length ? 1 : undefined,
+      },
+    },
+  };
+}
+
+interface PdlPerson {
+  id?: string;
+  full_name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  job_title?: string | null;
+  job_company_name?: string | null;
+  job_company_size?: string | null;
+  job_company_industry?: string | null;
+  job_company_founded?: number | null;
+  job_company_employee_count?: number | null;
+  job_title_levels?: string[] | null;
+  headline?: string | null;
+  summary?: string | null;
+  skills?: string[] | null;
+  location_name?: string | null;
+  linkedin_url?: string | null;
+  github_url?: string | null;
+  twitter_url?: string | null;
+  work_email?: string | null;
+  personal_emails?: string[] | null;
+  emails?: { address: string; type?: string }[] | null;
+  experience?: unknown;
+}
+
+function pdlToCandidate(p: PdlPerson): RawCandidate {
+  const name =
+    p.full_name ||
+    [p.first_name, p.last_name].filter(Boolean).join(" ") ||
+    "Unknown";
+  const email =
+    p.work_email ||
+    p.personal_emails?.[0] ||
+    p.emails?.find((e) => e.type === "professional")?.address ||
+    p.emails?.[0]?.address ||
+    null;
+  const profile =
+    p.linkedin_url ||
+    p.github_url ||
+    p.twitter_url ||
+    (p.id ? `https://app.peopledatalabs.com/profile/${p.id}` : "");
+  const headline =
+    p.headline ||
+    [p.job_title, p.job_company_name].filter(Boolean).join(" at ") ||
+    p.summary?.slice(0, 160) ||
+    null;
+  return {
+    source: "pdl",
+    external_id: p.id ?? `${name}-${email ?? profile}`,
+    name,
+    headline,
+    location: p.location_name ?? null,
+    profile_url: profile,
+    avatar_url: null,
+    email,
+    signals: {
+      job_title: p.job_title,
+      job_title_levels: p.job_title_levels,
+      company: p.job_company_name,
+      company_size: p.job_company_size,
+      company_industry: p.job_company_industry,
+      company_founded: p.job_company_founded,
+      company_employees: p.job_company_employee_count,
+      skills: p.skills?.slice(0, 20) ?? [],
+      linkedin_url: p.linkedin_url,
+      github_url: p.github_url,
+    },
+  };
+}
+
+export async function searchPdlCandidates(opts: {
+  query: string;
+  filters?: {
+    location?: string | null;
+    jobTitle?: string | null;
+    skills?: string[] | null;
+    company?: string | null;
+    seniority?: string | null;
+  };
+  limit?: number;
+}): Promise<RawCandidate[]> {
+  const key = pdlKey();
+  const size = Math.min(Math.max(opts.limit ?? 12, 1), 25);
+  const body = {
+    ...buildPdlQuery({ query: opts.query, filters: opts.filters }),
+    size,
+    pretty: false,
+  };
+  const res = await fetch(`${PDL_BASE}/person/search`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Api-Key": key,
+    },
+    body: JSON.stringify(body),
+  });
+  if (res.status === 401 || res.status === 403)
+    throw new Error("PDL rejected the API key. Verify PDL_API_KEY is correct and active.");
+  if (res.status === 402)
+    throw new Error("PDL credits exhausted. Top up the People Data Labs account.");
+  if (res.status === 429)
+    throw new Error("PDL rate limit hit. Wait a moment and retry.");
+  if (!res.ok) throw new Error(`PDL search failed [${res.status}]: ${await res.text()}`);
+  const json = (await res.json()) as { data?: PdlPerson[] };
+  return (json.data ?? []).map(pdlToCandidate);
+}
+
+/** Enrich a single person — used to top up missing fields (email, current role) on a candidate. */
+export async function enrichPdlPerson(opts: {
+  email?: string | null;
+  linkedinUrl?: string | null;
+  githubUrl?: string | null;
+  name?: string | null;
+  company?: string | null;
+}): Promise<PdlPerson | null> {
+  const key = pdlKey();
+  const params = new URLSearchParams();
+  if (opts.email) params.set("email", opts.email);
+  if (opts.linkedinUrl) params.set("profile", opts.linkedinUrl);
+  if (opts.githubUrl) params.append("profile", opts.githubUrl);
+  if (opts.name) params.set("name", opts.name);
+  if (opts.company) params.set("company", opts.company);
+  params.set("min_likelihood", "6");
+  const res = await fetch(`${PDL_BASE}/person/enrich?${params.toString()}`, {
+    headers: { "X-Api-Key": key },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`PDL enrich failed [${res.status}]: ${await res.text()}`);
+  const json = (await res.json()) as { status?: number; data?: PdlPerson };
+  if (json.status !== 200 || !json.data) return null;
+  return json.data;
+}
+
+/** Find a verified work email for a candidate via PDL. */
+export async function findPdlEmail(opts: {
+  linkedinUrl?: string | null;
+  name?: string | null;
+  company?: string | null;
+}): Promise<string | null> {
+  const person = await enrichPdlPerson(opts);
+  if (!person) return null;
+  return (
+    person.work_email ||
+    person.personal_emails?.[0] ||
+    person.emails?.find((e) => e.type === "professional")?.address ||
+    person.emails?.[0]?.address ||
+    null
+  );
+}
+
+/** Pull company signals (size, industry, funding stage) for context in fit scoring. */
+export async function fetchPdlCompany(name: string): Promise<Record<string, unknown> | null> {
+  const key = pdlKey();
+  const params = new URLSearchParams({ name });
+  const res = await fetch(`${PDL_BASE}/company/enrich?${params.toString()}`, {
+    headers: { "X-Api-Key": key },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) return null;
+  const json = (await res.json()) as { status?: number; [k: string]: unknown };
+  if (json.status !== 200) return null;
+  return json;
+}
+
 /** Rule-based pre-score (0-50) from raw GitHub signals + keyword overlap with brief. */
 function ruleScore(c: RawCandidate, brief: string): number {
-  const s = c.signals as { followers?: number; public_repos?: number };
+  const s = c.signals as {
+    followers?: number;
+    public_repos?: number;
+    job_title_levels?: string[];
+    company_employees?: number;
+    skills?: string[];
+  };
   let score = 0;
-  const followers = s.followers ?? 0;
-  const repos = s.public_repos ?? 0;
-  score += Math.min(20, Math.log2(followers + 1) * 3);
-  score += Math.min(15, Math.log2(repos + 1) * 2);
-  const blob = `${c.name} ${c.headline ?? ""} ${c.location ?? ""}`.toLowerCase();
+  if (c.source === "github") {
+    const followers = s.followers ?? 0;
+    const repos = s.public_repos ?? 0;
+    score += Math.min(20, Math.log2(followers + 1) * 3);
+    score += Math.min(15, Math.log2(repos + 1) * 2);
+  } else {
+    // PDL: reward seniority signals + skill overlap
+    const levels = s.job_title_levels ?? [];
+    if (levels.includes("senior") || levels.includes("manager")) score += 8;
+    if (levels.includes("director") || levels.includes("vp") || levels.includes("cxo")) score += 12;
+    score += Math.min(10, Math.log2((s.company_employees ?? 0) + 1));
+  }
+  const blob = `${c.name} ${c.headline ?? ""} ${c.location ?? ""} ${(s.skills ?? []).join(" ")}`.toLowerCase();
   const tokens = brief.toLowerCase().split(/[^a-z0-9+#.]+/).filter((t) => t.length > 2);
   const hits = tokens.filter((t) => blob.includes(t)).length;
   score += Math.min(15, hits * 3);
