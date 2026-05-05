@@ -121,6 +121,63 @@ function LiveInterviewPage() {
   const redFlags = useMemo(() => events.filter((e) => e.kind === "red_flag"), [events]);
   const statuses = useMemo(() => events.filter((e) => e.kind === "status"), [events]);
 
+  // Group consecutive transcript turns by speaker
+  const transcriptTurns = useMemo(() => {
+    const turns: { speaker: string; lines: EventRow[] }[] = [];
+    for (const e of transcript) {
+      const sp = (e.speaker ?? "Speaker").trim() || "Speaker";
+      const last = turns[turns.length - 1];
+      if (last && last.speaker === sp) last.lines.push(e);
+      else turns.push({ speaker: sp, lines: [e] });
+    }
+    return turns;
+  }, [transcript]);
+
+  // Stable color per speaker
+  const speakerStyles = useMemo(() => {
+    const palette = [
+      { dot: "bg-violet-500", chip: "bg-violet-500/10 text-violet-600 dark:text-violet-300" },
+      { dot: "bg-emerald-500", chip: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300" },
+      { dot: "bg-sky-500", chip: "bg-sky-500/10 text-sky-600 dark:text-sky-300" },
+      { dot: "bg-amber-500", chip: "bg-amber-500/10 text-amber-700 dark:text-amber-300" },
+      { dot: "bg-pink-500", chip: "bg-pink-500/10 text-pink-600 dark:text-pink-300" },
+    ];
+    const map = new Map<string, (typeof palette)[number]>();
+    let i = 0;
+    for (const t of transcriptTurns) {
+      if (!map.has(t.speaker)) {
+        map.set(t.speaker, palette[i % palette.length]);
+        i++;
+      }
+    }
+    return map;
+  }, [transcriptTurns]);
+
+  // Dismiss suggestions locally (per session)
+  const dismissKey = `dismissed-suggestions-${id}`;
+  const [dismissed, setDismissed] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
+    try {
+      return new Set(JSON.parse(window.sessionStorage.getItem(dismissKey) ?? "[]"));
+    } catch {
+      return new Set();
+    }
+  });
+  function dismissSuggestion(eventId: string) {
+    setDismissed((prev) => {
+      const next = new Set(prev);
+      next.add(eventId);
+      try {
+        window.sessionStorage.setItem(dismissKey, JSON.stringify([...next]));
+      } catch { /* ignore */ }
+      return next;
+    });
+  }
+  const visibleSuggestions = useMemo(
+    () => suggestions.filter((s) => !dismissed.has(s.id)).slice(-8).reverse(),
+    [suggestions, dismissed],
+  );
+
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/login" });
   }, [authLoading, user, navigate]);
