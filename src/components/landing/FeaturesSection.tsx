@@ -5,7 +5,7 @@ const features = [
     icon: Radar,
     title: "AI Sourcing",
     description:
-      "Continuously scans 600M+ profiles, repos and signals to surface hidden talent and flight-risk candidates before your competitors do.",
+      "Continuously scans public profiles, repos and hiring signals to surface hidden talent and flight-risk candidates before your competitors do.",
   },
   {
     icon: ClipboardCheck,
