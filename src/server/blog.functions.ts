@@ -65,3 +65,24 @@ export const getPublishedPosts = createServerFn({ method: "GET" }).handler(async
   const posts: PublicPost[] = await fetchPublishedPosts();
   return { posts };
 });
+
+export const subscribeToNewsletter = createServerFn({ method: "POST" })
+  .inputValidator((d: { email: string; source?: string }) => {
+    const email = String(d?.email ?? "").trim().toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      throw new Error("Invalid email");
+    }
+    if (email.length > 254) throw new Error("Email too long");
+    const source = String(d?.source ?? "blog").slice(0, 64);
+    return { email, source };
+  })
+  .handler(async ({ data }) => {
+    const { error } = await supabaseAdmin
+      .from("newsletter_subscribers")
+      .upsert(
+        { email: data.email, source: data.source, status: "active" },
+        { onConflict: "email", ignoreDuplicates: true },
+      );
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
