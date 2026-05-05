@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { posts, type PostCategory } from "@/content/blog-posts";
 import { toast } from "sonner";
 import { getPublishedPosts } from "@/server/blog.functions";
+import type { PublicPost } from "@/server/blog.server";
 
 export const Route = createFileRoute("/blog/")({
   loader: async () => {
@@ -41,7 +42,7 @@ export const Route = createFileRoute("/blog/")({
 function BlogPage() {
   const { dbPosts } = Route.useLoaderData();
   const merged = useMemo(() => {
-    const dbMapped = dbPosts.map((p) => ({
+    const dbMapped = (dbPosts as PublicPost[]).map((p) => ({
       slug: p.slug,
       title: p.title,
       excerpt: p.excerpt,
