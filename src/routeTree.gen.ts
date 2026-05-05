@@ -23,11 +23,11 @@ import { Route as CustomersRouteImport } from './routes/customers'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as CareersRouteImport } from './routes/careers'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InterviewIndexRouteImport } from './routes/interview.index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as InterviewRubricsRouteImport } from './routes/interview.rubrics'
 import { Route as InterviewNewRouteImport } from './routes/interview.new'
 import { Route as InterviewIdRouteImport } from './routes/interview.$id'
@@ -115,11 +115,6 @@ const CareersRoute = CareersRouteImport.update({
   path: '/careers',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -138,6 +133,11 @@ const IndexRoute = IndexRouteImport.update({
 const InterviewIndexRoute = InterviewIndexRouteImport.update({
   id: '/interview/',
   path: '/interview/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InterviewRubricsRoute = InterviewRubricsRouteImport.update({
@@ -228,7 +228,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
-  '/blog': typeof BlogRouteWithChildren
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -249,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/blog/': typeof BlogIndexRoute
   '/interview/': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
@@ -265,7 +265,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
-  '/blog': typeof BlogRouteWithChildren
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -286,6 +285,7 @@ export interface FileRoutesByTo {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/blog': typeof BlogIndexRoute
   '/interview': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
@@ -303,7 +303,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
-  '/blog': typeof BlogRouteWithChildren
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -324,6 +323,7 @@ export interface FileRoutesById {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/blog/': typeof BlogIndexRoute
   '/interview/': typeof InterviewIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
@@ -342,7 +342,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
-    | '/blog'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -363,6 +362,7 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/blog/'
     | '/interview/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
@@ -379,7 +379,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
-    | '/blog'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -400,6 +399,7 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/blog'
     | '/interview'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
@@ -416,7 +416,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
-    | '/blog'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -437,6 +436,7 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/blog/'
     | '/interview/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
@@ -454,7 +454,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
-  BlogRoute: typeof BlogRouteWithChildren
   CareersRoute: typeof CareersRoute
   ChangelogRoute: typeof ChangelogRoute
   ContactRoute: typeof ContactRoute
@@ -474,6 +473,7 @@ export interface RootRouteChildren {
   InterviewIdRoute: typeof InterviewIdRoute
   InterviewNewRoute: typeof InterviewNewRoute
   InterviewRubricsRoute: typeof InterviewRubricsRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   InterviewIndexRoute: typeof InterviewIndexRoute
   ApiPublicContactRoute: typeof ApiPublicContactRoute
   ApiPublicRecallWebhookRoute: typeof ApiPublicRecallWebhookRoute
@@ -587,13 +587,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CareersRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/account': {
       id: '/account'
       path: '/account'
@@ -620,6 +613,13 @@ declare module '@tanstack/react-router' {
       path: '/interview'
       fullPath: '/interview/'
       preLoaderRoute: typeof InterviewIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/interview/rubrics': {
@@ -737,21 +737,10 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface BlogRouteChildren {
-  BlogSlugRoute: typeof BlogSlugRoute
-}
-
-const BlogRouteChildren: BlogRouteChildren = {
-  BlogSlugRoute: BlogSlugRoute,
-}
-
-const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
-  BlogRoute: BlogRouteWithChildren,
   CareersRoute: CareersRoute,
   ChangelogRoute: ChangelogRoute,
   ContactRoute: ContactRoute,
@@ -771,6 +760,7 @@ const rootRouteChildren: RootRouteChildren = {
   InterviewIdRoute: InterviewIdRoute,
   InterviewNewRoute: InterviewNewRoute,
   InterviewRubricsRoute: InterviewRubricsRoute,
+  BlogIndexRoute: BlogIndexRoute,
   InterviewIndexRoute: InterviewIndexRoute,
   ApiPublicContactRoute: ApiPublicContactRoute,
   ApiPublicRecallWebhookRoute: ApiPublicRecallWebhookRoute,
@@ -786,3 +776,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

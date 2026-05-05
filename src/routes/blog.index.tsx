@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { posts, type PostCategory } from "@/content/blog-posts";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/blog")({
+export const Route = createFileRoute("/blog/")({
   head: () => ({
     meta: [
       { title: "Blog — Grow" },
