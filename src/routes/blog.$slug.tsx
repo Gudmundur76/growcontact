@@ -4,12 +4,40 @@ import { Footer } from "@/components/landing/Footer";
 import { CtaSection } from "@/components/landing/CtaSection";
 import { ArrowLeft } from "lucide-react";
 import { getPost, posts } from "@/content/blog-posts";
+import { getPublishedPosts } from "@/server/blog.functions";
 
 export const Route = createFileRoute("/blog/$slug")({
-  loader: ({ params }) => {
-    const post = getPost(params.slug);
-    if (!post) throw notFound();
-    return { post };
+  loader: async ({ params }) => {
+    const staticPost = getPost(params.slug);
+    if (staticPost) {
+      const others = posts
+        .filter((p) => p.slug !== staticPost.slug)
+        .slice(0, 3)
+        .map((p) => ({
+          slug: p.slug,
+          title: p.title,
+          excerpt: p.excerpt,
+          category: p.category as string,
+          date: p.date,
+          readTime: p.readTime,
+        }));
+      return { post: staticPost, others };
+    }
+    const { posts: dbPosts } = await getPublishedPosts();
+    const found = dbPosts.find((p) => p.slug === params.slug);
+    if (!found) throw notFound();
+    const others = [
+      ...dbPosts.filter((p) => p.slug !== found.slug),
+      ...posts.map((p) => ({
+        slug: p.slug,
+        title: p.title,
+        excerpt: p.excerpt,
+        category: p.category as string,
+        date: p.date,
+        readTime: p.readTime,
+      })),
+    ].slice(0, 3);
+    return { post: found, others };
   },
   head: ({ loaderData }) => {
     const post = loaderData?.post;
@@ -102,8 +130,7 @@ function renderInline(text: string) {
 }
 
 function BlogPostPage() {
-  const { post } = Route.useLoaderData();
-  const others = posts.filter((p) => p.slug !== post.slug).slice(0, 3);
+  const { post, others } = Route.useLoaderData();
 
   return (
     <>
@@ -151,7 +178,7 @@ function BlogPostPage() {
             Keep reading
           </h2>
           <div className="grid gap-6 md:grid-cols-3">
-            {others.map((p) => (
+            {others.map((p: { slug: string; title: string; excerpt: string; category: string; date: string; readTime: string }) => (
               <Link
                 key={p.slug}
                 to="/blog/$slug"

@@ -8,8 +8,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { posts, type PostCategory } from "@/content/blog-posts";
 import { toast } from "sonner";
+import { getPublishedPosts } from "@/server/blog.functions";
+
+interface DbPost {
+  slug: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  author: string;
+  authorRole: string;
+  date: string;
+  readTime: string;
+  body: string;
+}
 
 export const Route = createFileRoute("/blog/")({
+  loader: async () => {
+    try {
+      const { posts: dbPosts } = await getPublishedPosts();
+      return { dbPosts };
+    } catch {
+      return { dbPosts: [] };
+    }
+  },
   head: () => ({
     meta: [
       { title: "Blog — Grow" },
@@ -30,20 +51,53 @@ export const Route = createFileRoute("/blog/")({
 });
 
 function BlogPage() {
-  const featured = posts.find((p) => p.featured) ?? posts[0];
+  const { dbPosts } = Route.useLoaderData();
+  const merged = useMemo(() => {
+    const dbMapped = (dbPosts as DbPost[]).map((p) => ({
+      slug: p.slug,
+      title: p.title,
+      excerpt: p.excerpt,
+      category: p.category as PostCategory,
+      author: p.author,
+      authorRole: p.authorRole,
+      date: p.date,
+      readTime: p.readTime,
+    }));
+    // DB posts first (newest), then static evergreen
+    const staticMapped = posts.map((p) => ({
+      slug: p.slug,
+      title: p.title,
+      excerpt: p.excerpt,
+      category: p.category,
+      author: p.author,
+      authorRole: p.authorRole,
+      date: p.date,
+      readTime: p.readTime,
+    }));
+    const seen = new Set<string>();
+    return [...dbMapped, ...staticMapped].filter((p) => {
+      if (seen.has(p.slug)) return false;
+      seen.add(p.slug);
+      return true;
+    });
+  }, [dbPosts]);
+
+  const featured =
+    merged.find((p) => posts.find((s) => s.slug === p.slug && s.featured)) ??
+    merged[0];
   const [activeCat, setActiveCat] = useState<PostCategory | "All">("All");
   const [query, setQuery] = useState("");
   const [email, setEmail] = useState("");
 
   const categories: (PostCategory | "All")[] = useMemo(() => {
     const set = new Set<PostCategory>();
-    posts.forEach((p) => set.add(p.category));
+    merged.forEach((p) => set.add(p.category));
     return ["All", ...Array.from(set)];
-  }, []);
+  }, [merged]);
 
   const rest = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return posts
+    return merged
       .filter((p) => p.slug !== featured.slug)
       .filter((p) => activeCat === "All" || p.category === activeCat)
       .filter(
@@ -53,7 +107,7 @@ function BlogPage() {
           p.excerpt.toLowerCase().includes(q) ||
           p.author.toLowerCase().includes(q),
       );
-  }, [activeCat, query, featured.slug]);
+  }, [activeCat, query, featured.slug, merged]);
 
   function handleSubscribe(e: React.FormEvent) {
     e.preventDefault();
