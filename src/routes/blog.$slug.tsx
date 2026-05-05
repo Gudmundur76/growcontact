@@ -42,6 +42,11 @@ export const Route = createFileRoute("/blog/$slug")({
   head: ({ loaderData }) => {
     const post = loaderData?.post;
     if (!post) return { meta: [{ title: "Post not found — Grow" }] };
+    const url = `https://grow.contact/blog/${post.slug}`;
+    const isoDate = (() => {
+      const d = new Date(post.date);
+      return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+    })();
     return {
       meta: [
         { title: `${post.title} — Grow Blog` },
@@ -49,7 +54,39 @@ export const Route = createFileRoute("/blog/$slug")({
         { property: "og:title", content: post.title },
         { property: "og:description", content: post.excerpt },
         { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
+        { property: "article:published_time", content: isoDate },
+        { property: "article:author", content: post.author },
+        { property: "article:section", content: post.category },
         { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: post.title },
+        { name: "twitter:description", content: post.excerpt },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: post.title,
+            description: post.excerpt,
+            datePublished: isoDate,
+            dateModified: isoDate,
+            author: {
+              "@type": "Person",
+              name: post.author,
+              jobTitle: post.authorRole,
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "Grow",
+              url: "https://grow.contact",
+            },
+            mainEntityOfPage: { "@type": "WebPage", "@id": url },
+            articleSection: post.category,
+          }),
+        },
       ],
     };
   },
