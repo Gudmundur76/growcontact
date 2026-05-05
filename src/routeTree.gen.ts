@@ -34,6 +34,7 @@ import { Route as InterviewIdRouteImport } from './routes/interview.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminContactsRouteImport } from './routes/admin/contacts'
+import { Route as AdminBlogRouteImport } from './routes/admin/blog'
 import { Route as ShareScorecardTokenRouteImport } from './routes/share.scorecard.$token'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicRecallWebhookRouteImport } from './routes/api/public/recall-webhook'
@@ -171,6 +172,11 @@ const AdminContactsRoute = AdminContactsRouteImport.update({
   path: '/admin/contacts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminBlogRoute = AdminBlogRouteImport.update({
+  id: '/admin/blog',
+  path: '/admin/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShareScorecardTokenRoute = ShareScorecardTokenRouteImport.update({
   id: '/share/scorecard/$token',
   path: '/share/scorecard/$token',
@@ -249,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -287,6 +294,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -326,6 +334,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -366,6 +375,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/terms'
     | '/unsubscribe'
+    | '/admin/blog'
     | '/admin/contacts'
     | '/blog/$slug'
     | '/email/unsubscribe'
@@ -404,6 +414,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/terms'
     | '/unsubscribe'
+    | '/admin/blog'
     | '/admin/contacts'
     | '/blog/$slug'
     | '/email/unsubscribe'
@@ -442,6 +453,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/terms'
     | '/unsubscribe'
+    | '/admin/blog'
     | '/admin/contacts'
     | '/blog/$slug'
     | '/email/unsubscribe'
@@ -481,6 +493,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  AdminBlogRoute: typeof AdminBlogRoute
   AdminContactsRoute: typeof AdminContactsRoute
   BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -679,6 +692,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContactsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/blog': {
+      id: '/admin/blog'
+      path: '/admin/blog'
+      fullPath: '/admin/blog'
+      preLoaderRoute: typeof AdminBlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/share/scorecard/$token': {
       id: '/share/scorecard/$token'
       path: '/share/scorecard/$token'
@@ -777,6 +797,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  AdminBlogRoute: AdminBlogRoute,
   AdminContactsRoute: AdminContactsRoute,
   BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
