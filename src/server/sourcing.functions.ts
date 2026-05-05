@@ -8,6 +8,9 @@ import {
   rankCandidates,
   personalizeOutreach,
 } from "./sourcing.server";
+import * as React from "react";
+import { render } from "@react-email/components";
+import { TEMPLATES } from "@/lib/email-templates/registry";
 
 // ---------- Rate limiter ----------
 const rateBuckets = new Map<string, { count: number; reset: number }>();
@@ -386,29 +389,86 @@ export const sendOutreach = createServerFn({ method: "POST" })
       senderName: seq.sender_name,
     });
 
-    // Send via internal transactional pipeline
-    const baseUrl = process.env.PUBLIC_BASE_URL ?? "https://growcontact.lovable.app";
-    const sendRes = await fetch(`${baseUrl}/lovable/email/transactional/send`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Internal-Auth": process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
-      },
-      body: JSON.stringify({
-        templateName: "outreach",
-        recipientEmail: data.recipientEmail,
-        idempotencyKey: `outreach-${data.candidateId}-${data.sequenceId}-${Date.now()}`,
-        templateData: {
-          subject: personalized.subject,
-          body: personalized.body,
-          senderName: seq.sender_name ?? "",
-          candidateName: cand.name,
-        },
-      }),
+    // Render and enqueue via the existing transactional pipeline (admin-side, no JWT hop).
+    const recipient = data.recipientEmail.toLowerCase();
+    const { data: suppressed } = await supabaseAdmin
+      .from("suppressed_emails")
+      .select("id")
+      .eq("email", recipient)
+      .maybeSingle();
+    if (suppressed) {
+      await supabaseAdmin.from("sourcing_sends").insert({
+        user_id: userId,
+        candidate_id: data.candidateId,
+        sequence_id: data.sequenceId,
+        recipient_email: data.recipientEmail,
+        subject: personalized.subject,
+        body: personalized.body,
+        status: "suppressed",
+      });
+      throw new Error("Recipient has unsubscribed from emails.");
+    }
+
+    const tpl = TEMPLATES["outreach"];
+    const element = React.createElement(tpl.component, {
+      subject: personalized.subject,
+      body: personalized.body,
+      senderName: seq.sender_name ?? "",
+      candidateName: cand.name,
+    });
+    const html = await render(element);
+    const text = await render(element, { plainText: true });
+    const messageId = crypto.randomUUID();
+
+    // Ensure unsubscribe token exists
+    const { data: tok } = await supabaseAdmin
+      .from("email_unsubscribe_tokens")
+      .select("token")
+      .eq("email", recipient)
+      .maybeSingle();
+    let unsubscribe_token = tok?.token;
+    if (!unsubscribe_token) {
+      const bytes = new Uint8Array(32);
+      crypto.getRandomValues(bytes);
+      unsubscribe_token = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+      await supabaseAdmin
+        .from("email_unsubscribe_tokens")
+        .upsert({ token: unsubscribe_token, email: recipient }, { onConflict: "email", ignoreDuplicates: true });
+      const { data: re } = await supabaseAdmin
+        .from("email_unsubscribe_tokens")
+        .select("token")
+        .eq("email", recipient)
+        .maybeSingle();
+      unsubscribe_token = re?.token ?? unsubscribe_token;
+    }
+
+    await supabaseAdmin.from("email_send_log").insert({
+      message_id: messageId,
+      template_name: "outreach",
+      recipient_email: data.recipientEmail,
+      status: "pending",
     });
 
-    const status = sendRes.ok ? "sent" : "failed";
-    const errorMessage = sendRes.ok ? null : `Email send failed [${sendRes.status}]`;
+    const { error: enqErr } = await supabaseAdmin.rpc("enqueue_email", {
+      queue_name: "transactional_emails",
+      payload: {
+        message_id: messageId,
+        to: data.recipientEmail,
+        from: "growcontact <noreply@grow.contact>",
+        sender_domain: "notify.grow.contact",
+        subject: personalized.subject,
+        html,
+        text,
+        purpose: "transactional",
+        label: "outreach",
+        idempotency_key: `outreach-${data.candidateId}-${data.sequenceId}`,
+        unsubscribe_token,
+        queued_at: new Date().toISOString(),
+      },
+    });
+
+    const status = enqErr ? "failed" : "sent";
+    const errorMessage = enqErr ? enqErr.message : null;
 
     const { error: logErr } = await supabaseAdmin.from("sourcing_sends").insert({
       user_id: userId,
@@ -421,6 +481,6 @@ export const sendOutreach = createServerFn({ method: "POST" })
       error_message: errorMessage,
     });
     if (logErr) throw new Error(logErr.message);
-    if (!sendRes.ok) throw new Error(errorMessage ?? "Send failed");
+    if (enqErr) throw new Error(errorMessage ?? "Send failed");
     return { ok: true, subject: personalized.subject };
   });
