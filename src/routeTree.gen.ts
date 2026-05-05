@@ -33,6 +33,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SourcingIndexRouteImport } from './routes/sourcing.index'
 import { Route as InterviewIndexRouteImport } from './routes/interview.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as SourcingShortlistsRouteImport } from './routes/sourcing.shortlists'
+import { Route as SourcingSequencesRouteImport } from './routes/sourcing.sequences'
+import { Route as SourcingSearchesRouteImport } from './routes/sourcing.searches'
 import { Route as InterviewRubricsRouteImport } from './routes/interview.rubrics'
 import { Route as InterviewNewRouteImport } from './routes/interview.new'
 import { Route as InterviewIdRouteImport } from './routes/interview.$id'
@@ -50,6 +53,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicScorecardTokenRouteImport } from './routes/api/public/scorecard.$token'
+import { Route as ApiPublicHooksSourcingAlertsRouteImport } from './routes/api/public/hooks/sourcing-alerts'
 import { Route as ApiPublicHooksGenerateBlogPostRouteImport } from './routes/api/public/hooks/generate-blog-post'
 import { Route as ApiPublicHooksAutoPublishBlogPostRouteImport } from './routes/api/public/hooks/auto-publish-blog-post'
 
@@ -173,6 +177,21 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SourcingShortlistsRoute = SourcingShortlistsRouteImport.update({
+  id: '/shortlists',
+  path: '/shortlists',
+  getParentRoute: () => SourcingRoute,
+} as any)
+const SourcingSequencesRoute = SourcingSequencesRouteImport.update({
+  id: '/sequences',
+  path: '/sequences',
+  getParentRoute: () => SourcingRoute,
+} as any)
+const SourcingSearchesRoute = SourcingSearchesRouteImport.update({
+  id: '/searches',
+  path: '/searches',
+  getParentRoute: () => SourcingRoute,
+} as any)
 const InterviewRubricsRoute = InterviewRubricsRouteImport.update({
   id: '/interview/rubrics',
   path: '/interview/rubrics',
@@ -261,6 +280,12 @@ const ApiPublicScorecardTokenRoute = ApiPublicScorecardTokenRouteImport.update({
   path: '/api/public/scorecard/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksSourcingAlertsRoute =
+  ApiPublicHooksSourcingAlertsRouteImport.update({
+    id: '/api/public/hooks/sourcing-alerts',
+    path: '/api/public/hooks/sourcing-alerts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksGenerateBlogPostRoute =
   ApiPublicHooksGenerateBlogPostRouteImport.update({
     id: '/api/public/hooks/generate-blog-post',
@@ -303,6 +328,9 @@ export interface FileRoutesByFullPath {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/sourcing/searches': typeof SourcingSearchesRoute
+  '/sourcing/sequences': typeof SourcingSequencesRoute
+  '/sourcing/shortlists': typeof SourcingShortlistsRoute
   '/blog/': typeof BlogIndexRoute
   '/interview/': typeof InterviewIndexRoute
   '/sourcing/': typeof SourcingIndexRoute
@@ -312,6 +340,7 @@ export interface FileRoutesByFullPath {
   '/share/scorecard/$token': typeof ShareScorecardTokenRoute
   '/api/public/hooks/auto-publish-blog-post': typeof ApiPublicHooksAutoPublishBlogPostRoute
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
+  '/api/public/hooks/sourcing-alerts': typeof ApiPublicHooksSourcingAlertsRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -347,6 +376,9 @@ export interface FileRoutesByTo {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/sourcing/searches': typeof SourcingSearchesRoute
+  '/sourcing/sequences': typeof SourcingSequencesRoute
+  '/sourcing/shortlists': typeof SourcingShortlistsRoute
   '/blog': typeof BlogIndexRoute
   '/interview': typeof InterviewIndexRoute
   '/sourcing': typeof SourcingIndexRoute
@@ -356,6 +388,7 @@ export interface FileRoutesByTo {
   '/share/scorecard/$token': typeof ShareScorecardTokenRoute
   '/api/public/hooks/auto-publish-blog-post': typeof ApiPublicHooksAutoPublishBlogPostRoute
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
+  '/api/public/hooks/sourcing-alerts': typeof ApiPublicHooksSourcingAlertsRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -393,6 +426,9 @@ export interface FileRoutesById {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/sourcing/searches': typeof SourcingSearchesRoute
+  '/sourcing/sequences': typeof SourcingSequencesRoute
+  '/sourcing/shortlists': typeof SourcingShortlistsRoute
   '/blog/': typeof BlogIndexRoute
   '/interview/': typeof InterviewIndexRoute
   '/sourcing/': typeof SourcingIndexRoute
@@ -402,6 +438,7 @@ export interface FileRoutesById {
   '/share/scorecard/$token': typeof ShareScorecardTokenRoute
   '/api/public/hooks/auto-publish-blog-post': typeof ApiPublicHooksAutoPublishBlogPostRoute
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
+  '/api/public/hooks/sourcing-alerts': typeof ApiPublicHooksSourcingAlertsRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -440,6 +477,9 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/sourcing/searches'
+    | '/sourcing/sequences'
+    | '/sourcing/shortlists'
     | '/blog/'
     | '/interview/'
     | '/sourcing/'
@@ -449,6 +489,7 @@ export interface FileRouteTypes {
     | '/share/scorecard/$token'
     | '/api/public/hooks/auto-publish-blog-post'
     | '/api/public/hooks/generate-blog-post'
+    | '/api/public/hooks/sourcing-alerts'
     | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -484,6 +525,9 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/sourcing/searches'
+    | '/sourcing/sequences'
+    | '/sourcing/shortlists'
     | '/blog'
     | '/interview'
     | '/sourcing'
@@ -493,6 +537,7 @@ export interface FileRouteTypes {
     | '/share/scorecard/$token'
     | '/api/public/hooks/auto-publish-blog-post'
     | '/api/public/hooks/generate-blog-post'
+    | '/api/public/hooks/sourcing-alerts'
     | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -529,6 +574,9 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/sourcing/searches'
+    | '/sourcing/sequences'
+    | '/sourcing/shortlists'
     | '/blog/'
     | '/interview/'
     | '/sourcing/'
@@ -538,6 +586,7 @@ export interface FileRouteTypes {
     | '/share/scorecard/$token'
     | '/api/public/hooks/auto-publish-blog-post'
     | '/api/public/hooks/generate-blog-post'
+    | '/api/public/hooks/sourcing-alerts'
     | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -583,6 +632,7 @@ export interface RootRouteChildren {
   ShareScorecardTokenRoute: typeof ShareScorecardTokenRoute
   ApiPublicHooksAutoPublishBlogPostRoute: typeof ApiPublicHooksAutoPublishBlogPostRoute
   ApiPublicHooksGenerateBlogPostRoute: typeof ApiPublicHooksGenerateBlogPostRoute
+  ApiPublicHooksSourcingAlertsRoute: typeof ApiPublicHooksSourcingAlertsRoute
   ApiPublicScorecardTokenRoute: typeof ApiPublicScorecardTokenRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -761,6 +811,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sourcing/shortlists': {
+      id: '/sourcing/shortlists'
+      path: '/shortlists'
+      fullPath: '/sourcing/shortlists'
+      preLoaderRoute: typeof SourcingShortlistsRouteImport
+      parentRoute: typeof SourcingRoute
+    }
+    '/sourcing/sequences': {
+      id: '/sourcing/sequences'
+      path: '/sequences'
+      fullPath: '/sourcing/sequences'
+      preLoaderRoute: typeof SourcingSequencesRouteImport
+      parentRoute: typeof SourcingRoute
+    }
+    '/sourcing/searches': {
+      id: '/sourcing/searches'
+      path: '/searches'
+      fullPath: '/sourcing/searches'
+      preLoaderRoute: typeof SourcingSearchesRouteImport
+      parentRoute: typeof SourcingRoute
+    }
     '/interview/rubrics': {
       id: '/interview/rubrics'
       path: '/interview/rubrics'
@@ -880,6 +951,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicScorecardTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/sourcing-alerts': {
+      id: '/api/public/hooks/sourcing-alerts'
+      path: '/api/public/hooks/sourcing-alerts'
+      fullPath: '/api/public/hooks/sourcing-alerts'
+      preLoaderRoute: typeof ApiPublicHooksSourcingAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/generate-blog-post': {
       id: '/api/public/hooks/generate-blog-post'
       path: '/api/public/hooks/generate-blog-post'
@@ -898,10 +976,16 @@ declare module '@tanstack/react-router' {
 }
 
 interface SourcingRouteChildren {
+  SourcingSearchesRoute: typeof SourcingSearchesRoute
+  SourcingSequencesRoute: typeof SourcingSequencesRoute
+  SourcingShortlistsRoute: typeof SourcingShortlistsRoute
   SourcingIndexRoute: typeof SourcingIndexRoute
 }
 
 const SourcingRouteChildren: SourcingRouteChildren = {
+  SourcingSearchesRoute: SourcingSearchesRoute,
+  SourcingSequencesRoute: SourcingSequencesRoute,
+  SourcingShortlistsRoute: SourcingShortlistsRoute,
   SourcingIndexRoute: SourcingIndexRoute,
 }
 
@@ -947,6 +1031,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksAutoPublishBlogPostRoute:
     ApiPublicHooksAutoPublishBlogPostRoute,
   ApiPublicHooksGenerateBlogPostRoute: ApiPublicHooksGenerateBlogPostRoute,
+  ApiPublicHooksSourcingAlertsRoute: ApiPublicHooksSourcingAlertsRoute,
   ApiPublicScorecardTokenRoute: ApiPublicScorecardTokenRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
@@ -957,3 +1042,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

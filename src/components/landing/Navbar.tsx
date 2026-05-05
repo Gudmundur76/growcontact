@@ -17,9 +17,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-type NavTo = "/pricing" | "/customers" | "/blog" | "/about" | "/careers";
+type NavTo = "/pricing" | "/customers" | "/blog" | "/about" | "/careers" | "/sourcing";
 
 const links: { label: string; to: NavTo }[] = [
+  { label: "AI Sourcing", to: "/sourcing" },
   { label: "Interview Copilot", to: "/interview-copilot" as NavTo },
   { label: "Pricing", to: "/pricing" },
   { label: "Customers", to: "/customers" },
