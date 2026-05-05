@@ -60,11 +60,6 @@ export const Route = createRootRoute({
         content:
           "Source, screen, interview and hire from one calibrated AI platform.",
       },
-      { title: "Grow contact" },
-      { property: "og:title", content: "Grow contact" },
-      { name: "description", content: "A dark-themed landing page with a dynamic hero section, interactive navbar, and a scrolling logo marquee." },
-      { property: "og:description", content: "A dark-themed landing page with a dynamic hero section, interactive navbar, and a scrolling logo marquee." },
-      { name: "twitter:description", content: "A dark-themed landing page with a dynamic hero section, interactive navbar, and a scrolling logo marquee." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/619b56c4-eb2b-476b-80fb-b55a066ffc5f/id-preview-d21d0f50--e1107b25-62a7-46ae-ab03-790d77a20251.lovable.app-1777895398072.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/619b56c4-eb2b-476b-80fb-b55a066ffc5f/id-preview-d21d0f50--e1107b25-62a7-46ae-ab03-790d77a20251.lovable.app-1777895398072.png" },
     ],
@@ -74,6 +69,25 @@ export const Route = createRootRoute({
         href: appCss,
       },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      {
+        rel: "alternate",
+        type: "application/rss+xml",
+        title: "Grow Blog",
+        href: "https://grow.contact/rss.xml",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "Grow",
+          url: "https://grow.contact",
+          logo: "https://grow.contact/favicon.svg",
+          sameAs: [],
+        }),
+      },
     ],
   }),
   shellComponent: RootShell,
