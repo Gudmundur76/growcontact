@@ -19,8 +19,10 @@ export interface TemplateEntry {
  */
 import { template as contactConfirmation } from './contact-confirmation'
 import { template as scorecardShare } from './scorecard-share'
+import { template as scorecardRecap } from './scorecard-recap'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'contact-confirmation': contactConfirmation,
   'scorecard-share': scorecardShare,
+  'scorecard-recap': scorecardRecap,
 }
