@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { posts, type PostCategory } from "@/content/blog-posts";
 import { toast } from "sonner";
-import { getPublishedPosts } from "@/server/blog.functions";
+import { getPublishedPosts, subscribeToNewsletter } from "@/server/blog.functions";
 
 interface DbPost {
   slug: string;
@@ -88,6 +88,7 @@ function BlogPage() {
   const [activeCat, setActiveCat] = useState<PostCategory | "All">("All");
   const [query, setQuery] = useState("");
   const [email, setEmail] = useState("");
+  const [subscribing, setSubscribing] = useState(false);
 
   const categories: (PostCategory | "All")[] = useMemo(() => {
     const set = new Set<PostCategory>();
@@ -109,14 +110,22 @@ function BlogPage() {
       );
   }, [activeCat, query, featured.slug, merged]);
 
-  function handleSubscribe(e: React.FormEvent) {
+  async function handleSubscribe(e: React.FormEvent) {
     e.preventDefault();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
       toast.error("Enter a valid email");
       return;
     }
-    toast.success("Subscribed — we'll send the next dispatch your way.");
-    setEmail("");
+    setSubscribing(true);
+    try {
+      await subscribeToNewsletter({ data: { email, source: "blog" } });
+      toast.success("Subscribed — we'll send the next dispatch your way.");
+      setEmail("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not subscribe");
+    } finally {
+      setSubscribing(false);
+    }
   }
 
   return (
@@ -289,8 +298,8 @@ function BlogPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                <Button type="submit" variant="hero" className="w-full">
-                  Subscribe
+                <Button type="submit" variant="hero" className="w-full" disabled={subscribing}>
+                  {subscribing ? "Subscribing…" : "Subscribe"}
                 </Button>
                 <p className="text-center text-[11px] text-muted-foreground">
                   10,400+ talent leaders subscribed.
