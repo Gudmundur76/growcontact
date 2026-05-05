@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import type { Json } from "@/integrations/supabase/types";
 import {
   searchGithubCandidates,
   rankCandidates,
@@ -96,7 +97,7 @@ export const runSourcingSearch = createServerFn({ method: "POST" })
       profile_url: c.profile_url,
       avatar_url: c.avatar_url,
       email: c.email,
-      signals: c.signals as unknown as never,
+      signals: c.signals as Json,
       ai_summary: c.ai_summary,
       fit_score: c.fit_score,
       last_search_id: searchId,
