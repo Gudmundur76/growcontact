@@ -225,7 +225,7 @@ export const enrichCandidate = createServerFn({ method: "POST" })
       .eq("id", c.id);
     if (updErr) throw new Error(updErr.message);
 
-    return { ok: true as const, email: newEmail, signals: newSignals };
+    return { ok: true as const, email: newEmail, signals: newSignals as Record<string, Json> };
   });
 
 const FindEmailSchema = z.object({ candidateId: z.string().uuid() });
@@ -280,7 +280,7 @@ export const fetchCandidateCompany = createServerFn({ method: "POST" })
     const companyName = (sig.company as string | undefined) ?? null;
     if (!companyName) return { company: null };
 
-    const company = await fetchPdlCompany(companyName);
+    const company = (await fetchPdlCompany(companyName)) as Record<string, Json> | null;
     if (!company) return { company: null };
 
     const newSignals = { ...sig, company_profile: company };
