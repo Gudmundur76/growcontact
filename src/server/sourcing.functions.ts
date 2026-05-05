@@ -5,6 +5,10 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import type { Json } from "@/integrations/supabase/types";
 import {
   searchGithubCandidates,
+  searchPdlCandidates,
+  enrichPdlPerson,
+  findPdlEmail,
+  fetchPdlCompany,
   rankCandidates,
   personalizeOutreach,
 } from "./sourcing.server";
@@ -33,12 +37,17 @@ function rateLimit(key: string, limit: number, windowMs: number) {
 const RunSearchSchema = z.object({
   query: z.string().min(2).max(500),
   roleTitle: z.string().max(200).optional().nullable(),
+  source: z.enum(["github", "pdl"]).optional(),
   filters: z
     .object({
       location: z.string().max(120).optional().nullable(),
       language: z.string().max(60).optional().nullable(),
       minFollowers: z.number().int().min(0).max(100000).optional().nullable(),
       minRepos: z.number().int().min(0).max(10000).optional().nullable(),
+      jobTitle: z.string().max(200).optional().nullable(),
+      company: z.string().max(200).optional().nullable(),
+      seniority: z.enum(["entry", "senior", "manager", "director", "vp", "cxo"]).optional().nullable(),
+      skills: z.array(z.string().min(1).max(60)).max(15).optional().nullable(),
     })
     .optional(),
   limit: z.number().int().min(1).max(25).optional(),
@@ -53,11 +62,30 @@ export const runSourcingSearch = createServerFn({ method: "POST" })
     const { userId } = context;
     rateLimit(`sourcing:search:${userId}`, 20, 60_000);
 
-    const raw = await searchGithubCandidates({
-      query: data.query,
-      filters: data.filters ?? undefined,
-      limit: data.limit ?? 12,
-    });
+    const source = data.source ?? "github";
+    const raw =
+      source === "pdl"
+        ? await searchPdlCandidates({
+            query: data.query,
+            filters: {
+              location: data.filters?.location ?? null,
+              jobTitle: data.filters?.jobTitle ?? null,
+              company: data.filters?.company ?? null,
+              seniority: data.filters?.seniority ?? null,
+              skills: data.filters?.skills ?? null,
+            },
+            limit: data.limit ?? 12,
+          })
+        : await searchGithubCandidates({
+            query: data.query,
+            filters: {
+              location: data.filters?.location ?? null,
+              language: data.filters?.language ?? null,
+              minFollowers: data.filters?.minFollowers ?? null,
+              minRepos: data.filters?.minRepos ?? null,
+            },
+            limit: data.limit ?? 12,
+          });
     const ranked = await rankCandidates({
       brief: data.query,
       roleTitle: data.roleTitle ?? null,
@@ -124,6 +152,143 @@ export const runSourcingSearch = createServerFn({ method: "POST" })
       .order("fit_score", { ascending: false });
 
     return { searchId, candidates: stored ?? [] };
+  });
+
+// ---------- PDL: enrichment + email finder + company signals ----------
+
+const EnrichSchema = z.object({ candidateId: z.string().uuid() });
+
+export const enrichCandidate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => EnrichSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    rateLimit(`sourcing:enrich:${userId}`, 60, 60_000);
+
+    const { data: c, error } = await supabaseAdmin
+      .from("sourcing_candidates")
+      .select("*")
+      .eq("id", data.candidateId)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!c) throw new Error("Candidate not found");
+
+    const sig = (c.signals as Record<string, unknown>) ?? {};
+    const linkedinUrl =
+      (sig.linkedin_url as string | undefined) ??
+      (c.source === "pdl" ? c.profile_url : null);
+    const githubUrl =
+      c.source === "github" ? c.profile_url : (sig.github_url as string | undefined) ?? null;
+
+    const person = await enrichPdlPerson({
+      email: c.email,
+      linkedinUrl: linkedinUrl ?? null,
+      githubUrl: githubUrl ?? null,
+      name: c.name,
+      company: (sig.company as string | undefined) ?? null,
+    });
+    if (!person) return { ok: false as const, reason: "no_match" };
+
+    const newSignals = {
+      ...sig,
+      job_title: person.job_title ?? sig.job_title,
+      job_title_levels: person.job_title_levels ?? sig.job_title_levels,
+      company: person.job_company_name ?? sig.company,
+      company_size: person.job_company_size ?? sig.company_size,
+      company_industry: person.job_company_industry ?? sig.company_industry,
+      company_employees: person.job_company_employee_count ?? sig.company_employees,
+      skills: person.skills?.slice(0, 20) ?? sig.skills,
+      linkedin_url: person.linkedin_url ?? linkedinUrl,
+      github_url: person.github_url ?? githubUrl,
+      enriched_at: new Date().toISOString(),
+    };
+    const newEmail =
+      c.email ||
+      person.work_email ||
+      person.personal_emails?.[0] ||
+      person.emails?.find((e) => e.type === "professional")?.address ||
+      person.emails?.[0]?.address ||
+      null;
+
+    const { error: updErr } = await supabaseAdmin
+      .from("sourcing_candidates")
+      .update({
+        email: newEmail,
+        headline:
+          c.headline ||
+          [person.job_title, person.job_company_name].filter(Boolean).join(" at ") ||
+          null,
+        location: c.location || person.location_name || null,
+        signals: newSignals as Json,
+      })
+      .eq("id", c.id);
+    if (updErr) throw new Error(updErr.message);
+
+    return { ok: true as const, email: newEmail, signals: newSignals as Record<string, Json> };
+  });
+
+const FindEmailSchema = z.object({ candidateId: z.string().uuid() });
+
+export const findCandidateEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => FindEmailSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    rateLimit(`sourcing:email:${userId}`, 60, 60_000);
+
+    const { data: c } = await supabaseAdmin
+      .from("sourcing_candidates")
+      .select("*")
+      .eq("id", data.candidateId)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!c) throw new Error("Candidate not found");
+    if (c.email) return { email: c.email, cached: true };
+
+    const sig = (c.signals as Record<string, unknown>) ?? {};
+    const email = await findPdlEmail({
+      linkedinUrl:
+        (sig.linkedin_url as string | undefined) ??
+        (c.source === "pdl" ? c.profile_url : null),
+      name: c.name,
+      company: (sig.company as string | undefined) ?? null,
+    });
+    if (!email) return { email: null, cached: false };
+
+    await supabaseAdmin.from("sourcing_candidates").update({ email }).eq("id", c.id);
+    return { email, cached: false };
+  });
+
+const CompanySchema = z.object({ candidateId: z.string().uuid() });
+
+export const fetchCandidateCompany = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => CompanySchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    rateLimit(`sourcing:company:${userId}`, 60, 60_000);
+
+    const { data: c } = await supabaseAdmin
+      .from("sourcing_candidates")
+      .select("*")
+      .eq("id", data.candidateId)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!c) throw new Error("Candidate not found");
+    const sig = (c.signals as Record<string, unknown>) ?? {};
+    const companyName = (sig.company as string | undefined) ?? null;
+    if (!companyName) return { company: null };
+
+    const company = (await fetchPdlCompany(companyName)) as Record<string, Json> | null;
+    if (!company) return { company: null };
+
+    const newSignals = { ...sig, company_profile: company };
+    await supabaseAdmin
+      .from("sourcing_candidates")
+      .update({ signals: newSignals as Json })
+      .eq("id", c.id);
+    return { company };
   });
 
 // ---------- Searches CRUD ----------
