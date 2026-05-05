@@ -178,7 +178,7 @@ function BlogPostPage() {
             Keep reading
           </h2>
           <div className="grid gap-6 md:grid-cols-3">
-            {others.map((p) => (
+            {others.map((p: { slug: string; title: string; excerpt: string; category: string; date: string; readTime: string }) => (
               <Link
                 key={p.slug}
                 to="/blog/$slug"
