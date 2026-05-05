@@ -375,6 +375,34 @@ function LiveInterviewPage() {
       const r = await callServer(finalizeScorecard) as { scorecard: ScorecardRow };
       setScorecard(r.scorecard);
       toast.success("Scorecard generated");
+      // Fire-and-forget: email the interviewer a recap.
+      if (user?.email && session) {
+        const card = r.scorecard;
+        const comps = asCompetencies(card.competencies).map((c) => ({
+          name: c.name, rating: c.rating, notes: c.notes,
+        }));
+        sendTransactionalEmail({
+          templateName: "scorecard-recap",
+          recipientEmail: user.email,
+          idempotencyKey: `scorecard-recap-${session.id}`,
+          templateData: {
+            candidateName: session.candidate_name,
+            roleTitle: session.role_title,
+            overallRating: card.overall_rating,
+            recommendation: card.recommendation,
+            summary: card.summary,
+            strengths: asArray(card.strengths),
+            concerns: asArray(card.concerns),
+            competencies: comps,
+            followUps: asArray(card.follow_ups),
+            sessionUrl: `${window.location.origin}/interview/${session.id}`,
+          },
+        }).then(() => {
+          toast.success("Recap emailed to you");
+        }).catch((err) => {
+          console.error("recap email failed", err);
+        });
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed");
     } finally {
