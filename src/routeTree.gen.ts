@@ -49,6 +49,7 @@ import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/em
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicScorecardTokenRouteImport } from './routes/api/public/scorecard.$token'
 import { Route as ApiPublicHooksGenerateBlogPostRouteImport } from './routes/api/public/hooks/generate-blog-post'
+import { Route as ApiPublicHooksAutoPublishBlogPostRouteImport } from './routes/api/public/hooks/auto-publish-blog-post'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -254,6 +255,12 @@ const ApiPublicHooksGenerateBlogPostRoute =
     path: '/api/public/hooks/generate-blog-post',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksAutoPublishBlogPostRoute =
+  ApiPublicHooksAutoPublishBlogPostRouteImport.update({
+    id: '/api/public/hooks/auto-publish-blog-post',
+    path: '/api/public/hooks/auto-publish-blog-post',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -289,6 +296,7 @@ export interface FileRoutesByFullPath {
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/scorecard/$token': typeof ShareScorecardTokenRoute
+  '/api/public/hooks/auto-publish-blog-post': typeof ApiPublicHooksAutoPublishBlogPostRoute
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -331,6 +339,7 @@ export interface FileRoutesByTo {
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/scorecard/$token': typeof ShareScorecardTokenRoute
+  '/api/public/hooks/auto-publish-blog-post': typeof ApiPublicHooksAutoPublishBlogPostRoute
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -374,6 +383,7 @@ export interface FileRoutesById {
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/scorecard/$token': typeof ShareScorecardTokenRoute
+  '/api/public/hooks/auto-publish-blog-post': typeof ApiPublicHooksAutoPublishBlogPostRoute
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -418,6 +428,7 @@ export interface FileRouteTypes {
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
     | '/share/scorecard/$token'
+    | '/api/public/hooks/auto-publish-blog-post'
     | '/api/public/hooks/generate-blog-post'
     | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
@@ -460,6 +471,7 @@ export interface FileRouteTypes {
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
     | '/share/scorecard/$token'
+    | '/api/public/hooks/auto-publish-blog-post'
     | '/api/public/hooks/generate-blog-post'
     | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
@@ -502,6 +514,7 @@ export interface FileRouteTypes {
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
     | '/share/scorecard/$token'
+    | '/api/public/hooks/auto-publish-blog-post'
     | '/api/public/hooks/generate-blog-post'
     | '/api/public/scorecard/$token'
     | '/lovable/email/auth/preview'
@@ -545,6 +558,7 @@ export interface RootRouteChildren {
   ApiPublicRecallWebhookRoute: typeof ApiPublicRecallWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ShareScorecardTokenRoute: typeof ShareScorecardTokenRoute
+  ApiPublicHooksAutoPublishBlogPostRoute: typeof ApiPublicHooksAutoPublishBlogPostRoute
   ApiPublicHooksGenerateBlogPostRoute: typeof ApiPublicHooksGenerateBlogPostRoute
   ApiPublicScorecardTokenRoute: typeof ApiPublicScorecardTokenRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -836,6 +850,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksGenerateBlogPostRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/auto-publish-blog-post': {
+      id: '/api/public/hooks/auto-publish-blog-post'
+      path: '/api/public/hooks/auto-publish-blog-post'
+      fullPath: '/api/public/hooks/auto-publish-blog-post'
+      preLoaderRoute: typeof ApiPublicHooksAutoPublishBlogPostRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -873,6 +894,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicRecallWebhookRoute: ApiPublicRecallWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ShareScorecardTokenRoute: ShareScorecardTokenRoute,
+  ApiPublicHooksAutoPublishBlogPostRoute:
+    ApiPublicHooksAutoPublishBlogPostRoute,
   ApiPublicHooksGenerateBlogPostRoute: ApiPublicHooksGenerateBlogPostRoute,
   ApiPublicScorecardTokenRoute: ApiPublicScorecardTokenRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
