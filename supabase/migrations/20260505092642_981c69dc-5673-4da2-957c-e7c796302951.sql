@@ -1,0 +1,1 @@
+UPDATE public.blog_posts SET status = 'published', published_at = COALESCE(published_at, now()) WHERE slug = 'fix-your-take-home-scoring-process';
