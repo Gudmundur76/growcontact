@@ -30,6 +30,7 @@ import { Route as CareersRouteImport } from './routes/careers'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SourcingIndexRouteImport } from './routes/sourcing.index'
 import { Route as InterviewIndexRouteImport } from './routes/interview.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as InterviewRubricsRouteImport } from './routes/interview.rubrics'
@@ -156,6 +157,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SourcingIndexRoute = SourcingIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SourcingRoute,
 } as any)
 const InterviewIndexRoute = InterviewIndexRouteImport.update({
   id: '/interview/',
@@ -287,7 +293,7 @@ export interface FileRoutesByFullPath {
   '/security': typeof SecurityRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/sourcing': typeof SourcingRoute
+  '/sourcing': typeof SourcingRouteWithChildren
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/blog': typeof AdminBlogRoute
@@ -299,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/interview/rubrics': typeof InterviewRubricsRoute
   '/blog/': typeof BlogIndexRoute
   '/interview/': typeof InterviewIndexRoute
+  '/sourcing/': typeof SourcingIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -331,7 +338,6 @@ export interface FileRoutesByTo {
   '/security': typeof SecurityRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/sourcing': typeof SourcingRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/blog': typeof AdminBlogRoute
@@ -343,6 +349,7 @@ export interface FileRoutesByTo {
   '/interview/rubrics': typeof InterviewRubricsRoute
   '/blog': typeof BlogIndexRoute
   '/interview': typeof InterviewIndexRoute
+  '/sourcing': typeof SourcingIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -376,7 +383,7 @@ export interface FileRoutesById {
   '/security': typeof SecurityRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/sourcing': typeof SourcingRoute
+  '/sourcing': typeof SourcingRouteWithChildren
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/blog': typeof AdminBlogRoute
@@ -388,6 +395,7 @@ export interface FileRoutesById {
   '/interview/rubrics': typeof InterviewRubricsRoute
   '/blog/': typeof BlogIndexRoute
   '/interview/': typeof InterviewIndexRoute
+  '/sourcing/': typeof SourcingIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -434,6 +442,7 @@ export interface FileRouteTypes {
     | '/interview/rubrics'
     | '/blog/'
     | '/interview/'
+    | '/sourcing/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
@@ -466,7 +475,6 @@ export interface FileRouteTypes {
     | '/security'
     | '/signup'
     | '/sitemap.xml'
-    | '/sourcing'
     | '/terms'
     | '/unsubscribe'
     | '/admin/blog'
@@ -478,6 +486,7 @@ export interface FileRouteTypes {
     | '/interview/rubrics'
     | '/blog'
     | '/interview'
+    | '/sourcing'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
@@ -522,6 +531,7 @@ export interface FileRouteTypes {
     | '/interview/rubrics'
     | '/blog/'
     | '/interview/'
+    | '/sourcing/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
     | '/lovable/email/suppression'
@@ -555,7 +565,7 @@ export interface RootRouteChildren {
   SecurityRoute: typeof SecurityRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  SourcingRoute: typeof SourcingRoute
+  SourcingRoute: typeof SourcingRouteWithChildren
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   AdminBlogRoute: typeof AdminBlogRoute
@@ -730,6 +740,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sourcing/': {
+      id: '/sourcing/'
+      path: '/'
+      fullPath: '/sourcing/'
+      preLoaderRoute: typeof SourcingIndexRouteImport
+      parentRoute: typeof SourcingRoute
+    }
     '/interview/': {
       id: '/interview/'
       path: '/interview'
@@ -880,6 +897,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface SourcingRouteChildren {
+  SourcingIndexRoute: typeof SourcingIndexRoute
+}
+
+const SourcingRouteChildren: SourcingRouteChildren = {
+  SourcingIndexRoute: SourcingIndexRoute,
+}
+
+const SourcingRouteWithChildren = SourcingRoute._addFileChildren(
+  SourcingRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -899,7 +928,7 @@ const rootRouteChildren: RootRouteChildren = {
   SecurityRoute: SecurityRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  SourcingRoute: SourcingRoute,
+  SourcingRoute: SourcingRouteWithChildren,
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   AdminBlogRoute: AdminBlogRoute,
