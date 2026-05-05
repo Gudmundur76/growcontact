@@ -121,6 +121,63 @@ function LiveInterviewPage() {
   const redFlags = useMemo(() => events.filter((e) => e.kind === "red_flag"), [events]);
   const statuses = useMemo(() => events.filter((e) => e.kind === "status"), [events]);
 
+  // Group consecutive transcript turns by speaker
+  const transcriptTurns = useMemo(() => {
+    const turns: { speaker: string; lines: EventRow[] }[] = [];
+    for (const e of transcript) {
+      const sp = (e.speaker ?? "Speaker").trim() || "Speaker";
+      const last = turns[turns.length - 1];
+      if (last && last.speaker === sp) last.lines.push(e);
+      else turns.push({ speaker: sp, lines: [e] });
+    }
+    return turns;
+  }, [transcript]);
+
+  // Stable color per speaker
+  const speakerStyles = useMemo(() => {
+    const palette = [
+      { dot: "bg-violet-500", chip: "bg-violet-500/10 text-violet-600 dark:text-violet-300" },
+      { dot: "bg-emerald-500", chip: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300" },
+      { dot: "bg-sky-500", chip: "bg-sky-500/10 text-sky-600 dark:text-sky-300" },
+      { dot: "bg-amber-500", chip: "bg-amber-500/10 text-amber-700 dark:text-amber-300" },
+      { dot: "bg-pink-500", chip: "bg-pink-500/10 text-pink-600 dark:text-pink-300" },
+    ];
+    const map = new Map<string, (typeof palette)[number]>();
+    let i = 0;
+    for (const t of transcriptTurns) {
+      if (!map.has(t.speaker)) {
+        map.set(t.speaker, palette[i % palette.length]);
+        i++;
+      }
+    }
+    return map;
+  }, [transcriptTurns]);
+
+  // Dismiss suggestions locally (per session)
+  const dismissKey = `dismissed-suggestions-${id}`;
+  const [dismissed, setDismissed] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
+    try {
+      return new Set(JSON.parse(window.sessionStorage.getItem(dismissKey) ?? "[]"));
+    } catch {
+      return new Set();
+    }
+  });
+  function dismissSuggestion(eventId: string) {
+    setDismissed((prev) => {
+      const next = new Set(prev);
+      next.add(eventId);
+      try {
+        window.sessionStorage.setItem(dismissKey, JSON.stringify([...next]));
+      } catch { /* ignore */ }
+      return next;
+    });
+  }
+  const visibleSuggestions = useMemo(
+    () => suggestions.filter((s) => !dismissed.has(s.id)).slice(-8).reverse(),
+    [suggestions, dismissed],
+  );
+
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/login" });
   }, [authLoading, user, navigate]);
@@ -539,7 +596,7 @@ function LiveInterviewPage() {
           </div>
         </div>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
+        <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px] lg:items-start">
           {bulkOpen && !completed && (
             <div className="lg:col-span-2 rounded-xl border bg-card p-4 space-y-3">
               <div className="text-sm font-medium">Paste full transcript</div>
@@ -564,19 +621,40 @@ function LiveInterviewPage() {
             <header className="flex items-center gap-2 border-b px-4 py-3 text-sm font-medium">
               <CircleDot className={`size-3 ${inCall ? "text-emerald-500" : "text-muted-foreground"}`} />
               Live transcript
+              {transcriptTurns.length > 0 && (
+                <span className="ml-auto text-xs font-normal text-muted-foreground">
+                  {transcript.length} line{transcript.length === 1 ? "" : "s"} · {speakerStyles.size} speaker{speakerStyles.size === 1 ? "" : "s"}
+                </span>
+              )}
             </header>
-            <div ref={transcriptScroll} className="relative max-h-[60vh] space-y-3 overflow-y-auto p-4">
-              {transcript.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Waiting for the bot to join and start transcribing…
-                </p>
+            <div ref={transcriptScroll} className="relative max-h-[60vh] space-y-4 overflow-y-auto p-4">
+              {transcriptTurns.length === 0 ? (
+                <div className="flex flex-col items-center justify-center gap-2 py-10 text-center text-sm text-muted-foreground">
+                  <CircleDot className="size-5 text-muted-foreground/40" />
+                  <p>Waiting for the bot to join and start transcribing…</p>
+                  <p className="text-xs">Or paste lines below to drive the copilot manually.</p>
+                </div>
               ) : (
-                transcript.map((e) => (
-                  <div key={e.id} className="text-sm">
-                    <span className="font-medium">{e.speaker ?? "Speaker"}:</span>{" "}
-                    <span className="text-muted-foreground">{e.content}</span>
-                  </div>
-                ))
+                transcriptTurns.map((turn, i) => {
+                  const style = speakerStyles.get(turn.speaker) ?? { dot: "bg-muted-foreground", chip: "bg-muted text-muted-foreground" };
+                  return (
+                    <div key={i} className="flex gap-3 text-sm">
+                      <div className="flex flex-col items-center pt-1">
+                        <span className={`size-2 shrink-0 rounded-full ${style.dot}`} aria-hidden />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${style.chip}`}>
+                          {turn.speaker}
+                        </span>
+                        <div className="mt-1 space-y-1 text-foreground/90">
+                          {turn.lines.map((l) => (
+                            <p key={l.id} className="leading-relaxed">{l.content}</p>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
               )}
               <div ref={transcriptEnd} />
             </div>
@@ -621,20 +699,37 @@ function LiveInterviewPage() {
             )}
           </section>
 
-          <aside className="space-y-6">
+          <aside className="space-y-6 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1">
             <div className="rounded-xl border bg-card">
               <header className="flex items-center gap-2 border-b px-4 py-3 text-sm font-medium">
                 <Sparkles className="size-4 text-violet-500" /> Copilot suggestions
+                {visibleSuggestions.length > 0 && (
+                  <span className="ml-auto text-xs font-normal text-muted-foreground">
+                    {visibleSuggestions.length}
+                  </span>
+                )}
               </header>
               <ul className="space-y-2 p-4 text-sm">
-                {suggestions.length === 0 ? (
+                {visibleSuggestions.length === 0 ? (
                   <li className="text-muted-foreground">
-                    Click "Suggest follow-ups" to generate.
+                    {suggestions.length === 0
+                      ? 'Click "Suggest follow-ups" (⌘K) to generate.'
+                      : "All caught up — no pending suggestions."}
                   </li>
                 ) : (
-                  suggestions.slice(-8).reverse().map((e) => (
-                    <li key={e.id} className="rounded-md border bg-background p-2">
-                      {e.content}
+                  visibleSuggestions.map((e) => (
+                    <li
+                      key={e.id}
+                      className="group flex items-start gap-2 rounded-md border bg-background p-2"
+                    >
+                      <span className="flex-1 leading-relaxed">{e.content}</span>
+                      <button
+                        onClick={() => dismissSuggestion(e.id)}
+                        className="shrink-0 rounded px-1 text-xs text-muted-foreground opacity-60 transition hover:bg-muted hover:opacity-100"
+                        title="Mark as asked"
+                      >
+                        ✓
+                      </button>
                     </li>
                   ))
                 )}
