@@ -39,7 +39,9 @@ export const setPostStatus = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string; status: "draft" | "published" }) => d)
   .handler(async ({ context, data }) => {
     await assertAdmin(context.userId);
-    const patch: Record<string, unknown> = { status: data.status };
+    const patch: { status: "draft" | "published"; published_at?: string } = {
+      status: data.status,
+    };
     if (data.status === "published") patch.published_at = new Date().toISOString();
     const { error } = await supabaseAdmin
       .from("blog_posts")
