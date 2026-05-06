@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { generateBlogDraft, fetchPublishedPosts, type PublicPost } from "./blog.server";
@@ -34,9 +35,15 @@ export const listAdminPosts = createServerFn({ method: "GET" })
     return { posts: data ?? [] };
   });
 
+const SetPostStatusSchema = z.object({
+  id: z.string().uuid(),
+  status: z.enum(["draft", "published"]),
+});
+const DeletePostSchema = z.object({ id: z.string().uuid() });
+
 export const setPostStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string; status: "draft" | "published" }) => d)
+  .inputValidator((d: unknown) => SetPostStatusSchema.parse(d))
   .handler(async ({ context, data }) => {
     await assertAdmin(context.userId);
     const patch: { status: "draft" | "published"; published_at?: string } = {
@@ -53,7 +60,7 @@ export const setPostStatus = createServerFn({ method: "POST" })
 
 export const deletePost = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => d)
+  .inputValidator((d: unknown) => DeletePostSchema.parse(d))
   .handler(async ({ context, data }) => {
     await assertAdmin(context.userId);
     const { error } = await supabaseAdmin.from("blog_posts").delete().eq("id", data.id);
