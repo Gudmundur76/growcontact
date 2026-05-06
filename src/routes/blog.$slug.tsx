@@ -166,8 +166,14 @@ function renderBody(body: string) {
 }
 
 function renderInline(text: string) {
-  // bold **text**
-  return text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  // Escape HTML first to prevent stored XSS, then apply minimal markdown.
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+  return escaped.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
 }
 
 function slugifyHeading(s: string): string {
