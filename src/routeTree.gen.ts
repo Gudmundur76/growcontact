@@ -29,6 +29,7 @@ import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SourcingIndexRouteImport } from './routes/sourcing.index'
 import { Route as InterviewIndexRouteImport } from './routes/interview.index'
@@ -155,6 +156,11 @@ const AccountRoute = AccountRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -303,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/dashboard': typeof DashboardRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -352,6 +359,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/dashboard': typeof DashboardRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -401,6 +409,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/dashboard': typeof DashboardRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -452,6 +461,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/dashboard'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -501,6 +511,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/dashboard'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -549,6 +560,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/dashboard'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -599,6 +611,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
+  DashboardRoute: typeof DashboardRoute
   CareersRoute: typeof CareersRoute
   ChangelogRoute: typeof ChangelogRoute
   ContactRoute: typeof ContactRoute
@@ -781,6 +794,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -997,6 +1017,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
+  DashboardRoute: DashboardRoute,
   CareersRoute: CareersRoute,
   ChangelogRoute: ChangelogRoute,
   ContactRoute: ContactRoute,
