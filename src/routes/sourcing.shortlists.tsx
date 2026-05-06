@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Download } from "lucide-react";
 import { toast } from "sonner";
 import {
   listShortlists,
@@ -30,6 +30,8 @@ type Member = {
     profile_url: string;
     avatar_url: string | null;
     fit_score: number | null;
+    email?: string | null;
+    location?: string | null;
   };
 };
 const STAGES = ["new", "contacted", "replied", "screening", "passed", "rejected"] as const;
@@ -93,6 +95,34 @@ function ShortlistsPage() {
     load();
   }
 
+  function exportCsv() {
+    const list = lists.find((l) => l.id === activeId);
+    if (!list || members.length === 0) return;
+    const headers = ["name", "stage", "fit_score", "email", "location", "headline", "profile_url", "notes"];
+    const escape = (v: unknown) => {
+      const s = v == null ? "" : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const rows = members.map((m) => [
+      m.candidate.name,
+      m.stage,
+      m.candidate.fit_score ?? "",
+      m.candidate.email ?? "",
+      m.candidate.location ?? "",
+      m.candidate.headline ?? "",
+      m.candidate.profile_url,
+      m.notes ?? "",
+    ]);
+    const csv = [headers, ...rows].map((r) => r.map(escape).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${list.name.replace(/[^a-z0-9-_]+/gi, "_")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
       <aside className="space-y-3">
@@ -131,6 +161,12 @@ function ShortlistsPage() {
           <p className="text-muted-foreground">No candidates here yet. Add some from the Search tab.</p>
         ) : (
           <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">{members.length} candidate{members.length === 1 ? "" : "s"}</p>
+              <Button size="sm" variant="outline" onClick={exportCsv}>
+                <Download className="mr-1 h-3.5 w-3.5" /> Export CSV
+              </Button>
+            </div>
             {members.map((m) => (
               <div key={m.id} className="flex items-center gap-4 rounded-2xl border border-white/10 bg-card/40 p-4">
                 {m.candidate.avatar_url ? (
