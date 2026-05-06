@@ -649,3 +649,47 @@ export const sendOutreach = createServerFn({ method: "POST" })
     if (enqErr) throw new Error(errorMessage ?? "Send failed");
     return { ok: true, subject: personalized.subject };
   });
+
+// ---------- Outreach activity ----------
+
+const ListSendsSchema = z.object({
+  status: z.enum(["all", "sent", "failed", "suppressed"]).optional(),
+  candidateId: z.string().uuid().optional().nullable(),
+  limit: z.number().int().min(1).max(200).optional(),
+});
+
+export const listOutreachSends = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ListSendsSchema.parse(input ?? {}))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    let q = supabase
+      .from("sourcing_sends")
+      .select(
+        "id, recipient_email, subject, status, error_message, sent_at, sequence_id, candidate_id, sourcing_candidates!inner(id, name, profile_url, avatar_url), sourcing_sequences(id, name)",
+      )
+      .order("sent_at", { ascending: false })
+      .limit(data.limit ?? 100);
+    if (data.status && data.status !== "all") q = q.eq("status", data.status);
+    if (data.candidateId) q = q.eq("candidate_id", data.candidateId);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const outreachStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase } = context;
+    const { data, error } = await supabase
+      .from("sourcing_sends")
+      .select("status, sent_at");
+    if (error) throw new Error(error.message);
+    const total = data?.length ?? 0;
+    const sent = data?.filter((r) => r.status === "sent").length ?? 0;
+    const failed = data?.filter((r) => r.status === "failed").length ?? 0;
+    const suppressed = data?.filter((r) => r.status === "suppressed").length ?? 0;
+    const since = Date.now() - 7 * 86400_000;
+    const last7 = data?.filter((r) => new Date(r.sent_at).getTime() >= since).length ?? 0;
+    return { total, sent, failed, suppressed, last7 };
+  });

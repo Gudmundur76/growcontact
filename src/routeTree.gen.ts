@@ -36,6 +36,7 @@ import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as SourcingShortlistsRouteImport } from './routes/sourcing.shortlists'
 import { Route as SourcingSequencesRouteImport } from './routes/sourcing.sequences'
 import { Route as SourcingSearchesRouteImport } from './routes/sourcing.searches'
+import { Route as SourcingActivityRouteImport } from './routes/sourcing.activity'
 import { Route as InterviewRubricsRouteImport } from './routes/interview.rubrics'
 import { Route as InterviewNewRouteImport } from './routes/interview.new'
 import { Route as InterviewIdRouteImport } from './routes/interview.$id'
@@ -192,6 +193,11 @@ const SourcingSearchesRoute = SourcingSearchesRouteImport.update({
   path: '/searches',
   getParentRoute: () => SourcingRoute,
 } as any)
+const SourcingActivityRoute = SourcingActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => SourcingRoute,
+} as any)
 const InterviewRubricsRoute = InterviewRubricsRouteImport.update({
   id: '/interview/rubrics',
   path: '/interview/rubrics',
@@ -328,6 +334,7 @@ export interface FileRoutesByFullPath {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/sourcing/activity': typeof SourcingActivityRoute
   '/sourcing/searches': typeof SourcingSearchesRoute
   '/sourcing/sequences': typeof SourcingSequencesRoute
   '/sourcing/shortlists': typeof SourcingShortlistsRoute
@@ -376,6 +383,7 @@ export interface FileRoutesByTo {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/sourcing/activity': typeof SourcingActivityRoute
   '/sourcing/searches': typeof SourcingSearchesRoute
   '/sourcing/sequences': typeof SourcingSequencesRoute
   '/sourcing/shortlists': typeof SourcingShortlistsRoute
@@ -426,6 +434,7 @@ export interface FileRoutesById {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/sourcing/activity': typeof SourcingActivityRoute
   '/sourcing/searches': typeof SourcingSearchesRoute
   '/sourcing/sequences': typeof SourcingSequencesRoute
   '/sourcing/shortlists': typeof SourcingShortlistsRoute
@@ -477,6 +486,7 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/sourcing/activity'
     | '/sourcing/searches'
     | '/sourcing/sequences'
     | '/sourcing/shortlists'
@@ -525,6 +535,7 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/sourcing/activity'
     | '/sourcing/searches'
     | '/sourcing/sequences'
     | '/sourcing/shortlists'
@@ -574,6 +585,7 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/sourcing/activity'
     | '/sourcing/searches'
     | '/sourcing/sequences'
     | '/sourcing/shortlists'
@@ -832,6 +844,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SourcingSearchesRouteImport
       parentRoute: typeof SourcingRoute
     }
+    '/sourcing/activity': {
+      id: '/sourcing/activity'
+      path: '/activity'
+      fullPath: '/sourcing/activity'
+      preLoaderRoute: typeof SourcingActivityRouteImport
+      parentRoute: typeof SourcingRoute
+    }
     '/interview/rubrics': {
       id: '/interview/rubrics'
       path: '/interview/rubrics'
@@ -976,6 +995,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface SourcingRouteChildren {
+  SourcingActivityRoute: typeof SourcingActivityRoute
   SourcingSearchesRoute: typeof SourcingSearchesRoute
   SourcingSequencesRoute: typeof SourcingSequencesRoute
   SourcingShortlistsRoute: typeof SourcingShortlistsRoute
@@ -983,6 +1003,7 @@ interface SourcingRouteChildren {
 }
 
 const SourcingRouteChildren: SourcingRouteChildren = {
+  SourcingActivityRoute: SourcingActivityRoute,
   SourcingSearchesRoute: SourcingSearchesRoute,
   SourcingSequencesRoute: SourcingSequencesRoute,
   SourcingShortlistsRoute: SourcingShortlistsRoute,
@@ -1042,12 +1063,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

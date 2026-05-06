@@ -19,11 +19,12 @@ export const Route = createFileRoute("/sourcing")({
   component: SourcingLayout,
 });
 
-const tabs: { to: "/sourcing" | "/sourcing/searches" | "/sourcing/shortlists" | "/sourcing/sequences"; label: string }[] = [
+const tabs: { to: "/sourcing" | "/sourcing/searches" | "/sourcing/shortlists" | "/sourcing/sequences" | "/sourcing/activity"; label: string }[] = [
   { to: "/sourcing", label: "Search" },
   { to: "/sourcing/searches", label: "Saved" },
   { to: "/sourcing/shortlists", label: "Shortlists" },
   { to: "/sourcing/sequences", label: "Sequences" },
+  { to: "/sourcing/activity", label: "Activity" },
 ];
 
 function SourcingLayout() {
