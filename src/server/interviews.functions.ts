@@ -464,11 +464,17 @@ export const restoreSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ sessionId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    const { data: session } = await supabase
+      .from("interview_sessions")
+      .select("id, user_id")
+      .eq("id", data.sessionId)
+      .maybeSingle();
+    if (!session || session.user_id !== userId) throw new Error("Not found");
     const { error } = await supabase
       .from("interview_sessions")
       .update({ deleted_at: null })
-      .eq("id", data.sessionId);
+      .eq("id", session.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -479,11 +485,17 @@ export const setSessionArchived = createServerFn({ method: "POST" })
     z.object({ sessionId: z.string().uuid(), archived: z.boolean() }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    const { data: session } = await supabase
+      .from("interview_sessions")
+      .select("id, user_id")
+      .eq("id", data.sessionId)
+      .maybeSingle();
+    if (!session || session.user_id !== userId) throw new Error("Not found");
     const { error } = await supabase
       .from("interview_sessions")
       .update({ archived: data.archived })
-      .eq("id", data.sessionId);
+      .eq("id", session.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -550,7 +562,13 @@ export const updateScorecard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ScorecardEditSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    const { data: session } = await supabase
+      .from("interview_sessions")
+      .select("id, user_id")
+      .eq("id", data.sessionId)
+      .maybeSingle();
+    if (!session || session.user_id !== userId) throw new Error("Not found");
     const { error } = await supabase
       .from("interview_scorecards")
       .update({
@@ -562,7 +580,7 @@ export const updateScorecard = createServerFn({ method: "POST" })
         competencies: data.competencies,
         follow_ups: data.follow_ups,
       })
-      .eq("session_id", data.sessionId);
+      .eq("session_id", session.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
