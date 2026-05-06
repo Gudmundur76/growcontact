@@ -38,7 +38,7 @@ function LoginPage() {
       toast.error(error.message);
       return;
     }
-    navigate({ to: "/" });
+    navigate({ to: "/dashboard" });
   }
 
   async function handleGoogle() {
@@ -50,7 +50,7 @@ function LoginPage() {
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/" });
+    navigate({ to: "/dashboard" });
   }
 
   return (
