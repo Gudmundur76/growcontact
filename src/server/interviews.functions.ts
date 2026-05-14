@@ -37,6 +37,19 @@ export const startInterview = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const platform = detectPlatform(data.meetingUrl);
 
+    // Verify rubric ownership before storing the FK to prevent cross-tenant leak
+    let safeRubricId: string | null = null;
+    if (data.rubricId) {
+      const { data: ownedRubric } = await supabase
+        .from("interview_rubrics")
+        .select("id")
+        .eq("id", data.rubricId)
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (!ownedRubric) throw new Error("Rubric not found");
+      safeRubricId = ownedRubric.id;
+    }
+
     // Insert pending session first (so we have an id even if Recall fails)
     const { data: session, error: insertErr } = await supabase
       .from("interview_sessions")
@@ -48,7 +61,7 @@ export const startInterview = createServerFn({ method: "POST" })
         meeting_url: data.meetingUrl,
         meeting_platform: platform,
         status: "pending",
-        rubric_id: data.rubricId ?? null,
+        rubric_id: safeRubricId,
       })
       .select("id")
       .single();
@@ -139,7 +152,7 @@ export const finalizeScorecard = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!session || session.user_id !== userId) throw new Error("Not found");
 
-    const rubric = await loadRubric(session.rubric_id);
+    const rubric = await loadRubric(session.rubric_id, userId);
 
     const { data: events } = await supabaseAdmin
       .from("interview_events")
@@ -189,7 +202,7 @@ export const generateLiveSuggestionsFn = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!session || session.user_id !== userId) throw new Error("Not found");
 
-    const rubric = await loadRubric(session.rubric_id);
+    const rubric = await loadRubric(session.rubric_id, userId);
 
     const { data: events } = await supabaseAdmin
       .from("interview_events")
@@ -236,12 +249,14 @@ export const generateLiveSuggestionsFn = createServerFn({ method: "POST" })
 
 async function loadRubric(
   rubricId: string | null | undefined,
+  userId: string,
 ): Promise<{ name: string; focus: string | null; competencies: string[] } | null> {
   if (!rubricId) return null;
   const { data } = await supabaseAdmin
     .from("interview_rubrics")
     .select("name, focus, competencies")
     .eq("id", rubricId)
+    .eq("user_id", userId)
     .maybeSingle();
   if (!data) return null;
   const comps = Array.isArray(data.competencies)
