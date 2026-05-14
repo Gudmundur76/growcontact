@@ -1,18 +1,20 @@
-import { supabase } from '@/integrations/supabase/client'
+import { supabase } from "@/integrations/supabase/client";
 
 interface SendTransactionalEmailParams {
-  templateName: string
-  recipientEmail: string
-  idempotencyKey?: string
-  templateData?: Record<string, unknown>
+  templateName: string;
+  recipientEmail: string;
+  idempotencyKey?: string;
+  templateData?: Record<string, unknown>;
 }
 
 export async function sendTransactionalEmail(params: SendTransactionalEmailParams) {
-  const { data: { session } } = await supabase.auth.getSession()
-  const response = await fetch('/lovable/email/transactional/send', {
-    method: 'POST',
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const response = await fetch("/lovable/email/transactional/send", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
     },
     body: JSON.stringify({
@@ -21,9 +23,9 @@ export async function sendTransactionalEmail(params: SendTransactionalEmailParam
       idempotencyKey: params.idempotencyKey,
       templateData: params.templateData,
     }),
-  })
+  });
   if (!response.ok) {
-    throw new Error(`Failed to send email: ${response.statusText}`)
+    throw new Error(`Failed to send email: ${response.statusText}`);
   }
-  return response.json()
+  return response.json();
 }

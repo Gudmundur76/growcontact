@@ -9,10 +9,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
-    meta: [
-      { title: "Dashboard — Grow" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Dashboard — Grow" }, { name: "robots", content: "noindex" }],
   }),
   component: DashboardWrapper,
 });
@@ -41,9 +38,7 @@ function DashboardPage() {
 
   const displayEmail = user?.email ?? "";
   const displayName =
-    (user?.user_metadata?.name as string | undefined) ??
-    displayEmail.split("@")[0] ??
-    "there";
+    (user?.user_metadata?.name as string | undefined) ?? displayEmail.split("@")[0] ?? "there";
 
   return (
     <>
@@ -62,22 +57,13 @@ function DashboardPage() {
             ) : null}
 
             <div className="mt-10 flex flex-wrap gap-3">
-              <Button
-                variant="hero"
-                onClick={() => navigate({ to: "/interview" })}
-              >
+              <Button variant="hero" onClick={() => navigate({ to: "/interview" })}>
                 Interview Copilot
               </Button>
-              <Button
-                variant="heroSecondary"
-                onClick={() => navigate({ to: "/sourcing" })}
-              >
+              <Button variant="heroSecondary" onClick={() => navigate({ to: "/sourcing" })}>
                 AI Sourcing
               </Button>
-              <Button
-                variant="heroSecondary"
-                onClick={() => navigate({ to: "/account" })}
-              >
+              <Button variant="heroSecondary" onClick={() => navigate({ to: "/account" })}>
                 Account settings
               </Button>
             </div>

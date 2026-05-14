@@ -26,8 +26,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:description",
-        content:
-          "Source, screen, interview and hire from one calibrated AI platform.",
+        content: "Source, screen, interview and hire from one calibrated AI platform.",
       },
     ],
   }),

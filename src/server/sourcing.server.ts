@@ -65,9 +65,12 @@ export async function searchGithubCandidates(opts: {
   const limit = Math.min(Math.max(opts.limit ?? 10, 1), 25);
   const url = `${GH_SEARCH}?q=${encodeURIComponent(q)}&per_page=${limit}&sort=followers&order=desc`;
   const res = await fetch(url, { headers: ghHeaders() });
-  if (res.status === 403) throw new Error("GitHub rate limit hit. Add a GITHUB_TOKEN secret to raise the limit.");
+  if (res.status === 403)
+    throw new Error("GitHub rate limit hit. Add a GITHUB_TOKEN secret to raise the limit.");
   if (!res.ok) throw new Error(`GitHub search failed [${res.status}]: ${await res.text()}`);
-  const json = (await res.json()) as { items?: { login: string; id: number; html_url: string; avatar_url: string }[] };
+  const json = (await res.json()) as {
+    items?: { login: string; id: number; html_url: string; avatar_url: string }[];
+  };
   const items = json.items ?? [];
 
   // Fetch full profiles in parallel for richer signals
@@ -98,25 +101,27 @@ export async function searchGithubCandidates(opts: {
     }),
   );
 
-  return profiles.filter((p): p is NonNullable<typeof p> => !!p).map((p) => ({
-    source: "github",
-    external_id: String(p.id),
-    name: p.name || p.login,
-    headline: p.bio ?? (p.company ? `at ${p.company}` : null),
-    location: p.location,
-    profile_url: p.html_url,
-    avatar_url: p.avatar_url,
-    email: p.email,
-    signals: {
-      login: p.login,
-      followers: p.followers,
-      following: p.following,
-      public_repos: p.public_repos,
-      company: p.company,
-      blog: p.blog,
-      created_at: p.created_at,
-    },
-  }));
+  return profiles
+    .filter((p): p is NonNullable<typeof p> => !!p)
+    .map((p) => ({
+      source: "github",
+      external_id: String(p.id),
+      name: p.name || p.login,
+      headline: p.bio ?? (p.company ? `at ${p.company}` : null),
+      location: p.location,
+      profile_url: p.html_url,
+      avatar_url: p.avatar_url,
+      email: p.email,
+      signals: {
+        login: p.login,
+        followers: p.followers,
+        following: p.following,
+        public_repos: p.public_repos,
+        company: p.company,
+        blog: p.blog,
+        created_at: p.created_at,
+      },
+    }));
 }
 
 // ---------------- People Data Labs ----------------
@@ -196,10 +201,7 @@ interface PdlPerson {
 }
 
 function pdlToCandidate(p: PdlPerson): RawCandidate {
-  const name =
-    p.full_name ||
-    [p.first_name, p.last_name].filter(Boolean).join(" ") ||
-    "Unknown";
+  const name = p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ") || "Unknown";
   const email =
     p.work_email ||
     p.personal_emails?.[0] ||
@@ -270,8 +272,7 @@ export async function searchPdlCandidates(opts: {
     throw new Error("PDL rejected the API key. Verify PDL_API_KEY is correct and active.");
   if (res.status === 402)
     throw new Error("PDL credits exhausted. Top up the People Data Labs account.");
-  if (res.status === 429)
-    throw new Error("PDL rate limit hit. Wait a moment and retry.");
+  if (res.status === 429) throw new Error("PDL rate limit hit. Wait a moment and retry.");
   if (!res.ok) throw new Error(`PDL search failed [${res.status}]: ${await res.text()}`);
   const json = (await res.json()) as { data?: PdlPerson[] };
   return (json.data ?? []).map(pdlToCandidate);
@@ -356,8 +357,12 @@ function ruleScore(c: RawCandidate, brief: string): number {
     if (levels.includes("director") || levels.includes("vp") || levels.includes("cxo")) score += 12;
     score += Math.min(10, Math.log2((s.company_employees ?? 0) + 1));
   }
-  const blob = `${c.name} ${c.headline ?? ""} ${c.location ?? ""} ${(s.skills ?? []).join(" ")}`.toLowerCase();
-  const tokens = brief.toLowerCase().split(/[^a-z0-9+#.]+/).filter((t) => t.length > 2);
+  const blob =
+    `${c.name} ${c.headline ?? ""} ${c.location ?? ""} ${(s.skills ?? []).join(" ")}`.toLowerCase();
+  const tokens = brief
+    .toLowerCase()
+    .split(/[^a-z0-9+#.]+/)
+    .filter((t) => t.length > 2);
   const hits = tokens.filter((t) => blob.includes(t)).length;
   score += Math.min(15, hits * 3);
   return Math.round(score);
@@ -440,7 +445,12 @@ Respond with ONLY a JSON object: { "ranked": [ { "i": number, "summary": string,
 /** Generate a personalized outreach email body using the candidate signals + sequence template. */
 export async function personalizeOutreach(opts: {
   template: { subject: string; body: string };
-  candidate: { name: string; headline: string | null; signals: Record<string, unknown>; ai_summary?: string | null };
+  candidate: {
+    name: string;
+    headline: string | null;
+    signals: Record<string, unknown>;
+    ai_summary?: string | null;
+  };
   roleTitle: string;
   senderName?: string | null;
 }): Promise<{ subject: string; body: string }> {

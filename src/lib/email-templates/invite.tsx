@@ -1,13 +1,21 @@
-import * as React from 'react'
+import * as React from "react";
 import {
-  Body, Button, Container, Head, Heading, Html, Link, Preview, Text,
-} from '@react-email/components'
-import { brand } from './_brand'
+  Body,
+  Button,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Link,
+  Preview,
+  Text,
+} from "@react-email/components";
+import { brand } from "./_brand";
 
 interface InviteEmailProps {
-  siteName: string
-  siteUrl: string
-  confirmationUrl: string
+  siteName: string;
+  siteUrl: string;
+  confirmationUrl: string;
 }
 
 export const InviteEmail = ({ siteName, siteUrl, confirmationUrl }: InviteEmailProps) => (
@@ -19,16 +27,21 @@ export const InviteEmail = ({ siteName, siteUrl, confirmationUrl }: InviteEmailP
         <Text style={brand.brandMark}>{siteName}</Text>
         <Heading style={brand.h1}>You've been invited</Heading>
         <Text style={brand.text}>
-          You've been invited to join{' '}
-          <Link href={siteUrl} style={brand.link}><strong>{siteName}</strong></Link>. Accept the invitation below to create your account.
+          You've been invited to join{" "}
+          <Link href={siteUrl} style={brand.link}>
+            <strong>{siteName}</strong>
+          </Link>
+          . Accept the invitation below to create your account.
         </Text>
-        <Button style={brand.button} href={confirmationUrl}>Accept invitation</Button>
+        <Button style={brand.button} href={confirmationUrl}>
+          Accept invitation
+        </Button>
         <Text style={brand.footer}>
           If you weren't expecting this invitation, you can safely ignore this email.
         </Text>
       </Container>
     </Body>
   </Html>
-)
+);
 
-export default InviteEmail
+export default InviteEmail;

@@ -19,8 +19,7 @@ export const Route = createFileRoute("/signup")({
       { property: "og:title", content: "Start your free trial — Grow" },
       {
         property: "og:description",
-        content:
-          "Create your Grow account in seconds. 14-day trial, no credit card.",
+        content: "Create your Grow account in seconds. 14-day trial, no credit card.",
       },
     ],
   }),
@@ -88,8 +87,8 @@ function SignupPage() {
               Hire your next 10 people with Grow.
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              14-day trial. No credit card. Cancel anytime. Bring your roles —
-              we'll bring the candidates.
+              14-day trial. No credit card. Cancel anytime. Bring your roles — we'll bring the
+              candidates.
             </p>
             <ul className="mt-10 space-y-3 text-sm text-foreground/90">
               <li>• Unlimited AI sourcing during trial</li>
@@ -101,17 +100,12 @@ function SignupPage() {
           <div className="liquid-glass rounded-3xl bg-card/40 p-8">
             {submitted ? (
               <div className="flex h-full flex-col items-start justify-center">
-                <h2 className="text-2xl font-semibold text-foreground">
-                  Check your inbox.
-                </h2>
+                <h2 className="text-2xl font-semibold text-foreground">Check your inbox.</h2>
                 <p className="mt-3 text-muted-foreground">
-                  We sent you a confirmation link. Click it to verify your
-                  email and finish setting up your workspace.
+                  We sent you a confirmation link. Click it to verify your email and finish setting
+                  up your workspace.
                 </p>
-                <Link
-                  to="/"
-                  className="mt-8 text-sm font-medium text-primary hover:underline"
-                >
+                <Link to="/" className="mt-8 text-sm font-medium text-primary hover:underline">
                   ← Back to home
                 </Link>
               </div>
@@ -131,10 +125,7 @@ function SignupPage() {
                   <span className="h-px flex-1 bg-white/10" />
                 </div>
                 <div>
-                  <label
-                    htmlFor="name"
-                    className="mb-2 block text-sm font-medium text-foreground"
-                  >
+                  <label htmlFor="name" className="mb-2 block text-sm font-medium text-foreground">
                     Full name
                   </label>
                   <input
@@ -147,10 +138,7 @@ function SignupPage() {
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="mb-2 block text-sm font-medium text-foreground"
-                  >
+                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-foreground">
                     Work email
                   </label>
                   <input
@@ -211,9 +199,13 @@ function SignupPage() {
                 </p>
                 <p className="text-center text-xs text-muted-foreground">
                   By signing up you agree to our{" "}
-                  <Link to="/terms" className="hover:underline">Terms</Link>{" "}
+                  <Link to="/terms" className="hover:underline">
+                    Terms
+                  </Link>{" "}
                   and{" "}
-                  <Link to="/privacy" className="hover:underline">Privacy</Link>{" "}
+                  <Link to="/privacy" className="hover:underline">
+                    Privacy
+                  </Link>{" "}
                   policy.
                 </p>
               </form>

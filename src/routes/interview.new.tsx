@@ -13,10 +13,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/interview/new")({
   head: () => ({
-    meta: [
-      { title: "Start interview — Grow" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Start interview — Grow" }, { name: "robots", content: "noindex" }],
   }),
   component: NewInterviewPage,
 });
@@ -54,7 +51,9 @@ function NewInterviewPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const result = await startInterview({
         data: {
           candidateName,
@@ -91,7 +90,8 @@ function NewInterviewPage() {
       <main className="container mx-auto max-w-2xl px-4 pb-24 pt-32">
         <h1 className="text-4xl font-medium tracking-tight">Start an interview</h1>
         <p className="mt-2 text-muted-foreground">
-          The bot will join the meeting, transcribe live, and surface AI follow-ups in your copilot view.
+          The bot will join the meeting, transcribe live, and surface AI follow-ups in your copilot
+          view.
         </p>
 
         <form onSubmit={onSubmit} className="mt-10 space-y-6 rounded-xl border bg-card p-6">

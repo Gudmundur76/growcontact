@@ -117,8 +117,7 @@ function InterviewCopilotMarketing() {
             <Sparkles className="size-3 text-primary" /> New · Interview Copilot
           </span>
           <h1 className="mt-6 text-balance text-5xl font-medium tracking-tight md:text-6xl">
-            The AI copilot for{" "}
-            <span className="text-primary">live interviews</span>
+            The AI copilot for <span className="text-primary">live interviews</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-balance text-lg text-muted-foreground">
             Joins Zoom, Google Meet, and Microsoft Teams. Transcribes live. Surfaces calibrated

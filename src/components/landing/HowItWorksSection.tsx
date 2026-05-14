@@ -36,17 +36,10 @@ export function HowItWorksSection() {
 
         <div className="grid gap-6 md:grid-cols-3">
           {steps.map(({ step, title, description }) => (
-            <div
-              key={step}
-              className="liquid-glass rounded-3xl bg-card/40 p-8"
-            >
+            <div key={step} className="liquid-glass rounded-3xl bg-card/40 p-8">
               <div className="text-sm font-medium text-primary">{step}</div>
-              <h3 className="mt-4 text-2xl font-semibold text-foreground">
-                {title}
-              </h3>
-              <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                {description}
-              </p>
+              <h3 className="mt-4 text-2xl font-semibold text-foreground">{title}</h3>
+              <p className="mt-3 text-base leading-relaxed text-muted-foreground">{description}</p>
             </div>
           ))}
         </div>

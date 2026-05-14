@@ -19,8 +19,7 @@ export const Route = createFileRoute("/pricing")({
       { property: "og:title", content: "Pricing — Grow" },
       {
         property: "og:description",
-        content:
-          "Replace a senior recruiter for a fraction of the cost. See Grow's plans.",
+        content: "Replace a senior recruiter for a fraction of the cost. See Grow's plans.",
       },
     ],
   }),
@@ -36,9 +35,15 @@ const compareGroups: {
   {
     group: "Sourcing AI",
     rows: [
-      { feature: "Candidates surfaced / month", values: { Starter: "200", Growth: "Unlimited", Scale: "Unlimited" } },
+      {
+        feature: "Candidates surfaced / month",
+        values: { Starter: "200", Growth: "Unlimited", Scale: "Unlimited" },
+      },
       { feature: "Retention-aware ranking", values: { Starter: false, Growth: true, Scale: true } },
-      { feature: "Outbound sequences", values: { Starter: "Single-step", Growth: "Branching", Scale: "Branching + A/B" } },
+      {
+        feature: "Outbound sequences",
+        values: { Starter: "Single-step", Growth: "Branching", Scale: "Branching + A/B" },
+      },
       { feature: "Custom sourcing models", values: { Starter: false, Growth: false, Scale: true } },
     ],
   },
@@ -47,16 +52,28 @@ const compareGroups: {
     rows: [
       { feature: "Live transcription", values: { Starter: false, Growth: true, Scale: true } },
       { feature: "Real-time scorecards", values: { Starter: false, Growth: true, Scale: true } },
-      { feature: "Calibration drift alerts", values: { Starter: false, Growth: true, Scale: true } },
-      { feature: "Panel debrief synthesis", values: { Starter: false, Growth: false, Scale: true } },
+      {
+        feature: "Calibration drift alerts",
+        values: { Starter: false, Growth: true, Scale: true },
+      },
+      {
+        feature: "Panel debrief synthesis",
+        values: { Starter: false, Growth: false, Scale: true },
+      },
     ],
   },
   {
     group: "Platform & integrations",
     rows: [
-      { feature: "ATS sync (Greenhouse, Ashby, Lever)", values: { Starter: false, Growth: true, Scale: true } },
+      {
+        feature: "ATS sync (Greenhouse, Ashby, Lever)",
+        values: { Starter: false, Growth: true, Scale: true },
+      },
       { feature: "SAML SSO + SCIM", values: { Starter: false, Growth: false, Scale: true } },
-      { feature: "Audit logs & data residency", values: { Starter: false, Growth: false, Scale: true } },
+      {
+        feature: "Audit logs & data residency",
+        values: { Starter: false, Growth: false, Scale: true },
+      },
       { feature: "Customer-managed keys", values: { Starter: false, Growth: false, Scale: true } },
     ],
   },
@@ -65,7 +82,10 @@ const compareGroups: {
     rows: [
       { feature: "Email support", values: { Starter: true, Growth: true, Scale: true } },
       { feature: "Priority Slack channel", values: { Starter: false, Growth: true, Scale: true } },
-      { feature: "Dedicated success engineer", values: { Starter: false, Growth: false, Scale: true } },
+      {
+        feature: "Dedicated success engineer",
+        values: { Starter: false, Growth: false, Scale: true },
+      },
       { feature: "99.9% uptime SLA", values: { Starter: false, Growth: false, Scale: true } },
     ],
   },
@@ -155,10 +175,7 @@ function PricingPage() {
                       {row.feature}
                     </div>
                     {(["Starter", "Growth", "Scale"] as Tier[]).map((tier) => (
-                      <div
-                        key={tier}
-                        className="flex items-center gap-2 md:justify-center"
-                      >
+                      <div key={tier} className="flex items-center gap-2 md:justify-center">
                         <span className="text-xs uppercase tracking-wider text-muted-foreground md:hidden">
                           {tier}:
                         </span>
@@ -169,9 +186,7 @@ function PricingPage() {
                             <Minus className="h-4 w-4 text-muted-foreground/40" />
                           )
                         ) : (
-                          <span className="text-foreground/90">
-                            {row.values[tier] as string}
-                          </span>
+                          <span className="text-foreground/90">{row.values[tier] as string}</span>
                         )}
                       </div>
                     ))}
@@ -234,18 +249,14 @@ function PricingPage() {
                     +
                   </span>
                 </summary>
-                <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                  {f.a}
-                </p>
+                <p className="mt-4 text-base leading-relaxed text-muted-foreground">{f.a}</p>
               </details>
             ))}
           </div>
 
           <div className="mt-14 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-white/5 bg-card/30 p-8 backdrop-blur-xl">
             <div>
-              <div className="text-lg font-semibold text-foreground">
-                Still deciding?
-              </div>
+              <div className="text-lg font-semibold text-foreground">Still deciding?</div>
               <p className="mt-1 text-sm text-muted-foreground">
                 Talk to a Grow specialist about the right plan for your team.
               </p>

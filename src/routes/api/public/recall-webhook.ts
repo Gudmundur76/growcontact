@@ -15,8 +15,7 @@ export const Route = createFileRoute("/api/public/recall-webhook")({
           return new Response("Webhook secret not configured", { status: 503 });
         }
         const sig =
-          request.headers.get("x-recall-signature") ??
-          request.headers.get("svix-signature");
+          request.headers.get("x-recall-signature") ?? request.headers.get("svix-signature");
         if (!verifyRecallSignature(rawBody, sig)) {
           return new Response("Invalid signature", { status: 401 });
         }
@@ -64,9 +63,11 @@ export const Route = createFileRoute("/api/public/recall-webhook")({
         // Transcript chunks (Recall real-time transcription)
         if (eventType === "transcript.data" || data.words) {
           const words = (data.words ?? []) as Array<{ text?: string }>;
-          const text = words.map((w) => w.text ?? "").join(" ").trim();
-          const speaker =
-            (data.participant as { name?: string } | undefined)?.name ?? "Speaker";
+          const text = words
+            .map((w) => w.text ?? "")
+            .join(" ")
+            .trim();
+          const speaker = (data.participant as { name?: string } | undefined)?.name ?? "Speaker";
           if (text) {
             await supabaseAdmin.from("interview_events").insert({
               session_id: sessionId,

@@ -42,8 +42,7 @@ export const Route = createFileRoute("/blog/")({
       { property: "og:title", content: "Blog — Grow" },
       {
         property: "og:description",
-        content:
-          "Essays, benchmarks and product updates from the team building Grow.",
+        content: "Essays, benchmarks and product updates from the team building Grow.",
       },
     ],
   }),
@@ -83,8 +82,7 @@ function BlogPage() {
   }, [dbPosts]);
 
   const featured =
-    merged.find((p) => posts.find((s) => s.slug === p.slug && s.featured)) ??
-    merged[0];
+    merged.find((p) => posts.find((s) => s.slug === p.slug && s.featured)) ?? merged[0];
   const [activeCat, setActiveCat] = useState<PostCategory | "All">("All");
   const [query, setQuery] = useState("");
   const [email, setEmail] = useState("");
@@ -141,8 +139,8 @@ function BlogPage() {
             Field notes from the talent operating system.
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            Essays, benchmarks and product dispatches from the team building
-            Grow — and from the leaders running it inside their hiring loops.
+            Essays, benchmarks and product dispatches from the team building Grow — and from the
+            leaders running it inside their hiring loops.
           </p>
         </div>
       </section>
@@ -229,38 +227,36 @@ function BlogPage() {
           {rest.length === 0 ? (
             <div className="liquid-glass rounded-3xl bg-card/40 p-12 text-center">
               <p className="text-base text-muted-foreground">
-                No essays match that filter yet. Try clearing the search or
-                picking a different category.
+                No essays match that filter yet. Try clearing the search or picking a different
+                category.
               </p>
             </div>
           ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {rest.map((p) => (
-              <Link
-                key={p.slug}
-                to="/blog/$slug"
-                params={{ slug: p.slug }}
-                className="liquid-glass group flex h-full flex-col rounded-3xl bg-card/40 p-7 transition-colors hover:bg-card/60"
-              >
-                <div className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-                  {p.category}
-                </div>
-                <h3 className="mt-4 text-xl font-semibold leading-snug text-foreground">
-                  {p.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  {p.excerpt}
-                </p>
-                <div className="mt-auto pt-8 text-xs text-muted-foreground">
-                  <span className="text-foreground">{p.author}</span>
-                  <span className="mx-2">·</span>
-                  {p.date}
-                  <span className="mx-2">·</span>
-                  {p.readTime}
-                </div>
-              </Link>
-            ))}
-          </div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {rest.map((p) => (
+                <Link
+                  key={p.slug}
+                  to="/blog/$slug"
+                  params={{ slug: p.slug }}
+                  className="liquid-glass group flex h-full flex-col rounded-3xl bg-card/40 p-7 transition-colors hover:bg-card/60"
+                >
+                  <div className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+                    {p.category}
+                  </div>
+                  <h3 className="mt-4 text-xl font-semibold leading-snug text-foreground">
+                    {p.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.excerpt}</p>
+                  <div className="mt-auto pt-8 text-xs text-muted-foreground">
+                    <span className="text-foreground">{p.author}</span>
+                    <span className="mx-2">·</span>
+                    {p.date}
+                    <span className="mx-2">·</span>
+                    {p.readTime}
+                  </div>
+                </Link>
+              ))}
+            </div>
           )}
         </div>
       </section>
@@ -285,9 +281,8 @@ function BlogPage() {
                   One essay every other Tuesday. No tracking, no clickbait.
                 </h3>
                 <p className="mt-3 text-sm text-muted-foreground md:text-base">
-                  Field notes from the team building Grow and the leaders
-                  running it inside their hiring loops. Unsubscribe in one
-                  click.
+                  Field notes from the team building Grow and the leaders running it inside their
+                  hiring loops. Unsubscribe in one click.
                 </p>
               </div>
               <form onSubmit={handleSubscribe} className="flex flex-col gap-3">

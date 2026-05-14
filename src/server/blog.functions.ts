@@ -50,10 +50,7 @@ export const setPostStatus = createServerFn({ method: "POST" })
       status: data.status,
     };
     if (data.status === "published") patch.published_at = new Date().toISOString();
-    const { error } = await supabaseAdmin
-      .from("blog_posts")
-      .update(patch)
-      .eq("id", data.id);
+    const { error } = await supabaseAdmin.from("blog_posts").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -75,7 +72,9 @@ export const getPublishedPosts = createServerFn({ method: "GET" }).handler(async
 
 export const subscribeToNewsletter = createServerFn({ method: "POST" })
   .inputValidator((d: { email: string; source?: string }) => {
-    const email = String(d?.email ?? "").trim().toLowerCase();
+    const email = String(d?.email ?? "")
+      .trim()
+      .toLowerCase();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
       throw new Error("Invalid email");
     }

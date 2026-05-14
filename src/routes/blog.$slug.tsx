@@ -95,12 +95,8 @@ export const Route = createFileRoute("/blog/$slug")({
     <>
       <Navbar />
       <section className="px-6 py-32 text-center">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-          Post not found
-        </h1>
-        <p className="mt-3 text-muted-foreground">
-          We couldn't find that essay.
-        </p>
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">Post not found</h1>
+        <p className="mt-3 text-muted-foreground">We couldn't find that essay.</p>
         <Link
           to="/blog"
           className="mt-8 inline-flex items-center gap-2 text-primary hover:underline"
@@ -236,10 +232,22 @@ function ShareButtons({ url, title }: { url: string; title: string }) {
     "inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-card/40 text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground";
   return (
     <div className="flex items-center gap-2">
-      <a href={tw} target="_blank" rel="noreferrer noopener" aria-label="Share on Twitter" className={cls}>
+      <a
+        href={tw}
+        target="_blank"
+        rel="noreferrer noopener"
+        aria-label="Share on Twitter"
+        className={cls}
+      >
         <Twitter className="h-4 w-4" />
       </a>
-      <a href={li} target="_blank" rel="noreferrer noopener" aria-label="Share on LinkedIn" className={cls}>
+      <a
+        href={li}
+        target="_blank"
+        rel="noreferrer noopener"
+        aria-label="Share on LinkedIn"
+        className={cls}
+      >
         <Linkedin className="h-4 w-4" />
       </a>
       <button type="button" onClick={copy} aria-label="Copy link" className={cls}>
@@ -272,46 +280,44 @@ function BlogPostPage() {
         <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1fr_minmax(0,720px)_1fr]">
           <div className="hidden lg:block" />
           <div>
-          <Link
-            to="/blog"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" /> All posts
-          </Link>
+            <Link
+              to="/blog"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" /> All posts
+            </Link>
 
-          <div className="mt-8 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.18em] text-primary">
-            <span>{post.category}</span>
-            <span className="h-px w-8 bg-primary/40" />
-            <span className="text-muted-foreground">{post.date}</span>
-          </div>
+            <div className="mt-8 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.18em] text-primary">
+              <span>{post.category}</span>
+              <span className="h-px w-8 bg-primary/40" />
+              <span className="text-muted-foreground">{post.date}</span>
+            </div>
 
-          <h1 className="mt-6 text-4xl font-semibold leading-tight tracking-tight text-foreground md:text-5xl">
-            {post.title}
-          </h1>
+            <h1 className="mt-6 text-4xl font-semibold leading-tight tracking-tight text-foreground md:text-5xl">
+              {post.title}
+            </h1>
 
-          <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-            {post.excerpt}
-          </p>
+            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{post.excerpt}</p>
 
-          <div className="mt-8 flex items-center justify-between gap-4 border-t border-white/10 pt-6 text-sm text-muted-foreground">
-            <div className="flex items-center gap-3">
-              <div
-                aria-hidden
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold uppercase tracking-wider text-primary"
-              >
-                {authorInitials(post.author)}
-              </div>
-              <div>
-                <div className="text-foreground">{post.author}</div>
-                <div className="text-xs">
-                  {post.authorRole} · {post.readTime}
+            <div className="mt-8 flex items-center justify-between gap-4 border-t border-white/10 pt-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-3">
+                <div
+                  aria-hidden
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold uppercase tracking-wider text-primary"
+                >
+                  {authorInitials(post.author)}
+                </div>
+                <div>
+                  <div className="text-foreground">{post.author}</div>
+                  <div className="text-xs">
+                    {post.authorRole} · {post.readTime}
+                  </div>
                 </div>
               </div>
+              <ShareButtons url={url} title={post.title} />
             </div>
-            <ShareButtons url={url} title={post.title} />
-          </div>
 
-          <div className="mt-12">{renderBody(post.body)}</div>
+            <div className="mt-12">{renderBody(post.body)}</div>
           </div>
 
           <aside className="hidden lg:block">
@@ -344,27 +350,34 @@ function BlogPostPage() {
             Keep reading
           </h2>
           <div className="grid gap-6 md:grid-cols-3">
-            {others.map((p: { slug: string; title: string; excerpt: string; category: string; date: string; readTime: string }) => (
-              <Link
-                key={p.slug}
-                to="/blog/$slug"
-                params={{ slug: p.slug }}
-                className="liquid-glass group flex h-full flex-col rounded-3xl bg-card/40 p-7 transition-colors hover:bg-card/60"
-              >
-                <div className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
-                  {p.category}
-                </div>
-                <h3 className="mt-4 text-lg font-semibold leading-snug text-foreground">
-                  {p.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  {p.excerpt}
-                </p>
-                <div className="mt-auto pt-6 text-xs text-muted-foreground">
-                  {p.date} · {p.readTime}
-                </div>
-              </Link>
-            ))}
+            {others.map(
+              (p: {
+                slug: string;
+                title: string;
+                excerpt: string;
+                category: string;
+                date: string;
+                readTime: string;
+              }) => (
+                <Link
+                  key={p.slug}
+                  to="/blog/$slug"
+                  params={{ slug: p.slug }}
+                  className="liquid-glass group flex h-full flex-col rounded-3xl bg-card/40 p-7 transition-colors hover:bg-card/60"
+                >
+                  <div className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+                    {p.category}
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold leading-snug text-foreground">
+                    {p.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.excerpt}</p>
+                  <div className="mt-auto pt-6 text-xs text-muted-foreground">
+                    {p.date} · {p.readTime}
+                  </div>
+                </Link>
+              ),
+            )}
           </div>
         </div>
       </section>

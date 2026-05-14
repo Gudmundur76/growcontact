@@ -62,7 +62,9 @@ function statusBadge(s: string) {
     cancelled: "bg-muted text-muted-foreground",
   };
   return (
-    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${map[s] ?? "bg-muted"}`}>
+    <span
+      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${map[s] ?? "bg-muted"}`}
+    >
       {s.replace("_", " ")}
     </span>
   );
@@ -88,10 +90,14 @@ function InterviewListPage() {
     setLoading(true);
     (async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         const r = await listSessions({
           data: { page, pageSize, scope, q: q || undefined },
-          headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
+          headers: session?.access_token
+            ? { Authorization: `Bearer ${session.access_token}` }
+            : undefined,
         });
         setSessions(r.rows as Session[]);
         setTotal(r.total);
@@ -104,7 +110,9 @@ function InterviewListPage() {
   }, [user, authLoading, navigate, page, scope, q]);
 
   async function authedHeaders() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined;
   }
 
@@ -159,8 +167,8 @@ function InterviewListPage() {
           <div>
             <h1 className="text-4xl font-medium tracking-tight">Interview Copilot</h1>
             <p className="mt-2 max-w-xl text-muted-foreground">
-              Drop a Zoom, Meet, or Teams link. The bot joins, transcribes, surfaces follow-ups in real
-              time, and produces a calibrated scorecard.
+              Drop a Zoom, Meet, or Teams link. The bot joins, transcribes, surfaces follow-ups in
+              real time, and produces a calibrated scorecard.
             </p>
           </div>
           <Button asChild>
@@ -170,10 +178,7 @@ function InterviewListPage() {
           </Button>
         </div>
         <div className="mt-3">
-          <Link
-            to="/interview/rubrics"
-            className="text-sm text-primary hover:underline"
-          >
+          <Link to="/interview/rubrics" className="text-sm text-primary hover:underline">
             Manage rubrics →
           </Link>
         </div>
@@ -183,7 +188,10 @@ function InterviewListPage() {
             {(["active", "archived", "trash"] as const).map((s) => (
               <button
                 key={s}
-                onClick={() => { setScope(s); setPage(0); }}
+                onClick={() => {
+                  setScope(s);
+                  setPage(0);
+                }}
                 className={`rounded px-3 py-1 capitalize ${scope === s ? "bg-muted font-medium" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {s}
@@ -192,7 +200,10 @@ function InterviewListPage() {
           </div>
           <Input
             value={q}
-            onChange={(e) => { setPage(0); setQ(e.target.value); }}
+            onChange={(e) => {
+              setPage(0);
+              setQ(e.target.value);
+            }}
             placeholder="Search candidate or role…"
             className="ml-auto max-w-xs"
           />
@@ -205,7 +216,11 @@ function InterviewListPage() {
             <div className="flex flex-col items-center gap-3 p-16 text-center">
               <Video className="size-8 text-muted-foreground" />
               <p className="text-lg">
-                {scope === "active" ? "No interviews yet" : scope === "archived" ? "Nothing archived" : "Trash is empty"}
+                {scope === "active"
+                  ? "No interviews yet"
+                  : scope === "archived"
+                    ? "Nothing archived"
+                    : "Trash is empty"}
               </p>
               <p className="text-sm text-muted-foreground">
                 {scope === "active"
@@ -242,7 +257,12 @@ function InterviewListPage() {
                   </Link>
                   <div className="mr-2 flex items-center gap-1 opacity-0 group-hover:opacity-100">
                     {scope === "trash" ? (
-                      <Button variant="ghost" size="icon" aria-label="Restore" onClick={(e) => onRestore(e, s.id)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Restore"
+                        onClick={(e) => onRestore(e, s.id)}
+                      >
                         <RotateCcw className="size-4" />
                       </Button>
                     ) : (
@@ -253,7 +273,11 @@ function InterviewListPage() {
                           aria-label={s.archived ? "Unarchive" : "Archive"}
                           onClick={(e) => onToggleArchive(e, s.id, s.archived)}
                         >
-                          {s.archived ? <ArchiveRestore className="size-4" /> : <Archive className="size-4" />}
+                          {s.archived ? (
+                            <ArchiveRestore className="size-4" />
+                          ) : (
+                            <Archive className="size-4" />
+                          )}
                         </Button>
                         <Button
                           variant="ghost"
@@ -278,10 +302,20 @@ function InterviewListPage() {
               Page {page + 1} of {totalPages} · {total} total
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === 0}
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+              >
                 Previous
               </Button>
-              <Button variant="outline" size="sm" disabled={page + 1 >= totalPages} onClick={() => setPage((p) => p + 1)}>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page + 1 >= totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
                 Next
               </Button>
             </div>

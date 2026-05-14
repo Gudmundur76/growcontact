@@ -1,11 +1,9 @@
-import * as React from 'react'
-import {
-  Body, Container, Head, Heading, Html, Preview, Text,
-} from '@react-email/components'
-import { brand } from './_brand'
+import * as React from "react";
+import { Body, Container, Head, Heading, Html, Preview, Text } from "@react-email/components";
+import { brand } from "./_brand";
 
 interface ReauthenticationEmailProps {
-  token: string
+  token: string;
 }
 
 export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => (
@@ -24,6 +22,6 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
       </Container>
     </Body>
   </Html>
-)
+);
 
-export default ReauthenticationEmail
+export default ReauthenticationEmail;

@@ -138,21 +138,46 @@ function SearchPage() {
         </div>
         <div>
           <Label htmlFor="role">Role title (optional)</Label>
-          <Input id="role" value={roleTitle} onChange={(e) => setRoleTitle(e.target.value)} className="mt-2" placeholder="Senior Frontend Engineer" />
+          <Input
+            id="role"
+            value={roleTitle}
+            onChange={(e) => setRoleTitle(e.target.value)}
+            className="mt-2"
+            placeholder="Senior Frontend Engineer"
+          />
         </div>
         <div>
           <Label htmlFor="loc">Location</Label>
-          <Input id="loc" value={location} onChange={(e) => setLocation(e.target.value)} className="mt-2" placeholder="Berlin, Remote, USA" />
+          <Input
+            id="loc"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className="mt-2"
+            placeholder="Berlin, Remote, USA"
+          />
         </div>
         {source === "github" ? (
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label htmlFor="lang">Language</Label>
-              <Input id="lang" value={language} onChange={(e) => setLanguage(e.target.value)} className="mt-2" placeholder="typescript" />
+              <Input
+                id="lang"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="mt-2"
+                placeholder="typescript"
+              />
             </div>
             <div>
               <Label htmlFor="fol">Min followers</Label>
-              <Input id="fol" inputMode="numeric" value={minFollowers} onChange={(e) => setMinFollowers(e.target.value.replace(/\D/g, ""))} className="mt-2" placeholder="50" />
+              <Input
+                id="fol"
+                inputMode="numeric"
+                value={minFollowers}
+                onChange={(e) => setMinFollowers(e.target.value.replace(/\D/g, ""))}
+                className="mt-2"
+                placeholder="50"
+              />
             </div>
           </div>
         ) : (
@@ -160,16 +185,34 @@ function SearchPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label htmlFor="jt">Job title</Label>
-                <Input id="jt" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} className="mt-2" placeholder="Product Designer" />
+                <Input
+                  id="jt"
+                  value={jobTitle}
+                  onChange={(e) => setJobTitle(e.target.value)}
+                  className="mt-2"
+                  placeholder="Product Designer"
+                />
               </div>
               <div>
                 <Label htmlFor="co">Company</Label>
-                <Input id="co" value={company} onChange={(e) => setCompany(e.target.value)} className="mt-2" placeholder="Stripe" />
+                <Input
+                  id="co"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  className="mt-2"
+                  placeholder="Stripe"
+                />
               </div>
             </div>
             <div>
               <Label htmlFor="sk">Skills (comma-separated)</Label>
-              <Input id="sk" value={skills} onChange={(e) => setSkills(e.target.value)} className="mt-2" placeholder="figma, design systems" />
+              <Input
+                id="sk"
+                value={skills}
+                onChange={(e) => setSkills(e.target.value)}
+                className="mt-2"
+                placeholder="figma, design systems"
+              />
             </div>
             <div>
               <Label htmlFor="sen">Seniority</Label>
@@ -192,11 +235,28 @@ function SearchPage() {
         )}
         <div>
           <Label htmlFor="save">Save as (optional)</Label>
-          <Input id="save" value={saveAs} onChange={(e) => setSaveAs(e.target.value)} className="mt-2" placeholder="EU TS engineers" />
-          <p className="mt-1 text-xs text-muted-foreground">Saved searches can be re-run on a schedule with email alerts.</p>
+          <Input
+            id="save"
+            value={saveAs}
+            onChange={(e) => setSaveAs(e.target.value)}
+            className="mt-2"
+            placeholder="EU TS engineers"
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Saved searches can be re-run on a schedule with email alerts.
+          </p>
         </div>
-        <Button onClick={onSearch} disabled={loading} className="w-full rounded-full" variant="hero">
-          {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+        <Button
+          onClick={onSearch}
+          disabled={loading}
+          className="w-full rounded-full"
+          variant="hero"
+        >
+          {loading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Sparkles className="mr-2 h-4 w-4" />
+          )}
           {loading ? "Searching…" : "Search & rank"}
         </Button>
       </aside>
@@ -204,9 +264,16 @@ function SearchPage() {
       <section className="space-y-4">
         {results.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/10 bg-card/20 p-10 text-center text-sm text-muted-foreground">
-            Describe the role on the left to get a ranked list of candidates from public GitHub profiles.
+            Describe the role on the left to get a ranked list of candidates from public GitHub
+            profiles.
             <br />
-            <span className="mt-2 block text-xs opacity-70">Tip: add a <Link to="/sourcing/sequences" className="underline">sequence</Link> first to send outreach in one click.</span>
+            <span className="mt-2 block text-xs opacity-70">
+              Tip: add a{" "}
+              <Link to="/sourcing/sequences" className="underline">
+                sequence
+              </Link>{" "}
+              first to send outreach in one click.
+            </span>
           </div>
         ) : (
           results.map((c) => (
@@ -215,7 +282,9 @@ function SearchPage() {
               c={c}
               roleTitle={roleTitle}
               onUpdate={(updated) =>
-                setResults((cur) => cur.map((x) => (x.id === updated.id ? { ...x, ...updated } : x)))
+                setResults((cur) =>
+                  cur.map((x) => (x.id === updated.id ? { ...x, ...updated } : x)),
+                )
               }
             />
           ))
@@ -284,7 +353,12 @@ function CandidateCard({
         )}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <a href={c.profile_url} target="_blank" rel="noreferrer" className="text-base font-semibold text-foreground hover:underline">
+            <a
+              href={c.profile_url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-base font-semibold text-foreground hover:underline"
+            >
               {c.name}
             </a>
             <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
@@ -292,7 +366,9 @@ function CandidateCard({
               {score} fit
             </Badge>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{c.headline ?? "(no bio)"}</p>
+          <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+            {c.headline ?? "(no bio)"}
+          </p>
           <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
             {c.location ? <span>📍 {c.location}</span> : null}
             {followers ? <span>👥 {followers}</span> : null}
@@ -368,7 +444,10 @@ function AddToShortlistButton({ candidateId }: { candidateId: string }) {
       {open ? (
         <div className="absolute z-10 mt-1 w-56 rounded-md border border-white/10 bg-popover p-1 shadow-lg">
           {lists.length === 0 ? (
-            <Link to="/sourcing/shortlists" className="block px-3 py-2 text-sm text-muted-foreground hover:bg-white/5">
+            <Link
+              to="/sourcing/shortlists"
+              className="block px-3 py-2 text-sm text-muted-foreground hover:bg-white/5"
+            >
               Create a shortlist first →
             </Link>
           ) : (
@@ -435,7 +514,10 @@ function SendOutreachButton({ candidate, roleTitle }: { candidate: Candidate; ro
       {open ? (
         <div className="absolute z-10 mt-1 w-72 space-y-2 rounded-md border border-white/10 bg-popover p-3 shadow-lg">
           {seqs.length === 0 ? (
-            <Link to="/sourcing/sequences" className="block text-sm text-muted-foreground underline">
+            <Link
+              to="/sourcing/sequences"
+              className="block text-sm text-muted-foreground underline"
+            >
               Create a sequence first →
             </Link>
           ) : (

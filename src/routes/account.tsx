@@ -80,9 +80,7 @@ function AccountPage() {
       <section className="relative px-6 py-24">
         <div className="mx-auto max-w-2xl">
           <div className="mb-8">
-            <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-              Your account
-            </h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground">Your account</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               Update your profile details. Signed in as{" "}
               <span className="text-foreground">{user?.email}</span>.
@@ -95,10 +93,7 @@ function AccountPage() {
             ) : (
               <form onSubmit={handleSave} className="space-y-5">
                 <div>
-                  <label
-                    htmlFor="name"
-                    className="mb-2 block text-sm font-medium text-foreground"
-                  >
+                  <label htmlFor="name" className="mb-2 block text-sm font-medium text-foreground">
                     Full name
                   </label>
                   <input
@@ -131,9 +126,7 @@ function AccountPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-foreground">
-                    Email
-                  </label>
+                  <label className="mb-2 block text-sm font-medium text-foreground">Email</label>
                   <input
                     type="email"
                     value={user?.email ?? ""}
@@ -145,11 +138,7 @@ function AccountPage() {
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                  <Button
-                    type="submit"
-                    variant="hero"
-                    disabled={saving}
-                  >
+                  <Button type="submit" variant="hero" disabled={saving}>
                     {saving ? "Saving…" : "Save changes"}
                   </Button>
                   <div className="flex items-center gap-3">
@@ -159,11 +148,7 @@ function AccountPage() {
                     >
                       Reset password
                     </Link>
-                    <Button
-                      type="button"
-                      variant="heroSecondary"
-                      onClick={handleSignOut}
-                    >
+                    <Button type="button" variant="heroSecondary" onClick={handleSignOut}>
                       Sign out
                     </Button>
                   </div>

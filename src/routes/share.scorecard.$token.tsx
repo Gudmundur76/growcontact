@@ -22,10 +22,7 @@ type Payload = {
 
 export const Route = createFileRoute("/share/scorecard/$token")({
   head: () => ({
-    meta: [
-      { title: "Interview scorecard — Grow" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Interview scorecard — Grow" }, { name: "robots", content: "noindex" }],
   }),
   component: SharedScorecard,
 });

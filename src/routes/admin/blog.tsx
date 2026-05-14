@@ -16,10 +16,7 @@ import {
 
 export const Route = createFileRoute("/admin/blog")({
   head: () => ({
-    meta: [
-      { title: "Admin · Blog — Grow" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Admin · Blog — Grow" }, { name: "robots", content: "noindex" }],
   }),
   component: AdminBlogPage,
 });
@@ -125,9 +122,7 @@ function AdminBlogPage() {
     return (
       <>
         <Navbar />
-        <section className="px-6 py-32 text-center text-muted-foreground">
-          Loading…
-        </section>
+        <section className="px-6 py-32 text-center text-muted-foreground">Loading…</section>
         <Footer />
       </>
     );
@@ -138,12 +133,8 @@ function AdminBlogPage() {
       <>
         <Navbar />
         <section className="px-6 py-32 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Not authorized
-          </h1>
-          <p className="mt-3 text-muted-foreground">
-            You need admin access to view this page.
-          </p>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Not authorized</h1>
+          <p className="mt-3 text-muted-foreground">You need admin access to view this page.</p>
         </section>
         <Footer />
       </>
@@ -164,16 +155,11 @@ function AdminBlogPage() {
                 AI-authored posts
               </h1>
               <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-                Auto-generated twice a week (Mon &amp; Thu, 09:00 UTC). Review
-                drafts here, then publish what's good.
+                Auto-generated twice a week (Mon &amp; Thu, 09:00 UTC). Review drafts here, then
+                publish what's good.
               </p>
             </div>
-            <Button
-              variant="hero"
-              onClick={handleGenerate}
-              disabled={generating}
-              className="gap-2"
-            >
+            <Button variant="hero" onClick={handleGenerate} disabled={generating} className="gap-2">
               {generating ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
@@ -185,9 +171,7 @@ function AdminBlogPage() {
 
           <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-card/40">
             {loading ? (
-              <div className="px-6 py-12 text-center text-sm text-muted-foreground">
-                Loading…
-              </div>
+              <div className="px-6 py-12 text-center text-sm text-muted-foreground">Loading…</div>
             ) : rows.length === 0 ? (
               <div className="px-6 py-12 text-center text-sm text-muted-foreground">
                 No AI posts yet. Click "Generate draft now" to make the first one.
@@ -195,7 +179,10 @@ function AdminBlogPage() {
             ) : (
               <ul className="divide-y divide-white/10">
                 {rows.map((r) => (
-                  <li key={r.id} className="flex flex-col gap-3 px-6 py-5 md:flex-row md:items-center md:justify-between">
+                  <li
+                    key={r.id}
+                    className="flex flex-col gap-3 px-6 py-5 md:flex-row md:items-center md:justify-between"
+                  >
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.16em]">
                         <span
@@ -214,12 +201,8 @@ function AdminBlogPage() {
                           {new Date(r.created_at).toLocaleDateString()}
                         </span>
                       </div>
-                      <h3 className="mt-2 text-base font-semibold text-foreground">
-                        {r.title}
-                      </h3>
-                      <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                        {r.excerpt}
-                      </p>
+                      <h3 className="mt-2 text-base font-semibold text-foreground">{r.title}</h3>
+                      <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{r.excerpt}</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       <Link

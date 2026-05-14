@@ -32,9 +32,7 @@ function slugify(s: string): string {
 
 function pickTheme(recentTitles: string[]): string {
   const seen = new Set(recentTitles.map((t) => t.toLowerCase()));
-  const fresh = THEMES.filter(
-    (t) => !Array.from(seen).some((s) => s.includes(t.split(" ")[0])),
-  );
+  const fresh = THEMES.filter((t) => !Array.from(seen).some((s) => s.includes(t.split(" ")[0])));
   const pool = fresh.length ? fresh : THEMES;
   return pool[Math.floor(Math.random() * pool.length)];
 }
@@ -98,8 +96,14 @@ Return ONLY a JSON object via the tool call.`;
             parameters: {
               type: "object",
               properties: {
-                title: { type: "string", description: "Headline, sentence case, no clickbait, ≤80 chars." },
-                excerpt: { type: "string", description: "1–2 sentences, ≤220 chars, no marketing speak." },
+                title: {
+                  type: "string",
+                  description: "Headline, sentence case, no clickbait, ≤80 chars.",
+                },
+                excerpt: {
+                  type: "string",
+                  description: "1–2 sentences, ≤220 chars, no marketing speak.",
+                },
                 category: { type: "string", enum: CATEGORIES as unknown as string[] },
                 body: { type: "string", description: "Markdown-ish body as specified." },
                 read_time: { type: "string", description: "e.g. '7 min read'" },
@@ -117,7 +121,8 @@ Return ONLY a JSON object via the tool call.`;
   if (!res.ok) {
     const text = await res.text();
     if (res.status === 429) throw new Error("AI rate limit — try again shortly");
-    if (res.status === 402) throw new Error("AI credits exhausted — top up in Settings → Workspace → Usage");
+    if (res.status === 402)
+      throw new Error("AI credits exhausted — top up in Settings → Workspace → Usage");
     throw new Error(`AI gateway error ${res.status}: ${text}`);
   }
 
@@ -195,7 +200,9 @@ function fmtDate(iso: string): string {
 export async function fetchPublishedPosts(): Promise<PublicPost[]> {
   const { data, error } = await supabaseAdmin
     .from("blog_posts")
-    .select("slug, title, excerpt, category, author, author_role, body, read_time, published_at, created_at")
+    .select(
+      "slug, title, excerpt, category, author, author_role, body, read_time, published_at, created_at",
+    )
     .eq("status", "published")
     .order("published_at", { ascending: false })
     .limit(200);

@@ -19,7 +19,15 @@ export const Route = createFileRoute("/sourcing")({
   component: SourcingLayout,
 });
 
-const tabs: { to: "/sourcing" | "/sourcing/searches" | "/sourcing/shortlists" | "/sourcing/sequences" | "/sourcing/activity"; label: string }[] = [
+const tabs: {
+  to:
+    | "/sourcing"
+    | "/sourcing/searches"
+    | "/sourcing/shortlists"
+    | "/sourcing/sequences"
+    | "/sourcing/activity";
+  label: string;
+}[] = [
   { to: "/sourcing", label: "Search" },
   { to: "/sourcing/searches", label: "Saved" },
   { to: "/sourcing/shortlists", label: "Shortlists" },
@@ -45,8 +53,8 @@ function SourcingLayout() {
           Find and reach out to candidates.
         </h1>
         <p className="mt-3 max-w-2xl text-base text-muted-foreground">
-          Searches public profiles and open-source signals. Hybrid AI ranking surfaces
-          the strongest matches for your role.
+          Searches public profiles and open-source signals. Hybrid AI ranking surfaces the strongest
+          matches for your role.
         </p>
         <nav className="mt-8 flex gap-1 border-b border-white/10">
           {tabs.map((t) => (

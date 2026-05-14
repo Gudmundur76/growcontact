@@ -23,10 +23,7 @@ type Rubric = {
 
 export const Route = createFileRoute("/interview/rubrics")({
   head: () => ({
-    meta: [
-      { title: "Rubrics — Interview Copilot" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Rubrics — Interview Copilot" }, { name: "robots", content: "noindex" }],
   }),
   component: RubricsPage,
 });
@@ -75,7 +72,9 @@ function RubricsPage() {
     if (!editing) return;
     setSaving(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       await upsertRubric({
         data: {
           id: editing.id,
@@ -101,7 +100,9 @@ function RubricsPage() {
 
   async function remove(id: string) {
     if (!confirm("Delete this rubric?")) return;
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     await deleteRubric({
       data: { id },
       headers: session?.access_token
@@ -115,7 +116,9 @@ function RubricsPage() {
   async function seedAll() {
     setSeeding(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const r = await seedRubricTemplates({
         data: { templates: ["engineering", "sales", "product", "design"] },
         headers: session?.access_token
@@ -145,31 +148,27 @@ function RubricsPage() {
           <div>
             <h1 className="text-4xl font-medium tracking-tight">Rubrics</h1>
             <p className="mt-2 max-w-xl text-muted-foreground">
-              Define per-role rubrics. The copilot uses them to calibrate live suggestions and
-              the final scorecard.
+              Define per-role rubrics. The copilot uses them to calibrate live suggestions and the
+              final scorecard.
             </p>
           </div>
           <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={seedAll}
-            disabled={seeding}
-          >
-            <Sparkles className="size-4" /> {seeding ? "Adding…" : "Seed templates"}
-          </Button>
-          <Button
-            onClick={() =>
-              setEditing({
-                name: "",
-                role_title: "",
-                focus: "",
-                competencies: STARTER_COMPETENCIES,
-                is_default: rubrics.length === 0,
-              })
-            }
-          >
-            <Plus className="size-4" /> New rubric
-          </Button>
+            <Button variant="outline" onClick={seedAll} disabled={seeding}>
+              <Sparkles className="size-4" /> {seeding ? "Adding…" : "Seed templates"}
+            </Button>
+            <Button
+              onClick={() =>
+                setEditing({
+                  name: "",
+                  role_title: "",
+                  focus: "",
+                  competencies: STARTER_COMPETENCIES,
+                  is_default: rubrics.length === 0,
+                })
+              }
+            >
+              <Plus className="size-4" /> New rubric
+            </Button>
           </div>
         </div>
 
