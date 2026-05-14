@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createRecallBot, leaveRecallBot, detectPlatform } from "./recall.server";
 import { generateScorecard } from "./interview-ai.server";
+import { dbError } from "./db-errors";
 
 // ---------- In-memory rate limiter ----------
 // Best-effort per-instance throttle. Acceptable for abuse prevention; resets on cold start.
@@ -299,7 +300,7 @@ export const upsertRubric = createServerFn({ method: "POST" })
         .eq("id", data.id)
         .select("id")
         .single();
-      if (error) throw new Error(error.message);
+      if (error) throw dbError(error, "interviews.functions");
       return { id: updated.id };
     }
     const { data: inserted, error } = await supabase
@@ -307,7 +308,7 @@ export const upsertRubric = createServerFn({ method: "POST" })
       .insert(row)
       .select("id")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "interviews.functions");
     return { id: inserted.id };
   });
 
@@ -319,7 +320,7 @@ export const deleteRubric = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { error } = await supabase.from("interview_rubrics").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "interviews.functions");
     return { ok: true };
   });
 
@@ -353,7 +354,7 @@ export const setSessionShare = createServerFn({ method: "POST" })
       .from("interview_sessions")
       .update({ share_token: newToken })
       .eq("id", session.id);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "interviews.functions");
     return { token: newToken };
   });
 
@@ -390,7 +391,7 @@ export const addManualTranscript = createServerFn({ method: "POST" })
       speaker: data.speaker,
       content: data.content,
     });
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "interviews.functions");
     return { ok: true };
   });
 
@@ -455,7 +456,7 @@ export const addBulkTranscript = createServerFn({ method: "POST" })
         .eq("id", session.id);
     }
     const { error } = await supabaseAdmin.from("interview_events").insert(rows);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "interviews.functions");
     return { ok: true, count: rows.length };
   });
 
@@ -475,7 +476,7 @@ export const deleteSession = createServerFn({ method: "POST" })
       .from("interview_sessions")
       .update({ deleted_at: new Date().toISOString(), share_token: null })
       .eq("id", session.id);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "interviews.functions");
     return { ok: true };
   });
 
@@ -494,7 +495,7 @@ export const restoreSession = createServerFn({ method: "POST" })
       .from("interview_sessions")
       .update({ deleted_at: null })
       .eq("id", session.id);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "interviews.functions");
     return { ok: true };
   });
 
@@ -515,7 +516,7 @@ export const setSessionArchived = createServerFn({ method: "POST" })
       .from("interview_sessions")
       .update({ archived: data.archived })
       .eq("id", session.id);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "interviews.functions");
     return { ok: true };
   });
 
@@ -549,7 +550,7 @@ export const listSessions = createServerFn({ method: "POST" })
       q = q.or(`candidate_name.ilike.%${term}%,role_title.ilike.%${term}%`);
     }
     const { data: rows, count, error } = await q;
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "interviews.functions");
     return { rows: rows ?? [], total: count ?? 0 };
   });
 
@@ -600,7 +601,7 @@ export const updateScorecard = createServerFn({ method: "POST" })
         follow_ups: data.follow_ups,
       })
       .eq("session_id", session.id);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "interviews.functions");
     return { ok: true };
   });
 
@@ -628,7 +629,7 @@ export const setSessionShareV2 = createServerFn({ method: "POST" })
         .from("interview_sessions")
         .update({ share_token: null, share_expires_at: null })
         .eq("id", session.id);
-      if (error) throw new Error(error.message);
+      if (error) throw dbError(error, "interviews.functions");
       return { token: null, expiresAt: null };
     }
     const token = session.share_token ?? randomToken();
@@ -638,7 +639,7 @@ export const setSessionShareV2 = createServerFn({ method: "POST" })
       .from("interview_sessions")
       .update({ share_token: token, share_expires_at: expiresAt })
       .eq("id", session.id);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "interviews.functions");
     return { token, expiresAt };
   });
 
@@ -726,6 +727,6 @@ export const seedRubricTemplates = createServerFn({ method: "POST" })
       .from("interview_rubrics")
       .insert(rows)
       .select("id");
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "interviews.functions");
     return { count: inserted?.length ?? 0 };
   });

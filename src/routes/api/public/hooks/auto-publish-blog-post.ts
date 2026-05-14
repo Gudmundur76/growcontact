@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { generateBlogDraft } from "@/server/blog.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { dbError } from "@/server/db-errors";
 
 export const Route = createFileRoute("/api/public/hooks/auto-publish-blog-post")({
   server: {
@@ -12,7 +13,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-publish-blog-post")
             .from("blog_posts")
             .update({ status: "published", published_at: new Date().toISOString() })
             .eq("id", draft.id);
-          if (error) throw new Error(error.message);
+          if (error) throw dbError(error, "auto-publish-blog-post");
           return new Response(JSON.stringify({ ok: true, slug: draft.slug, title: draft.title }), {
             status: 200,
             headers: { "Content-Type": "application/json" },
