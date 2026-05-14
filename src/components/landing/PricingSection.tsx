@@ -69,15 +69,11 @@ export function PricingSection() {
             <div
               key={plan.name}
               className={`liquid-glass flex flex-col rounded-3xl p-8 ${
-                plan.highlighted
-                  ? "bg-primary/10 ring-1 ring-primary/40"
-                  : "bg-card/40"
+                plan.highlighted ? "bg-primary/10 ring-1 ring-primary/40" : "bg-card/40"
               }`}
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-foreground">
-                  {plan.name}
-                </h3>
+                <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
                 {plan.highlighted && (
                   <span className="rounded-full bg-primary/20 px-3 py-1 text-xs font-medium text-primary">
                     Most popular
@@ -90,9 +86,7 @@ export function PricingSection() {
                 </span>
                 <span className="text-muted-foreground">{plan.cadence}</span>
               </div>
-              <p className="mt-3 text-sm text-muted-foreground">
-                {plan.description}
-              </p>
+              <p className="mt-3 text-sm text-muted-foreground">{plan.description}</p>
 
               <ul className="mt-8 space-y-3">
                 {plan.features.map((f) => (

@@ -33,13 +33,13 @@ function ResetPasswordPage() {
   useEffect(() => {
     // Supabase appends recovery tokens to the URL hash and fires
     // PASSWORD_RECOVERY once the session is established.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
-          setReady(true);
-        }
-      },
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
+        setReady(true);
+      }
+    });
 
     // If the user already has a session (e.g. landed back here), allow update.
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -51,9 +51,7 @@ function ResetPasswordPage() {
       if (!ready) {
         // Don't block — just warn if hash didn't carry recovery tokens.
         if (!window.location.hash.includes("type=recovery") && !ready) {
-          setError(
-            "This reset link is invalid or has expired. Request a new one to continue.",
-          );
+          setError("This reset link is invalid or has expired. Request a new one to continue.");
         }
       }
     }, 1500);

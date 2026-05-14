@@ -38,11 +38,7 @@ export function Navbar() {
     enabled: !!user,
     queryFn: async () => {
       const [{ data: p }, { data: roles }] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("name, company")
-          .eq("user_id", user!.id)
-          .maybeSingle(),
+        supabase.from("profiles").select("name, company").eq("user_id", user!.id).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", user!.id),
       ]);
       return {
@@ -53,8 +49,7 @@ export function Navbar() {
     },
   });
 
-  const displayName =
-    profile?.name?.trim() || user?.email?.split("@")[0] || "Account";
+  const displayName = profile?.name?.trim() || user?.email?.split("@")[0] || "Account";
   const initials = displayName
     .split(/\s+/)
     .map((s) => s[0])
@@ -76,16 +71,8 @@ export function Navbar() {
         className="relative z-20 flex w-full flex-row items-center justify-between px-6 py-5 md:px-8"
       >
         <Link to="/" className="flex items-center gap-2" aria-label="Grow home">
-          <img
-            src={logo}
-            alt="Grow"
-            className="h-8 w-auto"
-            width={32}
-            height={32}
-          />
-          <span className="text-base font-semibold tracking-tight text-foreground">
-            Grow
-          </span>
+          <img src={logo} alt="Grow" className="h-8 w-auto" width={32} height={32} />
+          <span className="text-base font-semibold tracking-tight text-foreground">Grow</span>
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
@@ -121,12 +108,8 @@ export function Navbar() {
               <DropdownMenuContent align="end" className="w-64">
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col gap-0.5">
-                    <span className="truncate text-sm font-medium">
-                      {displayName}
-                    </span>
-                    <span className="truncate text-xs text-muted-foreground">
-                      {user.email}
-                    </span>
+                    <span className="truncate text-sm font-medium">{displayName}</span>
+                    <span className="truncate text-xs text-muted-foreground">{user.email}</span>
                     {profile?.company ? (
                       <span className="truncate text-xs text-muted-foreground">
                         {profile.company}
@@ -215,11 +198,7 @@ export function Navbar() {
             <div className="mt-2 px-1 pb-1">
               {user ? (
                 <div className="space-y-2">
-                  <Button
-                    asChild
-                    variant="hero"
-                    className="w-full justify-center rounded-full"
-                  >
+                  <Button asChild variant="hero" className="w-full justify-center rounded-full">
                     <Link to="/account" onClick={() => setOpen(false)}>
                       Account
                     </Link>
@@ -237,11 +216,7 @@ export function Navbar() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <Button
-                    asChild
-                    variant="hero"
-                    className="w-full justify-center rounded-full"
-                  >
+                  <Button asChild variant="hero" className="w-full justify-center rounded-full">
                     <Link to="/signup" onClick={() => setOpen(false)}>
                       Start free trial
                     </Link>

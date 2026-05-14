@@ -21,7 +21,10 @@ export const Route = createFileRoute("/api/public/hooks/sourcing-alerts")({
         for (const s of searches) {
           // Skip if recently alerted (daily=24h, weekly=7d)
           const minHours = s.alert_frequency === "daily" ? 24 : 24 * 7;
-          if (s.last_alert_at && now.getTime() - new Date(s.last_alert_at).getTime() < minHours * 3600_000) {
+          if (
+            s.last_alert_at &&
+            now.getTime() - new Date(s.last_alert_at).getTime() < minHours * 3600_000
+          ) {
             continue;
           }
 

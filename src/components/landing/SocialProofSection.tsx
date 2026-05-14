@@ -53,9 +53,7 @@ export function SocialProofSection() {
           <div className="liquid-glass w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-semibold text-foreground">
             {brand.charAt(0)}
           </div>
-          <span className="text-base font-semibold text-foreground whitespace-nowrap">
-            {brand}
-          </span>
+          <span className="text-base font-semibold text-foreground whitespace-nowrap">{brand}</span>
         </div>
       ))}
     </div>

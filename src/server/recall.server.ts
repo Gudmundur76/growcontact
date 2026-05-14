@@ -10,8 +10,7 @@ export function detectPlatform(url: string): Platform {
   const u = url.toLowerCase();
   if (u.includes("zoom.us") || u.includes("zoom.com")) return "zoom";
   if (u.includes("meet.google.com")) return "google_meet";
-  if (u.includes("teams.microsoft.com") || u.includes("teams.live.com"))
-    return "microsoft_teams";
+  if (u.includes("teams.microsoft.com") || u.includes("teams.live.com")) return "microsoft_teams";
   return "unknown";
 }
 

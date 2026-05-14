@@ -65,9 +65,7 @@ export const startInterview = createServerFn({ method: "POST" })
       return { sessionId: session.id, botDispatched: false as const };
     }
 
-    const baseUrl =
-      process.env.PUBLIC_BASE_URL ??
-      "https://growcontact.lovable.app";
+    const baseUrl = process.env.PUBLIC_BASE_URL ?? "https://growcontact.lovable.app";
     const webhookUrl = `${baseUrl}/api/public/recall-webhook?session_id=${session.id}`;
 
     try {
@@ -151,9 +149,8 @@ export const finalizeScorecard = createServerFn({ method: "POST" })
       .order("created_at", { ascending: true });
 
     const transcript =
-      (events ?? [])
-        .map((e) => `${e.speaker ?? "Speaker"}: ${e.content}`)
-        .join("\n") || "(no transcript captured)";
+      (events ?? []).map((e) => `${e.speaker ?? "Speaker"}: ${e.content}`).join("\n") ||
+      "(no transcript captured)";
 
     const card = await generateScorecard({
       roleTitle: session.role_title,
@@ -163,21 +160,19 @@ export const finalizeScorecard = createServerFn({ method: "POST" })
       rubric,
     });
 
-    await supabaseAdmin
-      .from("interview_scorecards")
-      .upsert(
-        {
-          session_id: session.id,
-          summary: card.summary,
-          overall_rating: card.overall_rating,
-          recommendation: card.recommendation,
-          strengths: card.strengths,
-          concerns: card.concerns,
-          competencies: card.competencies,
-          follow_ups: card.follow_ups,
-        },
-        { onConflict: "session_id" }
-      );
+    await supabaseAdmin.from("interview_scorecards").upsert(
+      {
+        session_id: session.id,
+        summary: card.summary,
+        overall_rating: card.overall_rating,
+        recommendation: card.recommendation,
+        strengths: card.strengths,
+        concerns: card.concerns,
+        competencies: card.competencies,
+        follow_ups: card.follow_ups,
+      },
+      { onConflict: "session_id" },
+    );
 
     return { ok: true, scorecard: card };
   });
@@ -217,9 +212,21 @@ export const generateLiveSuggestionsFn = createServerFn({ method: "POST" })
     });
 
     const rows = [
-      ...result.follow_ups.map((c) => ({ session_id: session.id, kind: "suggestion" as const, content: c })),
-      ...result.red_flags.map((c) => ({ session_id: session.id, kind: "red_flag" as const, content: c })),
-      ...result.signals.map((c) => ({ session_id: session.id, kind: "suggestion" as const, content: `Signal: ${c}` })),
+      ...result.follow_ups.map((c) => ({
+        session_id: session.id,
+        kind: "suggestion" as const,
+        content: c,
+      })),
+      ...result.red_flags.map((c) => ({
+        session_id: session.id,
+        kind: "red_flag" as const,
+        content: c,
+      })),
+      ...result.signals.map((c) => ({
+        session_id: session.id,
+        kind: "suggestion" as const,
+        content: `Signal: ${c}`,
+      })),
     ];
     if (rows.length) await supabaseAdmin.from("interview_events").insert(rows);
     return { ok: true, ...result };
@@ -260,10 +267,7 @@ export const upsertRubric = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     if (data.isDefault) {
-      await supabase
-        .from("interview_rubrics")
-        .update({ is_default: false })
-        .eq("user_id", userId);
+      await supabase.from("interview_rubrics").update({ is_default: false }).eq("user_id", userId);
     }
     const row = {
       user_id: userId,
@@ -329,7 +333,7 @@ export const setSessionShare = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!session || session.user_id !== userId) throw new Error("Not found");
 
-    const newToken = data.enabled ? session.share_token ?? randomToken() : null;
+    const newToken = data.enabled ? (session.share_token ?? randomToken()) : null;
     const { error } = await supabaseAdmin
       .from("interview_sessions")
       .update({ share_token: newToken })
@@ -690,10 +694,7 @@ export const seedRubricTemplates = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => SeedSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: existing } = await supabase
-      .from("interview_rubrics")
-      .select("id")
-      .limit(1);
+    const { data: existing } = await supabase.from("interview_rubrics").select("id").limit(1);
     const hasAny = (existing ?? []).length > 0;
     const rows = data.templates.map((key, i) => {
       const t = TEMPLATES[key];

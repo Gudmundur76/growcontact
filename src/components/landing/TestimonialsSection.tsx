@@ -42,9 +42,7 @@ export function TestimonialsSection() {
                 "{t.quote}"
               </blockquote>
               <figcaption className="mt-8">
-                <div className="text-sm font-semibold text-foreground">
-                  {t.name}
-                </div>
+                <div className="text-sm font-semibold text-foreground">{t.name}</div>
                 <div className="text-sm text-muted-foreground">{t.role}</div>
               </figcaption>
             </figure>

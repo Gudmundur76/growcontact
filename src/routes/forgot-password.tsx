@@ -57,15 +57,14 @@ function ForgotPasswordPage() {
               Forgot your password?
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Enter your email and we'll send you a secure link to set a new
-              one.
+              Enter your email and we'll send you a secure link to set a new one.
             </p>
 
             {sent ? (
               <div className="mt-8 space-y-5 text-sm text-muted-foreground">
                 <p>
-                  If an account exists for that email, a reset link is on its
-                  way. Check your inbox (and spam) for a message from Grow.
+                  If an account exists for that email, a reset link is on its way. Check your inbox
+                  (and spam) for a message from Grow.
                 </p>
                 <Button asChild variant="heroSecondary" className="w-full justify-center">
                   <Link to="/login">Back to sign in</Link>
@@ -74,10 +73,7 @@ function ForgotPasswordPage() {
             ) : (
               <form onSubmit={handleSubmit} className="mt-8 space-y-5">
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="mb-2 block text-sm font-medium text-foreground"
-                  >
+                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-foreground">
                     Email
                   </label>
                   <input

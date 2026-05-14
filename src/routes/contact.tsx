@@ -15,14 +15,12 @@ export const Route = createFileRoute("/contact")({
       { title: "Contact — Grow" },
       {
         name: "description",
-        content:
-          "Get in touch with Grow — sales, support, partnerships and press.",
+        content: "Get in touch with Grow — sales, support, partnerships and press.",
       },
       { property: "og:title", content: "Contact — Grow" },
       {
         property: "og:description",
-        content:
-          "Talk to a Grow specialist about hiring at scale, integrations or partnerships.",
+        content: "Talk to a Grow specialist about hiring at scale, integrations or partnerships.",
       },
     ],
   }),
@@ -63,11 +61,7 @@ const contactSchema = z.object({
   email: z.string().trim().email("Enter a valid email").max(255),
   company: z.string().trim().max(200).optional().or(z.literal("")),
   team_size: z.string().trim().max(50).optional().or(z.literal("")),
-  message: z
-    .string()
-    .trim()
-    .min(1, "Please add a short message")
-    .max(5000, "Message is too long"),
+  message: z.string().trim().min(1, "Please add a short message").max(5000, "Message is too long"),
 });
 
 function ContactPage() {
@@ -101,8 +95,7 @@ function ContactPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...parsed.data,
-          user_agent:
-            typeof navigator !== "undefined" ? navigator.userAgent : null,
+          user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
         }),
       });
       if (!res.ok) {
@@ -126,15 +119,13 @@ function ContactPage() {
       <Navbar />
       <main className="mx-auto max-w-6xl px-6 pb-32 pt-32">
         <header className="max-w-2xl">
-          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Contact
-          </div>
+          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Contact</div>
           <h1 className="mt-4 text-balance text-5xl font-semibold tracking-tight text-foreground sm:text-6xl">
             Talk to the team building the talent OS.
           </h1>
           <p className="mt-6 text-lg text-muted-foreground">
-            Whether you're hiring your tenth engineer or your thousandth, we'll
-            help you figure out if Grow is the right fit — usually inside 48 hours.
+            Whether you're hiring your tenth engineer or your thousandth, we'll help you figure out
+            if Grow is the right fit — usually inside 48 hours.
           </p>
         </header>
 
@@ -145,9 +136,7 @@ function ContactPage() {
           >
             {submitted ? (
               <div className="flex h-full flex-col items-start justify-center gap-3">
-                <div className="text-2xl font-semibold text-foreground">
-                  Message sent.
-                </div>
+                <div className="text-2xl font-semibold text-foreground">Message sent.</div>
                 <p className="text-muted-foreground">
                   A Grow specialist will reach out within one business day.
                 </p>
@@ -176,14 +165,13 @@ function ContactPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="message">What can we help with?</Label>
-                  <Textarea id="message" rows={5} placeholder="A few sentences about your hiring goals…" />
+                  <Textarea
+                    id="message"
+                    rows={5}
+                    placeholder="A few sentences about your hiring goals…"
+                  />
                 </div>
-                <Button
-                  type="submit"
-                  variant="hero"
-                  className="rounded-full"
-                  disabled={submitting}
-                >
+                <Button type="submit" variant="hero" className="rounded-full" disabled={submitting}>
                   {submitting ? "Sending…" : "Send message"}
                 </Button>
               </div>
@@ -261,9 +249,7 @@ function ContactPage() {
                     +
                   </span>
                 </summary>
-                <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                  {f.a}
-                </p>
+                <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{f.a}</p>
               </details>
             ))}
           </div>

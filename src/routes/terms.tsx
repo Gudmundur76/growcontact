@@ -8,8 +8,7 @@ export const Route = createFileRoute("/terms")({
       { title: "Terms of Service — Grow" },
       {
         name: "description",
-        content:
-          "The terms governing use of Grow's talent operating system, APIs and AI features.",
+        content: "The terms governing use of Grow's talent operating system, APIs and AI features.",
       },
       { property: "og:title", content: "Terms of Service — Grow" },
       {
@@ -61,19 +60,14 @@ function TermsPage() {
     <div className="relative min-h-screen overflow-hidden bg-background">
       <Navbar />
       <main className="mx-auto max-w-3xl px-6 pb-32 pt-32">
-        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Legal
-        </div>
+        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Legal</div>
         <h1 className="mt-4 text-balance text-5xl font-semibold tracking-tight text-foreground sm:text-6xl">
           Terms of Service
         </h1>
-        <p className="mt-4 text-sm text-muted-foreground">
-          Last updated April 1, 2026
-        </p>
+        <p className="mt-4 text-sm text-muted-foreground">Last updated April 1, 2026</p>
         <p className="mt-8 text-lg text-muted-foreground">
-          The standard agreement between Grow Labs, Inc. and customers using
-          the Grow platform. For negotiated enterprise terms, talk to your
-          Grow account team.
+          The standard agreement between Grow Labs, Inc. and customers using the Grow platform. For
+          negotiated enterprise terms, talk to your Grow account team.
         </p>
 
         <div className="mt-16 space-y-10">

@@ -17,8 +17,7 @@ export const Route = createFileRoute("/careers")({
       { property: "og:title", content: "Careers — Grow" },
       {
         property: "og:description",
-        content:
-          "We're hiring engineers, designers and recruiters reinventing how teams hire.",
+        content: "We're hiring engineers, designers and recruiters reinventing how teams hire.",
       },
     ],
   }),
@@ -96,9 +95,8 @@ function CareersPage() {
             Build the system that decides who gets hired next.
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            We're a small, senior team rethinking recruiting from the model
-            layer up. If you've shipped products people rely on every day, we
-            want to talk.
+            We're a small, senior team rethinking recruiting from the model layer up. If you've
+            shipped products people rely on every day, we want to talk.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Button asChild variant="hero">
@@ -124,12 +122,8 @@ function CareersPage() {
           <div className="grid gap-6 md:grid-cols-3">
             {values.map((v) => (
               <div key={v.title} className="liquid-glass rounded-3xl bg-card/40 p-8">
-                <h3 className="text-xl font-semibold text-foreground">
-                  {v.title}
-                </h3>
-                <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                  {v.body}
-                </p>
+                <h3 className="text-xl font-semibold text-foreground">{v.title}</h3>
+                <p className="mt-3 text-base leading-relaxed text-muted-foreground">{v.body}</p>
               </div>
             ))}
           </div>
@@ -144,10 +138,7 @@ function CareersPage() {
             </h2>
             <ul className="mt-8 grid gap-4 sm:grid-cols-2">
               {perks.map((p) => (
-                <li
-                  key={p}
-                  className="flex items-start gap-3 text-base text-foreground/90"
-                >
+                <li key={p} className="flex items-start gap-3 text-base text-foreground/90">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                   {p}
                 </li>
@@ -189,9 +180,7 @@ function CareersPage() {
                     className="group flex flex-col gap-3 px-6 py-6 transition-colors hover:bg-white/[0.03] md:flex-row md:items-center md:justify-between md:px-8"
                   >
                     <div>
-                      <div className="text-lg font-semibold text-foreground">
-                        {r.title}
-                      </div>
+                      <div className="text-lg font-semibold text-foreground">{r.title}</div>
                       <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
                         <span className="inline-flex items-center gap-1.5">
                           <Briefcase className="h-3.5 w-3.5" />

@@ -84,12 +84,9 @@ const entries: Entry[] = [
 
 const tagStyles: Record<Tag, string> = {
   New: "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30",
-  Improved:
-    "bg-foreground/10 text-foreground ring-1 ring-inset ring-foreground/15",
-  Fixed:
-    "bg-muted/40 text-muted-foreground ring-1 ring-inset ring-muted-foreground/20",
-  Model:
-    "bg-accent/20 text-accent-foreground ring-1 ring-inset ring-accent/30",
+  Improved: "bg-foreground/10 text-foreground ring-1 ring-inset ring-foreground/15",
+  Fixed: "bg-muted/40 text-muted-foreground ring-1 ring-inset ring-muted-foreground/20",
+  Model: "bg-accent/20 text-accent-foreground ring-1 ring-inset ring-accent/30",
 };
 
 function ChangelogPage() {
@@ -106,8 +103,8 @@ function ChangelogPage() {
             Every change we ship to Grow.
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            New models, product surfaces, integrations, and the fixes in
-            between. Updated whenever we deploy — usually a few times a week.
+            New models, product surfaces, integrations, and the fixes in between. Updated whenever
+            we deploy — usually a few times a week.
           </p>
         </div>
       </section>
@@ -124,17 +121,13 @@ function ChangelogPage() {
                       <span className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
                         v{e.version}
                       </span>
-                      <span className="text-sm text-muted-foreground">
-                        {e.date}
-                      </span>
+                      <span className="text-sm text-muted-foreground">{e.date}</span>
                     </div>
                   </div>
                   <h2 className="mt-4 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
                     {e.title}
                   </h2>
-                  <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                    {e.body}
-                  </p>
+                  <p className="mt-4 text-base leading-relaxed text-muted-foreground">{e.body}</p>
                   <ul className="mt-6 space-y-3">
                     {e.items.map((it, i) => (
                       <li key={i} className="flex items-start gap-3">

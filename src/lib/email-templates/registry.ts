@@ -1,12 +1,12 @@
-import type { ComponentType } from 'react'
+import type { ComponentType } from "react";
 
 export interface TemplateEntry {
-  component: ComponentType<any>
-  subject: string | ((data: Record<string, any>) => string)
-  displayName?: string
-  previewData?: Record<string, any>
+  component: ComponentType<Record<string, unknown>>;
+  subject: string | ((data: Record<string, unknown>) => string);
+  displayName?: string;
+  previewData?: Record<string, unknown>;
   /** Fixed recipient — overrides caller-provided recipientEmail when set. */
-  to?: string
+  to?: string;
 }
 
 /**
@@ -17,14 +17,14 @@ export interface TemplateEntry {
  *   import { template as welcomeTemplate } from './welcome'
  *   // then add to TEMPLATES: 'welcome': welcomeTemplate
  */
-import { template as contactConfirmation } from './contact-confirmation'
-import { template as scorecardShare } from './scorecard-share'
-import { template as scorecardRecap } from './scorecard-recap'
-import { template as outreach } from './outreach'
+import { template as contactConfirmation } from "./contact-confirmation";
+import { template as scorecardShare } from "./scorecard-share";
+import { template as scorecardRecap } from "./scorecard-recap";
+import { template as outreach } from "./outreach";
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
-  'contact-confirmation': contactConfirmation,
-  'scorecard-share': scorecardShare,
-  'scorecard-recap': scorecardRecap,
-  'outreach': outreach,
-}
+  "contact-confirmation": contactConfirmation,
+  "scorecard-share": scorecardShare,
+  "scorecard-recap": scorecardRecap,
+  outreach: outreach,
+};

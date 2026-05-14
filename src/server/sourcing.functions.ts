@@ -46,7 +46,10 @@ const RunSearchSchema = z.object({
       minRepos: z.number().int().min(0).max(10000).optional().nullable(),
       jobTitle: z.string().max(200).optional().nullable(),
       company: z.string().max(200).optional().nullable(),
-      seniority: z.enum(["entry", "senior", "manager", "director", "vp", "cxo"]).optional().nullable(),
+      seniority: z
+        .enum(["entry", "senior", "manager", "director", "vp", "cxo"])
+        .optional()
+        .nullable(),
       skills: z.array(z.string().min(1).max(60)).max(15).optional().nullable(),
     })
     .optional(),
@@ -111,10 +114,21 @@ export const runSourcingSearch = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       searchId = ins.id;
     } else if (searchId) {
+      // Verify ownership before mutating via admin client (prevents IDOR)
+      const { data: owned } = await supabaseAdmin
+        .from("sourcing_searches")
+        .select("id")
+        .eq("id", searchId)
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (!owned) {
+        throw new Error("Search not found");
+      }
       await supabaseAdmin
         .from("sourcing_searches")
         .update({ last_run_at: new Date().toISOString() })
-        .eq("id", searchId);
+        .eq("id", searchId)
+        .eq("user_id", userId);
     }
 
     // Upsert candidates
@@ -176,10 +190,9 @@ export const enrichCandidate = createServerFn({ method: "POST" })
 
     const sig = (c.signals as Record<string, unknown>) ?? {};
     const linkedinUrl =
-      (sig.linkedin_url as string | undefined) ??
-      (c.source === "pdl" ? c.profile_url : null);
+      (sig.linkedin_url as string | undefined) ?? (c.source === "pdl" ? c.profile_url : null);
     const githubUrl =
-      c.source === "github" ? c.profile_url : (sig.github_url as string | undefined) ?? null;
+      c.source === "github" ? c.profile_url : ((sig.github_url as string | undefined) ?? null);
 
     const person = await enrichPdlPerson({
       email: c.email,
@@ -249,8 +262,7 @@ export const findCandidateEmail = createServerFn({ method: "POST" })
     const sig = (c.signals as Record<string, unknown>) ?? {};
     const email = await findPdlEmail({
       linkedinUrl:
-        (sig.linkedin_url as string | undefined) ??
-        (c.source === "pdl" ? c.profile_url : null),
+        (sig.linkedin_url as string | undefined) ?? (c.source === "pdl" ? c.profile_url : null),
       name: c.name,
       company: (sig.company as string | undefined) ?? null,
     });
@@ -386,7 +398,10 @@ export const deleteShortlist = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => z.object({ shortlistId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const { error } = await supabase.from("sourcing_shortlists").delete().eq("id", data.shortlistId);
+    const { error } = await supabase
+      .from("sourcing_shortlists")
+      .delete()
+      .eq("id", data.shortlistId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -598,7 +613,10 @@ export const sendOutreach = createServerFn({ method: "POST" })
       unsubscribe_token = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
       await supabaseAdmin
         .from("email_unsubscribe_tokens")
-        .upsert({ token: unsubscribe_token, email: recipient }, { onConflict: "email", ignoreDuplicates: true });
+        .upsert(
+          { token: unsubscribe_token, email: recipient },
+          { onConflict: "email", ignoreDuplicates: true },
+        );
       const { data: re } = await supabaseAdmin
         .from("email_unsubscribe_tokens")
         .select("token")
@@ -681,9 +699,7 @@ export const outreachStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase } = context;
-    const { data, error } = await supabase
-      .from("sourcing_sends")
-      .select("status, sent_at");
+    const { data, error } = await supabase.from("sourcing_sends").select("status, sent_at");
     if (error) throw new Error(error.message);
     const total = data?.length ?? 0;
     const sent = data?.filter((r) => r.status === "sent").length ?? 0;

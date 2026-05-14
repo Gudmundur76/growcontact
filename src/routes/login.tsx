@@ -59,12 +59,8 @@ function LoginPage() {
       <section className="relative px-6 py-24">
         <div className="mx-auto max-w-md">
           <div className="liquid-glass rounded-3xl bg-card/40 p-8">
-            <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-              Welcome back
-            </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Sign in to continue to Grow.
-            </p>
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground">Welcome back</h1>
+            <p className="mt-2 text-sm text-muted-foreground">Sign in to continue to Grow.</p>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-5">
               <Button
@@ -81,10 +77,7 @@ function LoginPage() {
                 <span className="h-px flex-1 bg-white/10" />
               </div>
               <div>
-                <label
-                  htmlFor="email"
-                  className="mb-2 block text-sm font-medium text-foreground"
-                >
+                <label htmlFor="email" className="mb-2 block text-sm font-medium text-foreground">
                   Email
                 </label>
                 <input
@@ -122,10 +115,7 @@ function LoginPage() {
               </Button>
               <div className="space-y-2 text-center text-xs text-muted-foreground">
                 <p>
-                  <Link
-                    to="/forgot-password"
-                    className="text-foreground hover:underline"
-                  >
+                  <Link to="/forgot-password" className="text-foreground hover:underline">
                     Forgot your password?
                   </Link>
                 </p>

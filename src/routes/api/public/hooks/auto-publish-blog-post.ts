@@ -13,10 +13,10 @@ export const Route = createFileRoute("/api/public/hooks/auto-publish-blog-post")
             .update({ status: "published", published_at: new Date().toISOString() })
             .eq("id", draft.id);
           if (error) throw new Error(error.message);
-          return new Response(
-            JSON.stringify({ ok: true, slug: draft.slug, title: draft.title }),
-            { status: 200, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ ok: true, slug: draft.slug, title: draft.title }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
         } catch (err) {
           const message = err instanceof Error ? err.message : "Unknown error";
           console.error("auto-publish-blog-post failed:", message);

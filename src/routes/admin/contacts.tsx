@@ -8,10 +8,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/contacts")({
   head: () => ({
-    meta: [
-      { title: "Admin · Contact submissions — Grow" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Admin · Contact submissions — Grow" }, { name: "robots", content: "noindex" }],
   }),
   component: AdminContactsPage,
 });
@@ -92,9 +89,7 @@ function AdminContactsPage() {
             {authLoading || checking || loading ? (
               <p className="text-sm text-muted-foreground">Loading…</p>
             ) : !isAdmin ? (
-              <p className="text-sm text-muted-foreground">
-                You don't have access to this page.
-              </p>
+              <p className="text-sm text-muted-foreground">You don't have access to this page.</p>
             ) : rows.length === 0 ? (
               <p className="text-sm text-muted-foreground">No submissions yet.</p>
             ) : (
@@ -109,9 +104,7 @@ function AdminContactsPage() {
                         <h2 className="text-base font-medium text-foreground">
                           {row.name}
                           {row.company ? (
-                            <span className="text-muted-foreground">
-                              {" "}· {row.company}
-                            </span>
+                            <span className="text-muted-foreground"> · {row.company}</span>
                           ) : null}
                         </h2>
                         <a
@@ -126,9 +119,7 @@ function AdminContactsPage() {
                         {row.team_size ? ` · ${row.team_size}` : ""}
                       </div>
                     </header>
-                    <p className="whitespace-pre-wrap text-sm text-foreground/90">
-                      {row.message}
-                    </p>
+                    <p className="whitespace-pre-wrap text-sm text-foreground/90">{row.message}</p>
                   </article>
                 ))}
               </div>

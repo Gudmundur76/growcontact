@@ -16,7 +16,12 @@ type Send = {
   status: string;
   error_message: string | null;
   sent_at: string;
-  sourcing_candidates: { id: string; name: string; profile_url: string; avatar_url: string | null } | null;
+  sourcing_candidates: {
+    id: string;
+    name: string;
+    profile_url: string;
+    avatar_url: string | null;
+  } | null;
   sourcing_sequences: { id: string; name: string } | null;
 };
 type Stats = { total: number; sent: number; failed: number; suppressed: number; last7: number };
@@ -136,15 +141,23 @@ function ActivityPage() {
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: number; tone?: "good" | "bad" | "muted" }) {
+function Stat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone?: "good" | "bad" | "muted";
+}) {
   const toneClass =
     tone === "good"
       ? "text-emerald-400"
       : tone === "bad"
-      ? "text-destructive"
-      : tone === "muted"
-      ? "text-muted-foreground"
-      : "text-foreground";
+        ? "text-destructive"
+        : tone === "muted"
+          ? "text-muted-foreground"
+          : "text-foreground";
   return (
     <div className="rounded-2xl border border-white/10 bg-card/40 p-4">
       <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>

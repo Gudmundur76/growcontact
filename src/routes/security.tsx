@@ -70,16 +70,13 @@ function SecurityPage() {
       <Navbar />
       <main className="px-6 pt-32">
         <header className="mx-auto max-w-3xl text-center">
-          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Security
-          </div>
+          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Security</div>
           <h1 className="mt-4 text-balance text-5xl font-semibold tracking-tight text-foreground sm:text-6xl">
             Built to be trusted with your most sensitive data.
           </h1>
           <p className="mt-6 text-lg text-muted-foreground">
-            Hiring data is some of the most personal data in your company.
-            Grow's security program is designed around that responsibility from
-            day one — not bolted on for procurement.
+            Hiring data is some of the most personal data in your company. Grow's security program
+            is designed around that responsibility from day one — not bolted on for procurement.
           </p>
         </header>
 
@@ -107,9 +104,7 @@ function SecurityPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   <p.icon className="h-5 w-5" />
                 </div>
-                <div className="mt-5 text-lg font-semibold text-foreground">
-                  {p.title}
-                </div>
+                <div className="mt-5 text-lg font-semibold text-foreground">{p.title}</div>
                 <p className="mt-2 text-sm text-muted-foreground">{p.body}</p>
               </div>
             ))}
@@ -117,16 +112,17 @@ function SecurityPage() {
         </section>
 
         <section className="mx-auto mt-24 max-w-3xl rounded-3xl border border-white/5 bg-card/30 p-8 backdrop-blur-xl">
-          <h2 className="text-xl font-semibold text-foreground">
-            Reporting a vulnerability
-          </h2>
+          <h2 className="text-xl font-semibold text-foreground">Reporting a vulnerability</h2>
           <p className="mt-3 text-muted-foreground">
             Found something? Email{" "}
-            <a href="mailto:security@grow.example" className="text-foreground underline-offset-4 hover:underline">
+            <a
+              href="mailto:security@grow.example"
+              className="text-foreground underline-offset-4 hover:underline"
+            >
               security@grow.example
             </a>{" "}
-            with reproduction steps. We acknowledge reports within one business
-            day and reward valid findings through our bug bounty program.
+            with reproduction steps. We acknowledge reports within one business day and reward valid
+            findings through our bug bounty program.
           </p>
         </section>
 
@@ -145,12 +141,8 @@ function SecurityPage() {
                 key={d.title}
                 className="rounded-3xl border border-white/5 bg-card/40 p-6 backdrop-blur-xl"
               >
-                <div className="text-lg font-semibold text-foreground">
-                  {d.title}
-                </div>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {d.body}
-                </p>
+                <div className="text-lg font-semibold text-foreground">{d.title}</div>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d.body}</p>
               </div>
             ))}
           </div>

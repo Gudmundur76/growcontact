@@ -17,8 +17,7 @@ export const Route = createFileRoute("/customers")({
       { property: "og:title", content: "Customers — Grow" },
       {
         property: "og:description",
-        content:
-          "Real results from teams replacing fragmented recruiting tools with Grow.",
+        content: "Real results from teams replacing fragmented recruiting tools with Grow.",
       },
     ],
   }),
@@ -82,9 +81,8 @@ function CustomersPage() {
             The fastest-moving teams hire on Grow.
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            From seed-stage AI labs to Series C infrastructure companies — see
-            how teams are turning recruiting from a quarter-long bottleneck
-            into a days-long, data-driven workflow.
+            From seed-stage AI labs to Series C infrastructure companies — see how teams are turning
+            recruiting from a quarter-long bottleneck into a days-long, data-driven workflow.
           </p>
         </div>
       </section>
@@ -109,18 +107,13 @@ function CustomersPage() {
       <section className="relative px-6 pb-24">
         <div className="mx-auto max-w-6xl space-y-6">
           {stories.map((s) => (
-            <article
-              key={s.company}
-              className="liquid-glass rounded-3xl bg-card/40 p-8 md:p-12"
-            >
+            <article key={s.company} className="liquid-glass rounded-3xl bg-card/40 p-8 md:p-12">
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div>
                   <div className="text-2xl font-semibold tracking-tight text-foreground">
                     {s.company}
                   </div>
-                  <div className="mt-1 text-sm text-muted-foreground">
-                    {s.industry}
-                  </div>
+                  <div className="mt-1 text-sm text-muted-foreground">{s.industry}</div>
                 </div>
                 <a
                   href="#"
@@ -140,18 +133,14 @@ function CustomersPage() {
                     <div className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
                       {m.value}
                     </div>
-                    <div className="mt-2 text-sm text-muted-foreground">
-                      {m.label}
-                    </div>
+                    <div className="mt-2 text-sm text-muted-foreground">{m.label}</div>
                   </div>
                 ))}
               </div>
 
               <blockquote className="mt-10 max-w-3xl border-l border-white/10 pl-6 text-base leading-relaxed text-foreground/90">
                 "{s.quote}"
-                <footer className="mt-3 text-sm text-muted-foreground">
-                  — {s.person}
-                </footer>
+                <footer className="mt-3 text-sm text-muted-foreground">— {s.person}</footer>
               </blockquote>
             </article>
           ))}
@@ -164,8 +153,7 @@ function CustomersPage() {
             Want to be the next story?
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Most teams ship their first hire on Grow within two weeks of
-            kickoff.
+            Most teams ship their first hire on Grow within two weeks of kickoff.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button asChild variant="hero">

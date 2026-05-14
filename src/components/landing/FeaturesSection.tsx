@@ -39,8 +39,8 @@ export function FeaturesSection() {
             A complete talent operating system.
           </h2>
           <p className="mt-6 text-lg text-muted-foreground">
-            Replace fragmented tools and senior recruiter overhead with one
-            intelligent platform that sources, screens and predicts.
+            Replace fragmented tools and senior recruiter overhead with one intelligent platform
+            that sources, screens and predicts.
           </p>
         </div>
 
@@ -54,9 +54,7 @@ export function FeaturesSection() {
                 <Icon className="h-5 w-5" />
               </div>
               <h3 className="text-xl font-semibold text-foreground">{title}</h3>
-              <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                {description}
-              </p>
+              <p className="mt-3 text-base leading-relaxed text-muted-foreground">{description}</p>
             </div>
           ))}
         </div>

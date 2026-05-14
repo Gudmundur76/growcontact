@@ -22,7 +22,9 @@ export const Route = createFileRoute("/api/public/scorecard/$token")({
 
         const { data: card } = await supabaseAdmin
           .from("interview_scorecards")
-          .select("summary, overall_rating, recommendation, strengths, concerns, competencies, follow_ups")
+          .select(
+            "summary, overall_rating, recommendation, strengths, concerns, competencies, follow_ups",
+          )
           .eq("session_id", session.id)
           .maybeSingle();
         if (!card) return new Response("Scorecard not ready", { status: 404 });

@@ -16,8 +16,7 @@ export const Route = createFileRoute("/about")({
       { property: "og:title", content: "About — Grow" },
       {
         property: "og:description",
-        content:
-          "Why we're building the talent operating system for high-growth teams.",
+        content: "Why we're building the talent operating system for high-growth teams.",
       },
     ],
   }),
@@ -62,10 +61,10 @@ function AboutPage() {
             We're rebuilding hiring around intelligence, not headcount.
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            Grow started with a simple observation: the best recruiters in the
-            world spend most of their day on work a great model can now do
-            faster — sourcing, screening, scheduling, debriefing. We set out to
-            give every team that recruiter, on tap, for a fraction of the cost.
+            Grow started with a simple observation: the best recruiters in the world spend most of
+            their day on work a great model can now do faster — sourcing, screening, scheduling,
+            debriefing. We set out to give every team that recruiter, on tap, for a fraction of the
+            cost.
           </p>
         </div>
       </section>
@@ -73,16 +72,9 @@ function AboutPage() {
       <section className="relative px-6 pb-24">
         <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
           {stats.map((s) => (
-            <div
-              key={s.label}
-              className="liquid-glass rounded-3xl bg-card/40 p-8"
-            >
-              <div className="text-4xl font-semibold tracking-tight text-foreground">
-                {s.value}
-              </div>
-              <div className="mt-3 text-sm text-muted-foreground">
-                {s.label}
-              </div>
+            <div key={s.label} className="liquid-glass rounded-3xl bg-card/40 p-8">
+              <div className="text-4xl font-semibold tracking-tight text-foreground">{s.value}</div>
+              <div className="mt-3 text-sm text-muted-foreground">{s.label}</div>
             </div>
           ))}
         </div>
@@ -100,16 +92,9 @@ function AboutPage() {
           </div>
           <div className="grid gap-6 md:grid-cols-2">
             {values.map((v) => (
-              <div
-                key={v.title}
-                className="liquid-glass rounded-3xl bg-card/40 p-8"
-              >
-                <h3 className="text-xl font-semibold text-foreground">
-                  {v.title}
-                </h3>
-                <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                  {v.body}
-                </p>
+              <div key={v.title} className="liquid-glass rounded-3xl bg-card/40 p-8">
+                <h3 className="text-xl font-semibold text-foreground">{v.title}</h3>
+                <p className="mt-3 text-base leading-relaxed text-muted-foreground">{v.body}</p>
               </div>
             ))}
           </div>
@@ -125,11 +110,10 @@ function AboutPage() {
             Recruiters, ML researchers, and product builders.
           </h2>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-            We're a remote team that has previously built talent and ML
-            infrastructure at companies like Stripe, Ramp, Scale, and
-            Greenhouse. We're backed by founders and operators who've hired
-            thousands of people the hard way — and want to make sure no one has
-            to do it that way again.
+            We're a remote team that has previously built talent and ML infrastructure at companies
+            like Stripe, Ramp, Scale, and Greenhouse. We're backed by founders and operators who've
+            hired thousands of people the hard way — and want to make sure no one has to do it that
+            way again.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Button asChild variant="hero">

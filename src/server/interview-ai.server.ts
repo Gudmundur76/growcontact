@@ -18,7 +18,8 @@ async function callAI(body: unknown) {
     body: JSON.stringify(body),
   });
   if (res.status === 429) throw new Error("AI rate limit exceeded, try again shortly.");
-  if (res.status === 402) throw new Error("Lovable AI credits exhausted. Add credits in workspace settings.");
+  if (res.status === 402)
+    throw new Error("Lovable AI credits exhausted. Add credits in workspace settings.");
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`AI call failed [${res.status}]: ${text}`);
@@ -51,11 +52,15 @@ CANDIDATE: ${opts.candidateName}
 JOB DESCRIPTION:
 ${opts.jobDescription || "(none provided)"}
 
-${opts.rubric ? `RUBRIC: ${opts.rubric.name}
+${
+  opts.rubric
+    ? `RUBRIC: ${opts.rubric.name}
 FOCUS: ${opts.rubric.focus || "(none)"}
 COMPETENCIES TO ASSESS: ${opts.rubric.competencies.join(", ")}
 
-` : ""}
+`
+    : ""
+}
 TRANSCRIPT SO FAR:
 ${opts.transcriptSoFar.slice(-8000)}
 
@@ -130,11 +135,15 @@ CANDIDATE: ${opts.candidateName}
 JOB DESCRIPTION:
 ${opts.jobDescription || "(none provided)"}
 
-${opts.rubric ? `RUBRIC: ${opts.rubric.name}
+${
+  opts.rubric
+    ? `RUBRIC: ${opts.rubric.name}
 FOCUS: ${opts.rubric.focus || "(none)"}
 REQUIRED COMPETENCIES (rate ALL of these): ${opts.rubric.competencies.join(", ")}
 
-` : ""}
+`
+    : ""
+}
 FULL TRANSCRIPT:
 ${opts.transcript.slice(-30000)}
 

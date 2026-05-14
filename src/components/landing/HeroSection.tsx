@@ -23,12 +23,7 @@ export function HeroSection() {
           in talent acquisition
         </p>
         <div className="mt-8 mb-[66px] flex flex-col items-center gap-3 sm:flex-row">
-          <Button
-            asChild
-            variant="hero"
-            className="rounded-full"
-            style={{ padding: "24px 29px" }}
-          >
+          <Button asChild variant="hero" className="rounded-full" style={{ padding: "24px 29px" }}>
             <Link to="/signup">Start free trial</Link>
           </Button>
           <Button

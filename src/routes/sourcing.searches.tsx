@@ -104,10 +104,7 @@ function SavedSearchesPage() {
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 text-xs text-muted-foreground">
               <Bell className="h-3.5 w-3.5" />
-              <Switch
-                checked={s.alert_enabled}
-                onCheckedChange={(v) => toggle(s.id, v)}
-              />
+              <Switch checked={s.alert_enabled} onCheckedChange={(v) => toggle(s.id, v)} />
               {s.alert_frequency}
             </label>
             <Button size="sm" variant="outline" onClick={() => rerun(s)}>
