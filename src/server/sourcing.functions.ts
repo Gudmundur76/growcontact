@@ -114,10 +114,21 @@ export const runSourcingSearch = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       searchId = ins.id;
     } else if (searchId) {
+      // Verify ownership before mutating via admin client (prevents IDOR)
+      const { data: owned } = await supabaseAdmin
+        .from("sourcing_searches")
+        .select("id")
+        .eq("id", searchId)
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (!owned) {
+        throw new Error("Search not found");
+      }
       await supabaseAdmin
         .from("sourcing_searches")
         .update({ last_run_at: new Date().toISOString() })
-        .eq("id", searchId);
+        .eq("id", searchId)
+        .eq("user_id", userId);
     }
 
     // Upsert candidates
