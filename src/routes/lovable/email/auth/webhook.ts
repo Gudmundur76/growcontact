@@ -21,7 +21,7 @@ const EMAIL_SUBJECTS: Record<string, string> = {
 };
 
 // Template mapping
-const EMAIL_TEMPLATES: Record<string, React.ComponentType<Record<string, unknown>>> = {
+const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
   signup: SignupEmail,
   invite: InviteEmail,
   magiclink: MagicLinkEmail,
@@ -55,7 +55,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
         }
 
         // Verify signature + timestamp, then parse payload.
-        let payload: Record<string, unknown>;
+        let payload: any;
         let run_id = "";
         try {
           const verified = await verifyWebhookRequest({
