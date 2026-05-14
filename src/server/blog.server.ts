@@ -172,7 +172,7 @@ Return ONLY a JSON object via the tool call.`;
     .select("id, slug, title")
     .single();
 
-  if (error) throw new Error(`DB insert failed: ${error.message}`);
+  if (error) throw dbError(error, "blog.server:insert");
   return inserted as { id: string; slug: string; title: string };
 }
 

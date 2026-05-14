@@ -111,7 +111,7 @@ export const runSourcingSearch = createServerFn({ method: "POST" })
         })
         .select("id")
         .single();
-      if (error) throw new Error(error.message);
+      if (error) throw dbError(error, "sourcing.functions");
       searchId = ins.id;
     } else if (searchId) {
       // Verify ownership before mutating via admin client (prevents IDOR)
@@ -151,7 +151,7 @@ export const runSourcingSearch = createServerFn({ method: "POST" })
       const { error } = await supabaseAdmin
         .from("sourcing_candidates")
         .upsert(rows, { onConflict: "user_id,source,external_id" });
-      if (error) throw new Error(error.message);
+      if (error) throw dbError(error, "sourcing.functions");
     }
 
     // Re-fetch with ids
@@ -185,7 +185,7 @@ export const enrichCandidate = createServerFn({ method: "POST" })
       .eq("id", data.candidateId)
       .eq("user_id", userId)
       .maybeSingle();
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     if (!c) throw new Error("Candidate not found");
 
     const sig = (c.signals as Record<string, unknown>) ?? {};
@@ -313,7 +313,7 @@ export const listSourcingSearches = createServerFn({ method: "GET" })
       .from("sourcing_searches")
       .select("*")
       .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     return data ?? [];
   });
 
@@ -334,7 +334,7 @@ export const toggleSearchAlert = createServerFn({ method: "POST" })
         ...(data.frequency ? { alert_frequency: data.frequency } : {}),
       })
       .eq("id", data.searchId);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     return { ok: true };
   });
 
@@ -344,7 +344,7 @@ export const deleteSourcingSearch = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { error } = await supabase.from("sourcing_searches").delete().eq("id", data.searchId);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     return { ok: true };
   });
 
@@ -369,7 +369,7 @@ export const upsertShortlist = createServerFn({ method: "POST" })
     };
     if (data.id) {
       const { error } = await supabase.from("sourcing_shortlists").update(row).eq("id", data.id);
-      if (error) throw new Error(error.message);
+      if (error) throw dbError(error, "sourcing.functions");
       return { id: data.id };
     }
     const { data: ins, error } = await supabase
@@ -377,7 +377,7 @@ export const upsertShortlist = createServerFn({ method: "POST" })
       .insert(row)
       .select("id")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     return { id: ins.id };
   });
 
@@ -389,7 +389,7 @@ export const listShortlists = createServerFn({ method: "GET" })
       .from("sourcing_shortlists")
       .select("*")
       .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     return data ?? [];
   });
 
@@ -402,7 +402,7 @@ export const deleteShortlist = createServerFn({ method: "POST" })
       .from("sourcing_shortlists")
       .delete()
       .eq("id", data.shortlistId);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     return { ok: true };
   });
 
@@ -425,7 +425,7 @@ export const addToShortlist = createServerFn({ method: "POST" })
       },
       { onConflict: "shortlist_id,candidate_id" },
     );
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     return { ok: true };
   });
 
@@ -443,7 +443,7 @@ export const updateShortlistMember = createServerFn({ method: "POST" })
       .from("sourcing_shortlist_members")
       .update({ stage: data.stage, notes: data.notes ?? null })
       .eq("id", data.memberId);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     return { ok: true };
   });
 
@@ -456,7 +456,7 @@ export const removeFromShortlist = createServerFn({ method: "POST" })
       .from("sourcing_shortlist_members")
       .delete()
       .eq("id", data.memberId);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     return { ok: true };
   });
 
@@ -502,7 +502,7 @@ export const upsertSequence = createServerFn({ method: "POST" })
     };
     if (data.id) {
       const { error } = await supabase.from("sourcing_sequences").update(row).eq("id", data.id);
-      if (error) throw new Error(error.message);
+      if (error) throw dbError(error, "sourcing.functions");
       return { id: data.id };
     }
     const { data: ins, error } = await supabase
@@ -510,7 +510,7 @@ export const upsertSequence = createServerFn({ method: "POST" })
       .insert(row)
       .select("id")
       .single();
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     return { id: ins.id };
   });
 
@@ -522,7 +522,7 @@ export const listSequences = createServerFn({ method: "GET" })
       .from("sourcing_sequences")
       .select("*")
       .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     return data ?? [];
   });
 
@@ -532,7 +532,7 @@ export const deleteSequence = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { error } = await supabase.from("sourcing_sequences").delete().eq("id", data.sequenceId);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     return { ok: true };
   });
 
@@ -691,7 +691,7 @@ export const listOutreachSends = createServerFn({ method: "POST" })
     if (data.status && data.status !== "all") q = q.eq("status", data.status);
     if (data.candidateId) q = q.eq("candidate_id", data.candidateId);
     const { data: rows, error } = await q;
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     return rows ?? [];
   });
 
@@ -700,7 +700,7 @@ export const outreachStats = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase } = context;
     const { data, error } = await supabase.from("sourcing_sends").select("status, sent_at");
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "sourcing.functions");
     const total = data?.length ?? 0;
     const sent = data?.filter((r) => r.status === "sent").length ?? 0;
     const failed = data?.filter((r) => r.status === "failed").length ?? 0;

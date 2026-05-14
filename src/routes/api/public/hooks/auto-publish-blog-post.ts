@@ -12,7 +12,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-publish-blog-post")
             .from("blog_posts")
             .update({ status: "published", published_at: new Date().toISOString() })
             .eq("id", draft.id);
-          if (error) throw new Error(error.message);
+          if (error) throw dbError(error, "auto-publish-blog-post");
           return new Response(JSON.stringify({ ok: true, slug: draft.slug, title: draft.title }), {
             status: 200,
             headers: { "Content-Type": "application/json" },

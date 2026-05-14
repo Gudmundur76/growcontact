@@ -31,7 +31,7 @@ export const listAdminPosts = createServerFn({ method: "GET" })
       .select("id, slug, title, excerpt, category, status, published_at, created_at, read_time")
       .order("created_at", { ascending: false })
       .limit(200);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "blog.functions");
     return { posts: data ?? [] };
   });
 
@@ -51,7 +51,7 @@ export const setPostStatus = createServerFn({ method: "POST" })
     };
     if (data.status === "published") patch.published_at = new Date().toISOString();
     const { error } = await supabaseAdmin.from("blog_posts").update(patch).eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "blog.functions");
     return { ok: true };
   });
 
@@ -61,7 +61,7 @@ export const deletePost = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     await assertAdmin(context.userId);
     const { error } = await supabaseAdmin.from("blog_posts").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "blog.functions");
     return { ok: true };
   });
 
@@ -89,6 +89,6 @@ export const subscribeToNewsletter = createServerFn({ method: "POST" })
         { email: data.email, source: data.source, status: "active" },
         { onConflict: "email", ignoreDuplicates: true },
       );
-    if (error) throw new Error(error.message);
+    if (error) throw dbError(error, "blog.functions");
     return { ok: true };
   });
