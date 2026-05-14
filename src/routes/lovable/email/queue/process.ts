@@ -37,7 +37,7 @@ function getRetryAfterSeconds(error: unknown): number {
 
 // Move a message to the dead letter queue and log the reason.
 async function moveToDlq(
-  supabase: SupabaseClient<any, any, any>,
+  supabase: SupabaseClient,
   queue: string,
   msg: { msg_id: number; message: Record<string, unknown> },
   reason: string,
@@ -49,13 +49,13 @@ async function moveToDlq(
     recipient_email: payload.to,
     status: "dlq",
     error_message: reason,
-  } as any);
+  } as never);
   const { error } = await supabase.rpc("move_to_dlq", {
     source_queue: queue,
     dlq_name: `${queue}_dlq`,
     message_id: msg.msg_id,
     payload,
-  } as any);
+  } as never);
   if (error) {
     console.error("Failed to move message to DLQ", { queue, msg_id: msg.msg_id, reason, error });
   }
@@ -129,7 +129,7 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
           const messageIds = Array.from(
             new Set(
               messages
-                .map((msg: any) =>
+                .map((msg: { id: string; payload: Record<string, unknown> }) =>
                   msg?.message?.message_id && typeof msg.message.message_id === "string"
                     ? msg.message.message_id
                     : null,
