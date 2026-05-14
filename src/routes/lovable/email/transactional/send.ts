@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from "react";
 import { render } from "@react-email/components";
 import { createClient } from "@supabase/supabase-js";
