@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { dbError } from "./db-errors";
 
 const CATEGORIES = ["Essay", "Benchmark", "Product", "Playbook"] as const;
 type Cat = (typeof CATEGORIES)[number];

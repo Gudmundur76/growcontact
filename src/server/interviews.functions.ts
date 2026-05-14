@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createRecallBot, leaveRecallBot, detectPlatform } from "./recall.server";
 import { generateScorecard } from "./interview-ai.server";
+import { dbError } from "./db-errors";
 
 // ---------- In-memory rate limiter ----------
 // Best-effort per-instance throttle. Acceptable for abuse prevention; resets on cold start.

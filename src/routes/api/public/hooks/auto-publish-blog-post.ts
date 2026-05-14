@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { generateBlogDraft } from "@/server/blog.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { dbError } from "@/server/db-errors";
 
 export const Route = createFileRoute("/api/public/hooks/auto-publish-blog-post")({
   server: {

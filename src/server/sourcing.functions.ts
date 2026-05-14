@@ -15,6 +15,7 @@ import {
 import * as React from "react";
 import { render } from "@react-email/components";
 import { TEMPLATES } from "@/lib/email-templates/registry";
+import { dbError } from "./db-errors";
 
 // ---------- Rate limiter ----------
 const rateBuckets = new Map<string, { count: number; reset: number }>();

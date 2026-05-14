@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { generateBlogDraft, fetchPublishedPosts, type PublicPost } from "./blog.server";
+import { dbError } from "./db-errors";
 
 async function assertAdmin(userId: string) {
   const { data } = await supabaseAdmin
