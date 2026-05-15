@@ -35,7 +35,7 @@ function rateLimit(key: string, limit: number, windowMs: number) {
 
 // ---------- Search ----------
 
-const RunSearchSchema = z.object({
+export const RunSearchSchema = z.object({
   query: z.string().min(2).max(500),
   roleTitle: z.string().max(200).optional().nullable(),
   source: z.enum(["github", "pdl"]).optional(),
@@ -171,7 +171,7 @@ export const runSourcingSearch = createServerFn({ method: "POST" })
 
 // ---------- PDL: enrichment + email finder + company signals ----------
 
-const EnrichSchema = z.object({ candidateId: z.string().uuid() });
+export const EnrichSchema = z.object({ candidateId: z.string().uuid() });
 
 export const enrichCandidate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -242,7 +242,7 @@ export const enrichCandidate = createServerFn({ method: "POST" })
     return { ok: true as const, email: newEmail, signals: newSignals as Record<string, Json> };
   });
 
-const FindEmailSchema = z.object({ candidateId: z.string().uuid() });
+export const FindEmailSchema = z.object({ candidateId: z.string().uuid() });
 
 export const findCandidateEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -273,7 +273,7 @@ export const findCandidateEmail = createServerFn({ method: "POST" })
     return { email, cached: false };
   });
 
-const CompanySchema = z.object({ candidateId: z.string().uuid() });
+export const CompanySchema = z.object({ candidateId: z.string().uuid() });
 
 export const fetchCandidateCompany = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -318,7 +318,7 @@ export const listSourcingSearches = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
-const ToggleAlertSchema = z.object({
+export const ToggleAlertSchema = z.object({
   searchId: z.string().uuid(),
   enabled: z.boolean(),
   frequency: z.enum(["daily", "weekly"]).optional(),
@@ -351,7 +351,7 @@ export const deleteSourcingSearch = createServerFn({ method: "POST" })
 
 // ---------- Shortlists ----------
 
-const ShortlistUpsertSchema = z.object({
+export const ShortlistUpsertSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1).max(120),
   roleTitle: z.string().max(200).optional().nullable(),
@@ -407,7 +407,7 @@ export const deleteShortlist = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-const AddMemberSchema = z.object({
+export const AddMemberSchema = z.object({
   shortlistId: z.string().uuid(),
   candidateId: z.string().uuid(),
   stage: z.enum(["new", "contacted", "replied", "screening", "passed", "rejected"]).optional(),
@@ -430,7 +430,7 @@ export const addToShortlist = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-const UpdateStageSchema = z.object({
+export const UpdateStageSchema = z.object({
   memberId: z.string().uuid(),
   stage: z.enum(["new", "contacted", "replied", "screening", "passed", "rejected"]),
   notes: z.string().max(2000).optional().nullable(),
@@ -482,7 +482,7 @@ export const getShortlist = createServerFn({ method: "POST" })
 
 // ---------- Sequences ----------
 
-const SequenceUpsertSchema = z.object({
+export const SequenceUpsertSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1).max(120),
   subject: z.string().min(1).max(200),
@@ -539,7 +539,7 @@ export const deleteSequence = createServerFn({ method: "POST" })
 
 // ---------- Outreach ----------
 
-const SendOutreachSchema = z.object({
+export const SendOutreachSchema = z.object({
   candidateId: z.string().uuid(),
   sequenceId: z.string().uuid(),
   recipientEmail: z.string().email().max(254),
@@ -671,7 +671,7 @@ export const sendOutreach = createServerFn({ method: "POST" })
 
 // ---------- Outreach activity ----------
 
-const ListSendsSchema = z.object({
+export const ListSendsSchema = z.object({
   status: z.enum(["all", "sent", "failed", "suppressed"]).optional(),
   candidateId: z.string().uuid().optional().nullable(),
   limit: z.number().int().min(1).max(200).optional(),

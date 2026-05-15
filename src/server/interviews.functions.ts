@@ -23,7 +23,7 @@ function rateLimit(key: string, limit: number, windowMs: number) {
   b.count += 1;
 }
 
-const StartSchema = z.object({
+export const StartSchema = z.object({
   candidateName: z.string().min(1).max(200),
   roleTitle: z.string().min(1).max(200),
   jobDescription: z.string().max(20000).optional().nullable(),
@@ -113,7 +113,7 @@ export const startInterview = createServerFn({ method: "POST" })
     }
   });
 
-const EndSchema = z.object({ sessionId: z.string().uuid() });
+export const EndSchema = z.object({ sessionId: z.string().uuid() });
 
 export const endInterview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -268,7 +268,7 @@ async function loadRubric(
 
 // ---------- Rubric CRUD ----------
 
-const RubricUpsertSchema = z.object({
+export const RubricUpsertSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1).max(200),
   roleTitle: z.string().max(200).optional().nullable(),
@@ -312,7 +312,7 @@ export const upsertRubric = createServerFn({ method: "POST" })
     return { id: inserted.id };
   });
 
-const IdSchema = z.object({ id: z.string().uuid() });
+export const IdSchema = z.object({ id: z.string().uuid() });
 
 export const deleteRubric = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -332,7 +332,7 @@ function randomToken(): string {
   return Array.from(arr, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-const ShareSchema = z.object({
+export const ShareSchema = z.object({
   sessionId: z.string().uuid(),
   enabled: z.boolean(),
 });
@@ -360,7 +360,7 @@ export const setSessionShare = createServerFn({ method: "POST" })
 
 // ---------- Manual transcript entry (no-bot fallback) ----------
 
-const ManualTranscriptSchema = z.object({
+export const ManualTranscriptSchema = z.object({
   sessionId: z.string().uuid(),
   speaker: z.string().min(1).max(120),
   content: z.string().min(1).max(8000),
@@ -395,7 +395,7 @@ export const addManualTranscript = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-const BulkSchema = z.object({
+export const BulkSchema = z.object({
   sessionId: z.string().uuid(),
   text: z.string().min(1).max(200000),
 });
@@ -520,7 +520,7 @@ export const setSessionArchived = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-const ListSchema = z.object({
+export const ListSchema = z.object({
   page: z.number().int().min(0).max(10000).default(0),
   pageSize: z.number().int().min(1).max(100).default(20),
   scope: z.enum(["active", "archived", "trash"]).default("active"),
@@ -556,7 +556,7 @@ export const listSessions = createServerFn({ method: "POST" })
 
 // ---------- Scorecard editing ----------
 
-const ScorecardEditSchema = z.object({
+export const ScorecardEditSchema = z.object({
   sessionId: z.string().uuid(),
   summary: z.string().min(1).max(8000),
   overall_rating: z.number().int().min(1).max(5).nullable(),
@@ -607,7 +607,7 @@ export const updateScorecard = createServerFn({ method: "POST" })
 
 // ---------- Share token expiry ----------
 
-const ShareExpirySchema = z.object({
+export const ShareExpirySchema = z.object({
   sessionId: z.string().uuid(),
   enabled: z.boolean(),
   expiresInDays: z.number().int().min(1).max(365).optional(),
@@ -701,7 +701,7 @@ const TEMPLATES: Record<string, { name: string; focus: string; competencies: str
   },
 };
 
-const SeedSchema = z.object({
+export const SeedSchema = z.object({
   templates: z.array(z.enum(["engineering", "sales", "product", "design"])).min(1),
 });
 
