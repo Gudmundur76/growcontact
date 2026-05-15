@@ -14,6 +14,7 @@ import {
 } from "@/server/interviews.functions";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Session = {
   id: string;
@@ -211,7 +212,18 @@ function InterviewListPage() {
 
         <div className="mt-4 rounded-xl border bg-card">
           {loading ? (
-            <div className="p-10 text-center text-muted-foreground">Loading…</div>
+            <ul className="divide-y">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <li key={i} className="flex items-center justify-between gap-4 p-4">
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-3 w-56" />
+                  </div>
+                  <Skeleton className="h-5 w-16" />
+                  <Skeleton className="h-3 w-16" />
+                </li>
+              ))}
+            </ul>
           ) : sessions.length === 0 ? (
             <div className="flex flex-col items-center gap-3 p-16 text-center">
               <Video className="size-8 text-muted-foreground" />

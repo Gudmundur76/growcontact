@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, Download, Video } from "lucide-react";
+import { Trash2, Plus, Download, Video, Users, Search } from "lucide-react";
 import { toast } from "sonner";
 import {
   listShortlists,
@@ -200,11 +200,25 @@ function ShortlistsPage() {
 
       <section>
         {!activeId ? (
-          <p className="text-muted-foreground">Select or create a shortlist.</p>
+          <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-white/10 bg-card/20 p-12 text-center">
+            <Users className="h-8 w-8 text-muted-foreground" />
+            <p className="text-base text-foreground">No shortlist selected</p>
+            <p className="max-w-sm text-sm text-muted-foreground">
+              Create your first shortlist on the left to start grouping candidates by role or
+              pipeline stage.
+            </p>
+          </div>
         ) : members.length === 0 ? (
-          <p className="text-muted-foreground">
-            No candidates here yet. Add some from the Search tab.
-          </p>
+          <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-white/10 bg-card/20 p-12 text-center">
+            <Search className="h-8 w-8 text-muted-foreground" />
+            <p className="text-base text-foreground">No candidates here yet</p>
+            <p className="max-w-sm text-sm text-muted-foreground">
+              Run a search and use “Shortlist” on any candidate card to add them here.
+            </p>
+            <Button asChild size="sm" variant="outline" className="mt-2">
+              <Link to="/sourcing">Go to search →</Link>
+            </Button>
+          </div>
         ) : (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
