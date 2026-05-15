@@ -158,7 +158,7 @@ describe("admin.revokeAdmin", () => {
       error: null,
     };
     mockState.responses["user_roles"] = { data: null, error: null };
-    const out = await revokeAdmin({ data: { user_id: UUID_A } });
+    const out = await withCtx(() => revokeAdmin({ data: { user_id: UUID_A } }));
     expect(out).toEqual({ ok: true });
     expect(lastCall("user_roles", "delete")).toBeTruthy();
   });
@@ -192,7 +192,7 @@ describe("interviews.upsertRubric", () => {
       data: { id: UUID_A },
       error: null,
     };
-    const out = await upsertRubric({
+    const out = await withCtx(() => upsertRubric({
       data: {
         name: "Staff Eng",
         roleTitle: "Staff Engineer",
@@ -200,7 +200,7 @@ describe("interviews.upsertRubric", () => {
         competencies: ["scope", "ownership"],
         isDefault: true,
       },
-    });
+    }));
     expect(out).toEqual({ id: UUID_A });
     expect(lastCall("interview_rubrics", "insert")).toBeTruthy();
     // isDefault: true triggers a clear of the previous default
@@ -236,9 +236,9 @@ describe("interviews.addManualTranscript", () => {
       error: null,
     };
     mockState.responses["interview_events"] = { data: null, error: null };
-    const out = await addManualTranscript({
+    const out = await withCtx(() => addManualTranscript({
       data: { sessionId: UUID_A, speaker: "Alice", content: "hello world" },
-    });
+    }));
     expect(out).toEqual({ ok: true });
     const insert = lastCall("interview_events", "insert");
     expect(insert).toBeTruthy();
@@ -260,9 +260,9 @@ describe("sourcing.upsertShortlist", () => {
       data: { id: UUID_A },
       error: null,
     };
-    const out = await upsertShortlist({
+    const out = await withCtx(() => upsertShortlist({
       data: { name: "Staff hires Q3", roleTitle: "Staff Engineer" },
-    });
+    }));
     expect(out).toEqual({ id: UUID_A });
     const insert = lastCall("sourcing_shortlists", "insert");
     expect(insert).toBeTruthy();
@@ -276,9 +276,9 @@ describe("sourcing.upsertShortlist", () => {
   it("updates an existing shortlist when id is provided", async () => {
     const { upsertShortlist } = await import("./sourcing.functions");
     mockState.responses["sourcing_shortlists"] = { data: null, error: null };
-    const out = await upsertShortlist({
+    const out = await withCtx(() => upsertShortlist({
       data: { id: UUID_A, name: "Renamed" },
-    });
+    }));
     expect(out).toEqual({ id: UUID_A });
     expect(lastCall("sourcing_shortlists", "update")).toBeTruthy();
     expect(lastCall("sourcing_shortlists", "insert")).toBeUndefined();
@@ -289,9 +289,9 @@ describe("sourcing.updateShortlistMember", () => {
   it("updates stage + notes on the member row", async () => {
     const { updateShortlistMember } = await import("./sourcing.functions");
     mockState.responses["sourcing_shortlist_members"] = { data: null, error: null };
-    const out = await updateShortlistMember({
+    const out = await withCtx(() => updateShortlistMember({
       data: { memberId: UUID_A, stage: "screening", notes: "moving forward" },
-    });
+    }));
     expect(out).toEqual({ ok: true });
     const upd = lastCall("sourcing_shortlist_members", "update");
     expect(upd).toBeTruthy();
@@ -329,9 +329,9 @@ describe("blog.setPostStatus", () => {
       error: null,
     };
     mockState.responses["blog_posts"] = { data: null, error: null };
-    const out = await setPostStatus({
+    const out = await withCtx(() => setPostStatus({
       data: { id: UUID_A, status: "published" },
-    });
+    }));
     expect(out).toEqual({ ok: true });
     const upd = lastCall("blog_posts", "update");
     expect(upd).toBeTruthy();
