@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 
 const STORAGE_KEY = "grow.cookie-consent.v1";
+export const COOKIE_PREFS_EVENT = "grow:open-cookie-preferences";
 
 type Consent = "accepted" | "rejected";
 
@@ -16,7 +17,16 @@ export function CookieConsent() {
     } catch {
       // localStorage unavailable — don't block the page
     }
+    const open = () => setVisible(true);
+    window.addEventListener(COOKIE_PREFS_EVENT, open);
+    return () => window.removeEventListener(COOKIE_PREFS_EVENT, open);
   }, []);
+
+export function openCookiePreferences() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(COOKIE_PREFS_EVENT));
+  }
+}
 
   const decide = (choice: Consent) => {
     try {
