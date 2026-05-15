@@ -45,9 +45,13 @@ function ShortlistsPage() {
   const [roleTitle, setRoleTitle] = useState("");
 
   async function load() {
-    const res = (await listShortlists()) as Shortlist[];
-    setLists(res);
-    if (!activeId && res[0]) setActiveId(res[0].id);
+    try {
+      const res = (await listShortlists()) as Shortlist[];
+      setLists(res);
+      if (!activeId && res[0]) setActiveId(res[0].id);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to load shortlists");
+    }
   }
   useEffect(() => {
     load();
