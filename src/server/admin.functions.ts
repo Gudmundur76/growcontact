@@ -94,7 +94,7 @@ export const listAdmins = createServerFn({ method: "GET" })
     };
   });
 
-const GrantSchema = z.object({ email: z.string().email().max(255) });
+export const GrantSchema = z.object({ email: z.string().email().max(255) });
 
 export const grantAdminByEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -131,7 +131,7 @@ export const grantAdminByEmail = createServerFn({ method: "POST" })
     return { ok: true, user_id: foundId };
   });
 
-const RevokeSchema = z.object({ user_id: z.string().uuid() });
+export const RevokeSchema = z.object({ user_id: z.string().uuid() });
 
 export const revokeAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
