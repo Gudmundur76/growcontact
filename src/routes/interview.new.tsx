@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
@@ -11,19 +12,27 @@ import { supabase } from "@/integrations/supabase/client";
 import { startInterview } from "@/server/interviews.functions";
 import { toast } from "sonner";
 
+const searchSchema = z.object({
+  candidate: z.string().max(200).optional(),
+  role: z.string().max(200).optional(),
+  jd: z.string().max(20000).optional(),
+});
+
 export const Route = createFileRoute("/interview/new")({
   head: () => ({
     meta: [{ title: "Start interview — Grow" }, { name: "robots", content: "noindex" }],
   }),
+  validateSearch: (s) => searchSchema.parse(s),
   component: NewInterviewPage,
 });
 
 function NewInterviewPage() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [candidateName, setCandidateName] = useState("");
-  const [roleTitle, setRoleTitle] = useState("");
-  const [jobDescription, setJobDescription] = useState("");
+  const search = Route.useSearch();
+  const [candidateName, setCandidateName] = useState(search.candidate ?? "");
+  const [roleTitle, setRoleTitle] = useState(search.role ?? "");
+  const [jobDescription, setJobDescription] = useState(search.jd ?? "");
   const [meetingUrl, setMeetingUrl] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [rubrics, setRubrics] = useState<{ id: string; name: string; is_default: boolean }[]>([]);
