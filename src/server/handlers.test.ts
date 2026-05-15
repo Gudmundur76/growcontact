@@ -137,7 +137,7 @@ describe("admin.revokeAdmin", () => {
   it("rejects callers that are not admin (assertAdmin path)", async () => {
     const { revokeAdmin } = await import("./admin.functions");
     mockState.responses["user_roles.maybeSingle"] = { data: null, error: null };
-    await expect(revokeAdmin({ data: { user_id: UUID_A } })).rejects.toThrow(/Forbidden/);
+    await expect(withCtx(() => revokeAdmin({ data: { user_id: UUID_A } }))).rejects.toThrow(/Forbidden/);
   });
 
   it("refuses self-revocation even for admins", async () => {
@@ -147,7 +147,7 @@ describe("admin.revokeAdmin", () => {
       error: null,
     };
     await expect(
-      revokeAdmin({ data: { user_id: TEST_USER_ID } }),
+      withCtx(() => revokeAdmin({ data: { user_id: TEST_USER_ID } })),
     ).rejects.toThrow(/can't revoke your own/i);
   });
 
@@ -165,7 +165,7 @@ describe("admin.revokeAdmin", () => {
 
   it("rejects malformed input via Zod (non-uuid)", async () => {
     const { revokeAdmin } = await import("./admin.functions");
-    await expect(revokeAdmin({ data: { user_id: "nope" } as never })).rejects.toThrow();
+    await expect(withCtx(() => revokeAdmin({ data: { user_id: "nope" } as never }))).rejects.toThrow();
   });
 });
 
@@ -178,7 +178,7 @@ describe("admin.grantAdminByEmail", () => {
     };
     mockState.responses["__users"] = { data: [], error: null };
     await expect(
-      grantAdminByEmail({ data: { email: "ghost@example.com" } }),
+      withCtx(() => grantAdminByEmail({ data: { email: "ghost@example.com" } })),
     ).rejects.toThrow(/No user with that email/);
   });
 });
@@ -210,7 +210,7 @@ describe("interviews.upsertRubric", () => {
   it("rejects too-long names via Zod", async () => {
     const { upsertRubric } = await import("./interviews.functions");
     await expect(
-      upsertRubric({ data: { name: "a".repeat(500), competencies: [] } as never }),
+      withCtx(() => upsertRubric({ data: { name: "a".repeat(500), competencies: [] } as never })),
     ).rejects.toThrow();
   });
 });
@@ -223,9 +223,9 @@ describe("interviews.addManualTranscript", () => {
       error: null,
     };
     await expect(
-      addManualTranscript({
+      withCtx(() => addManualTranscript({
         data: { sessionId: UUID_A, speaker: "Alice", content: "hi" },
-      }),
+      })),
     ).rejects.toThrow(/Not found/);
   });
 
@@ -304,9 +304,9 @@ describe("sourcing.updateShortlistMember", () => {
   it("rejects an unknown stage via Zod", async () => {
     const { updateShortlistMember } = await import("./sourcing.functions");
     await expect(
-      updateShortlistMember({
+      withCtx(() => updateShortlistMember({
         data: { memberId: UUID_A, stage: "bogus" } as never,
-      }),
+      })),
     ).rejects.toThrow();
   });
 });
@@ -318,7 +318,7 @@ describe("blog.setPostStatus", () => {
     const { setPostStatus } = await import("./blog.functions");
     mockState.responses["user_roles.maybeSingle"] = { data: null, error: null };
     await expect(
-      setPostStatus({ data: { id: UUID_A, status: "published" } }),
+      withCtx(() => setPostStatus({ data: { id: UUID_A, status: "published" } })),
     ).rejects.toThrow(/Forbidden/);
   });
 
