@@ -12,13 +12,20 @@ export const Route = createFileRoute("/admin")({
 });
 
 const tabs: {
-  to: "/admin" | "/admin/blog" | "/admin/contacts" | "/admin/subscribers" | "/admin/roles";
+  to:
+    | "/admin"
+    | "/admin/blog"
+    | "/admin/contacts"
+    | "/admin/subscribers"
+    | "/admin/emails"
+    | "/admin/roles";
   label: string;
 }[] = [
   { to: "/admin", label: "Overview" },
   { to: "/admin/blog", label: "Blog" },
   { to: "/admin/contacts", label: "Contacts" },
   { to: "/admin/subscribers", label: "Subscribers" },
+  { to: "/admin/emails", label: "Email analytics" },
   { to: "/admin/roles", label: "Roles" },
 ];
 

@@ -47,6 +47,7 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminSubscribersRouteImport } from './routes/admin/subscribers'
 import { Route as AdminRolesRouteImport } from './routes/admin/roles'
+import { Route as AdminEmailsRouteImport } from './routes/admin/emails'
 import { Route as AdminContactsRouteImport } from './routes/admin/contacts'
 import { Route as AdminBlogRouteImport } from './routes/admin/blog'
 import { Route as ShareScorecardTokenRouteImport } from './routes/share.scorecard.$token'
@@ -253,6 +254,11 @@ const AdminRolesRoute = AdminRolesRouteImport.update({
   path: '/roles',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminEmailsRoute = AdminEmailsRouteImport.update({
+  id: '/emails',
+  path: '/emails',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminContactsRoute = AdminContactsRouteImport.update({
   id: '/contacts',
   path: '/contacts',
@@ -361,6 +367,7 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
+  '/admin/emails': typeof AdminEmailsRoute
   '/admin/roles': typeof AdminRolesRoute
   '/admin/subscribers': typeof AdminSubscribersRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -414,6 +421,7 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
+  '/admin/emails': typeof AdminEmailsRoute
   '/admin/roles': typeof AdminRolesRoute
   '/admin/subscribers': typeof AdminSubscribersRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -470,6 +478,7 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
+  '/admin/emails': typeof AdminEmailsRoute
   '/admin/roles': typeof AdminRolesRoute
   '/admin/subscribers': typeof AdminSubscribersRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -527,6 +536,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/admin/blog'
     | '/admin/contacts'
+    | '/admin/emails'
     | '/admin/roles'
     | '/admin/subscribers'
     | '/blog/$slug'
@@ -580,6 +590,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/admin/blog'
     | '/admin/contacts'
+    | '/admin/emails'
     | '/admin/roles'
     | '/admin/subscribers'
     | '/blog/$slug'
@@ -635,6 +646,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/admin/blog'
     | '/admin/contacts'
+    | '/admin/emails'
     | '/admin/roles'
     | '/admin/subscribers'
     | '/blog/$slug'
@@ -979,6 +991,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRolesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/emails': {
+      id: '/admin/emails'
+      path: '/emails'
+      fullPath: '/admin/emails'
+      preLoaderRoute: typeof AdminEmailsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/contacts': {
       id: '/admin/contacts'
       path: '/contacts'
@@ -1090,6 +1109,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminBlogRoute: typeof AdminBlogRoute
   AdminContactsRoute: typeof AdminContactsRoute
+  AdminEmailsRoute: typeof AdminEmailsRoute
   AdminRolesRoute: typeof AdminRolesRoute
   AdminSubscribersRoute: typeof AdminSubscribersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1098,6 +1118,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminBlogRoute: AdminBlogRoute,
   AdminContactsRoute: AdminContactsRoute,
+  AdminEmailsRoute: AdminEmailsRoute,
   AdminRolesRoute: AdminRolesRoute,
   AdminSubscribersRoute: AdminSubscribersRoute,
   AdminIndexRoute: AdminIndexRoute,
