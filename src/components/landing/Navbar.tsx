@@ -132,9 +132,9 @@ export function Navbar() {
                 </DropdownMenuItem>
                 {profile?.isAdmin ? (
                   <DropdownMenuItem asChild>
-                    <Link to="/admin/contacts" className="cursor-pointer">
+                    <Link to="/admin" className="cursor-pointer">
                       <Shield className="mr-2 h-4 w-4" />
-                      Admin · Contacts
+                      Admin
                     </Link>
                   </DropdownMenuItem>
                 ) : null}

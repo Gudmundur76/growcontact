@@ -28,12 +28,14 @@ import { Route as CustomersRouteImport } from './routes/customers'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as CareersRouteImport } from './routes/careers'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SourcingIndexRouteImport } from './routes/sourcing.index'
 import { Route as InterviewIndexRouteImport } from './routes/interview.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as SourcingShortlistsRouteImport } from './routes/sourcing.shortlists'
 import { Route as SourcingSequencesRouteImport } from './routes/sourcing.sequences'
 import { Route as SourcingSearchesRouteImport } from './routes/sourcing.searches'
@@ -43,6 +45,8 @@ import { Route as InterviewNewRouteImport } from './routes/interview.new'
 import { Route as InterviewIdRouteImport } from './routes/interview.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AdminSubscribersRouteImport } from './routes/admin/subscribers'
+import { Route as AdminRolesRouteImport } from './routes/admin/roles'
 import { Route as AdminContactsRouteImport } from './routes/admin/contacts'
 import { Route as AdminBlogRouteImport } from './routes/admin/blog'
 import { Route as ShareScorecardTokenRouteImport } from './routes/share.scorecard.$token'
@@ -154,6 +158,11 @@ const CareersRoute = CareersRouteImport.update({
   path: '/careers',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -183,6 +192,11 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const SourcingShortlistsRoute = SourcingShortlistsRouteImport.update({
   id: '/shortlists',
@@ -229,15 +243,25 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSubscribersRoute = AdminSubscribersRouteImport.update({
+  id: '/subscribers',
+  path: '/subscribers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRolesRoute = AdminRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminContactsRoute = AdminContactsRouteImport.update({
-  id: '/admin/contacts',
-  path: '/admin/contacts',
-  getParentRoute: () => rootRouteImport,
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminBlogRoute = AdminBlogRouteImport.update({
-  id: '/admin/blog',
-  path: '/admin/blog',
-  getParentRoute: () => rootRouteImport,
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => AdminRoute,
 } as any)
 const ShareScorecardTokenRoute = ShareScorecardTokenRouteImport.update({
   id: '/share/scorecard/$token',
@@ -315,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/admin': typeof AdminRouteWithChildren
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -336,6 +361,8 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
+  '/admin/roles': typeof AdminRolesRoute
+  '/admin/subscribers': typeof AdminSubscribersRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/interview/$id': typeof InterviewIdRoute
@@ -345,6 +372,7 @@ export interface FileRoutesByFullPath {
   '/sourcing/searches': typeof SourcingSearchesRoute
   '/sourcing/sequences': typeof SourcingSequencesRoute
   '/sourcing/shortlists': typeof SourcingShortlistsRoute
+  '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/interview/': typeof InterviewIndexRoute
   '/sourcing/': typeof SourcingIndexRoute
@@ -386,6 +414,8 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
+  '/admin/roles': typeof AdminRolesRoute
+  '/admin/subscribers': typeof AdminSubscribersRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/interview/$id': typeof InterviewIdRoute
@@ -395,6 +425,7 @@ export interface FileRoutesByTo {
   '/sourcing/searches': typeof SourcingSearchesRoute
   '/sourcing/sequences': typeof SourcingSequencesRoute
   '/sourcing/shortlists': typeof SourcingShortlistsRoute
+  '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/interview': typeof InterviewIndexRoute
   '/sourcing': typeof SourcingIndexRoute
@@ -417,6 +448,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/admin': typeof AdminRouteWithChildren
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -438,6 +470,8 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
+  '/admin/roles': typeof AdminRolesRoute
+  '/admin/subscribers': typeof AdminSubscribersRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/interview/$id': typeof InterviewIdRoute
@@ -447,6 +481,7 @@ export interface FileRoutesById {
   '/sourcing/searches': typeof SourcingSearchesRoute
   '/sourcing/sequences': typeof SourcingSequencesRoute
   '/sourcing/shortlists': typeof SourcingShortlistsRoute
+  '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/interview/': typeof InterviewIndexRoute
   '/sourcing/': typeof SourcingIndexRoute
@@ -470,6 +505,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/admin'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -491,6 +527,8 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/admin/blog'
     | '/admin/contacts'
+    | '/admin/roles'
+    | '/admin/subscribers'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/interview/$id'
@@ -500,6 +538,7 @@ export interface FileRouteTypes {
     | '/sourcing/searches'
     | '/sourcing/sequences'
     | '/sourcing/shortlists'
+    | '/admin/'
     | '/blog/'
     | '/interview/'
     | '/sourcing/'
@@ -541,6 +580,8 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/admin/blog'
     | '/admin/contacts'
+    | '/admin/roles'
+    | '/admin/subscribers'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/interview/$id'
@@ -550,6 +591,7 @@ export interface FileRouteTypes {
     | '/sourcing/searches'
     | '/sourcing/sequences'
     | '/sourcing/shortlists'
+    | '/admin'
     | '/blog'
     | '/interview'
     | '/sourcing'
@@ -571,6 +613,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/admin'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -592,6 +635,8 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/admin/blog'
     | '/admin/contacts'
+    | '/admin/roles'
+    | '/admin/subscribers'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/interview/$id'
@@ -601,6 +646,7 @@ export interface FileRouteTypes {
     | '/sourcing/searches'
     | '/sourcing/sequences'
     | '/sourcing/shortlists'
+    | '/admin/'
     | '/blog/'
     | '/interview/'
     | '/sourcing/'
@@ -623,6 +669,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
+  AdminRoute: typeof AdminRouteWithChildren
   CareersRoute: typeof CareersRoute
   ChangelogRoute: typeof ChangelogRoute
   ContactRoute: typeof ContactRoute
@@ -642,8 +689,6 @@ export interface RootRouteChildren {
   SourcingRoute: typeof SourcingRouteWithChildren
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
-  AdminBlogRoute: typeof AdminBlogRoute
-  AdminContactsRoute: typeof AdminContactsRoute
   BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InterviewIdRoute: typeof InterviewIdRoute
@@ -801,6 +846,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CareersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/account': {
       id: '/account'
       path: '/account'
@@ -842,6 +894,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/sourcing/shortlists': {
       id: '/sourcing/shortlists'
@@ -906,19 +965,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/subscribers': {
+      id: '/admin/subscribers'
+      path: '/subscribers'
+      fullPath: '/admin/subscribers'
+      preLoaderRoute: typeof AdminSubscribersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/roles': {
+      id: '/admin/roles'
+      path: '/roles'
+      fullPath: '/admin/roles'
+      preLoaderRoute: typeof AdminRolesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/contacts': {
       id: '/admin/contacts'
-      path: '/admin/contacts'
+      path: '/contacts'
       fullPath: '/admin/contacts'
       preLoaderRoute: typeof AdminContactsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/blog': {
       id: '/admin/blog'
-      path: '/admin/blog'
+      path: '/blog'
       fullPath: '/admin/blog'
       preLoaderRoute: typeof AdminBlogRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/share/scorecard/$token': {
       id: '/share/scorecard/$token'
@@ -1014,6 +1087,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminBlogRoute: typeof AdminBlogRoute
+  AdminContactsRoute: typeof AdminContactsRoute
+  AdminRolesRoute: typeof AdminRolesRoute
+  AdminSubscribersRoute: typeof AdminSubscribersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminBlogRoute: AdminBlogRoute,
+  AdminContactsRoute: AdminContactsRoute,
+  AdminRolesRoute: AdminRolesRoute,
+  AdminSubscribersRoute: AdminSubscribersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 interface SourcingRouteChildren {
   SourcingActivityRoute: typeof SourcingActivityRoute
   SourcingSearchesRoute: typeof SourcingSearchesRoute
@@ -1038,6 +1129,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
+  AdminRoute: AdminRouteWithChildren,
   CareersRoute: CareersRoute,
   ChangelogRoute: ChangelogRoute,
   ContactRoute: ContactRoute,
@@ -1057,8 +1149,6 @@ const rootRouteChildren: RootRouteChildren = {
   SourcingRoute: SourcingRouteWithChildren,
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
-  AdminBlogRoute: AdminBlogRoute,
-  AdminContactsRoute: AdminContactsRoute,
   BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InterviewIdRoute: InterviewIdRoute,
