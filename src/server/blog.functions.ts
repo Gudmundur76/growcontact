@@ -36,11 +36,23 @@ export const listAdminPosts = createServerFn({ method: "GET" })
     return { posts: data ?? [] };
   });
 
-const SetPostStatusSchema = z.object({
+export const SetPostStatusSchema = z.object({
   id: z.string().uuid(),
   status: z.enum(["draft", "published"]),
 });
-const DeletePostSchema = z.object({ id: z.string().uuid() });
+export const DeletePostSchema = z.object({ id: z.string().uuid() });
+
+export function parseSubscribeInput(d: { email: string; source?: string }) {
+  const email = String(d?.email ?? "")
+    .trim()
+    .toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    throw new Error("Invalid email");
+  }
+  if (email.length > 254) throw new Error("Email too long");
+  const source = String(d?.source ?? "blog").slice(0, 64);
+  return { email, source };
+}
 
 export const setPostStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -72,17 +84,7 @@ export const getPublishedPosts = createServerFn({ method: "GET" }).handler(async
 });
 
 export const subscribeToNewsletter = createServerFn({ method: "POST" })
-  .inputValidator((d: { email: string; source?: string }) => {
-    const email = String(d?.email ?? "")
-      .trim()
-      .toLowerCase();
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      throw new Error("Invalid email");
-    }
-    if (email.length > 254) throw new Error("Email too long");
-    const source = String(d?.source ?? "blog").slice(0, 64);
-    return { email, source };
-  })
+  .inputValidator((d: { email: string; source?: string }) => parseSubscribeInput(d))
   .handler(async ({ data }) => {
     const { error } = await supabaseAdmin
       .from("newsletter_subscribers")
