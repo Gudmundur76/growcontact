@@ -22,12 +22,6 @@ export function CookieConsent() {
     return () => window.removeEventListener(COOKIE_PREFS_EVENT, open);
   }, []);
 
-export function openCookiePreferences() {
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event(COOKIE_PREFS_EVENT));
-  }
-}
-
   const decide = (choice: Consent) => {
     try {
       localStorage.setItem(
@@ -69,4 +63,10 @@ export function openCookiePreferences() {
       </div>
     </div>
   );
+}
+
+export function openCookiePreferences() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(COOKIE_PREFS_EVENT));
+  }
 }
