@@ -47,6 +47,8 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminSubscribersRouteImport } from './routes/admin/subscribers'
 import { Route as AdminRolesRouteImport } from './routes/admin/roles'
+import { Route as AdminContactsRouteImport } from './routes/admin/contacts'
+import { Route as AdminBlogRouteImport } from './routes/admin/blog'
 import { Route as ShareScorecardTokenRouteImport } from './routes/share.scorecard.$token'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicRecallWebhookRouteImport } from './routes/api/public/recall-webhook'
@@ -251,6 +253,16 @@ const AdminRolesRoute = AdminRolesRouteImport.update({
   path: '/roles',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminContactsRoute = AdminContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBlogRoute = AdminBlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ShareScorecardTokenRoute = ShareScorecardTokenRouteImport.update({
   id: '/share/scorecard/$token',
   path: '/share/scorecard/$token',
@@ -347,6 +359,8 @@ export interface FileRoutesByFullPath {
   '/sourcing': typeof SourcingRouteWithChildren
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin/blog': typeof AdminBlogRoute
+  '/admin/contacts': typeof AdminContactsRoute
   '/admin/roles': typeof AdminRolesRoute
   '/admin/subscribers': typeof AdminSubscribersRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -398,6 +412,8 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin/blog': typeof AdminBlogRoute
+  '/admin/contacts': typeof AdminContactsRoute
   '/admin/roles': typeof AdminRolesRoute
   '/admin/subscribers': typeof AdminSubscribersRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -452,6 +468,8 @@ export interface FileRoutesById {
   '/sourcing': typeof SourcingRouteWithChildren
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin/blog': typeof AdminBlogRoute
+  '/admin/contacts': typeof AdminContactsRoute
   '/admin/roles': typeof AdminRolesRoute
   '/admin/subscribers': typeof AdminSubscribersRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -507,6 +525,8 @@ export interface FileRouteTypes {
     | '/sourcing'
     | '/terms'
     | '/unsubscribe'
+    | '/admin/blog'
+    | '/admin/contacts'
     | '/admin/roles'
     | '/admin/subscribers'
     | '/blog/$slug'
@@ -558,6 +578,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
+    | '/admin/blog'
+    | '/admin/contacts'
     | '/admin/roles'
     | '/admin/subscribers'
     | '/blog/$slug'
@@ -611,6 +633,8 @@ export interface FileRouteTypes {
     | '/sourcing'
     | '/terms'
     | '/unsubscribe'
+    | '/admin/blog'
+    | '/admin/contacts'
     | '/admin/roles'
     | '/admin/subscribers'
     | '/blog/$slug'
@@ -955,6 +979,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRolesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/contacts': {
+      id: '/admin/contacts'
+      path: '/contacts'
+      fullPath: '/admin/contacts'
+      preLoaderRoute: typeof AdminContactsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/blog': {
+      id: '/admin/blog'
+      path: '/blog'
+      fullPath: '/admin/blog'
+      preLoaderRoute: typeof AdminBlogRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/share/scorecard/$token': {
       id: '/share/scorecard/$token'
       path: '/share/scorecard/$token'
@@ -1050,12 +1088,16 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminBlogRoute: typeof AdminBlogRoute
+  AdminContactsRoute: typeof AdminContactsRoute
   AdminRolesRoute: typeof AdminRolesRoute
   AdminSubscribersRoute: typeof AdminSubscribersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminBlogRoute: AdminBlogRoute,
+  AdminContactsRoute: AdminContactsRoute,
   AdminRolesRoute: AdminRolesRoute,
   AdminSubscribersRoute: AdminSubscribersRoute,
   AdminIndexRoute: AdminIndexRoute,
