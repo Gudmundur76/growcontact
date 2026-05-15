@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { getEmailAnalytics } from "@/server/admin-emails.functions";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/admin/emails")({
   head: () => ({
@@ -124,20 +125,40 @@ function EmailAnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-        <StatCard label="Total" value={stats?.total ?? 0} />
-        <StatCard label="Sent" value={stats?.sent ?? 0} />
-        <StatCard label="Failed" value={stats?.failed ?? 0} hint="dlq + failed + bounced" />
-        <StatCard label="Suppressed" value={stats?.suppressed ?? 0} />
-        <StatCard
-          label="Suppression list"
-          value={stats?.suppression_list_total ?? 0}
-          hint="lifetime"
-        />
+        {isLoading
+          ? Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="rounded-2xl border border-white/10 bg-card/40 p-4">
+                <Skeleton className="h-3 w-20" />
+                <Skeleton className="mt-3 h-7 w-16" />
+              </div>
+            ))
+          : (
+            <>
+              <StatCard label="Total" value={stats?.total ?? 0} />
+              <StatCard label="Sent" value={stats?.sent ?? 0} />
+              <StatCard label="Failed" value={stats?.failed ?? 0} hint="dlq + failed + bounced" />
+              <StatCard label="Suppressed" value={stats?.suppressed ?? 0} />
+              <StatCard
+                label="Suppression list"
+                value={stats?.suppression_list_total ?? 0}
+                hint="lifetime"
+              />
+            </>
+          )}
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-white/10 bg-card/40">
         {isLoading ? (
-          <div className="px-6 py-12 text-center text-sm text-muted-foreground">Loading…</div>
+          <div className="divide-y divide-white/5">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4 px-4 py-3">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 flex-1" />
+                <Skeleton className="h-5 w-16" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            ))}
+          </div>
         ) : error ? (
           <div className="px-6 py-12 text-center text-sm text-destructive">
             {error instanceof Error ? error.message : "Failed to load"}
