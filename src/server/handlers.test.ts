@@ -9,6 +9,7 @@
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { runWithStartContext } from "@tanstack/start-storage-context";
 
 const TEST_USER_ID = "11111111-1111-1111-1111-111111111111";
 const UUID_A = "22222222-2222-2222-2222-222222222222";
@@ -109,6 +110,25 @@ beforeEach(() => {
 
 function lastCall(table: string, method: string) {
   return [...mockState.calls].reverse().find((c) => c.table === table && c.method === method);
+}
+
+/**
+ * createServerFn requires a Start AsyncLocalStorage context to run. In tests
+ * we provide a minimal fake one and route every server-fn call through it.
+ */
+function withCtx<T>(fn: () => Promise<T>): Promise<T> {
+  return runWithStartContext(
+    {
+      getRouter: () => ({}) as never,
+      request: new Request("http://test.local/", {
+        headers: { authorization: "Bearer test-token" },
+      }),
+      startOptions: {},
+      contextAfterGlobalMiddlewares: {},
+      executedRequestMiddlewares: new Set(),
+    },
+    fn,
+  );
 }
 
 // ---------- admin.functions ----------
