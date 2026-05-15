@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, Download } from "lucide-react";
+import { Trash2, Plus, Download, Video } from "lucide-react";
 import { toast } from "sonner";
 import {
   listShortlists,
@@ -37,6 +37,7 @@ type Member = {
 const STAGES = ["new", "contacted", "replied", "screening", "passed", "rejected"] as const;
 
 function ShortlistsPage() {
+  const navigate = useNavigate();
   const [lists, setLists] = useState<Shortlist[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
@@ -90,6 +91,22 @@ function ShortlistsPage() {
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed");
     }
+  }
+  async function startInterviewFor(m: Member) {
+    const list = lists.find((l) => l.id === activeId);
+    try {
+      await updateShortlistMember({ data: { memberId: m.id, stage: "screening" } });
+      setMembers((arr) => arr.map((x) => (x.id === m.id ? { ...x, stage: "screening" } : x)));
+    } catch {
+      // non-fatal — still navigate
+    }
+    navigate({
+      to: "/interview/new",
+      search: {
+        candidate: m.candidate.name,
+        role: list?.role_title ?? undefined,
+      },
+    });
   }
   async function removeList(id: string) {
     if (!confirm("Delete this shortlist?")) return;
@@ -232,6 +249,14 @@ function ShortlistsPage() {
                     </option>
                   ))}
                 </select>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => startInterviewFor(m)}
+                  className="gap-1.5"
+                >
+                  <Video className="h-3.5 w-3.5" /> Interview
+                </Button>
                 <Button size="icon" variant="ghost" onClick={() => removeMember(m.id)}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
