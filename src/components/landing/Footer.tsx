@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { openCookiePreferences } from "@/components/CookieConsent";
 
 type FooterLink = {
   label: string;
@@ -99,6 +100,13 @@ export function Footer() {
             <Link to="/security" className="hover:text-foreground">
               Security
             </Link>
+            <button
+              type="button"
+              onClick={openCookiePreferences}
+              className="hover:text-foreground"
+            >
+              Cookie preferences
+            </button>
           </div>
         </div>
       </div>
