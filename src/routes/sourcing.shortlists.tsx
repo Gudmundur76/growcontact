@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, Download, Video, Users, Search, Briefcase, Leaf } from "lucide-react";
+import { Trash2, Plus, Download, Video, Users, Search, Briefcase, Leaf, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { pushCandidateToAshby } from "@/lib/ashby.functions";
-import { pushCandidateToGreenhouse } from "@/lib/integrations.functions";
+import { pushCandidateToGreenhouse, pushCandidateToHubspot } from "@/lib/integrations.functions";
 import {
   listShortlists,
   upsertShortlist,
@@ -280,6 +280,7 @@ function ShortlistsPage() {
                 </Button>
                 <PushCandidateAshbyBtn candidateId={m.candidate.id} />
                 <PushCandidateGreenhouseBtn candidateId={m.candidate.id} />
+                <PushCandidateHubspotBtn candidateId={m.candidate.id} />
                 <Button size="icon" variant="ghost" onClick={() => removeMember(m.id)}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
