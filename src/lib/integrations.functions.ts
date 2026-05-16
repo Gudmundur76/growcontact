@@ -2,8 +2,25 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type ProviderKey = "greenhouse" | "slack" | "webhook" | "teams";
-const PROVIDER = z.enum(["greenhouse", "slack", "webhook", "teams"]);
+export type ProviderKey =
+  | "greenhouse"
+  | "slack"
+  | "webhook"
+  | "teams"
+  | "hubspot"
+  | "notion"
+  | "sheets"
+  | "discord";
+const PROVIDER = z.enum([
+  "greenhouse",
+  "slack",
+  "webhook",
+  "teams",
+  "hubspot",
+  "notion",
+  "sheets",
+  "discord",
+]);
 
 // ---------- Helpers ----------
 
