@@ -26,8 +26,9 @@ import {
   ShareExpirySchema,
   SeedSchema,
 } from "./interviews.functions";
+import { TEST_UUID } from "./test-fixtures";
 
-const UUID = "11111111-1111-4111-8111-111111111111";
+const UUID = TEST_UUID;
 
 describe("admin schemas", () => {
   it("GrantSchema accepts a valid email", () => {

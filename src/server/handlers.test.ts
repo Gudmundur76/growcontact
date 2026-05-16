@@ -10,10 +10,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { runWithStartContext } from "@tanstack/start-storage-context";
+import { TEST_UUIDS } from "./test-fixtures";
 
-const TEST_USER_ID = "11111111-1111-4111-8111-111111111111";
-const UUID_A = "22222222-2222-4222-8222-222222222222";
-const UUID_B = "33333333-3333-4333-8333-333333333333";
+const TEST_USER_ID = TEST_UUIDS.user;
+const UUID_A = TEST_UUIDS.a;
+const UUID_B = TEST_UUIDS.b;
 
 type Resp = { data: any; error: any };
 type Responses = Record<string, Resp>;
@@ -23,6 +24,8 @@ const { mockState, makeClient } = vi.hoisted(() => {
   const state: { responses: Responses; calls: CallLog; userId: string } = {
     responses: {},
     calls: [],
+    // NOTE: vi.hoisted() runs before module imports, so TEST_UUIDS is not in
+    // scope here. Keep this literal in sync with TEST_UUIDS.user.
     userId: "11111111-1111-4111-8111-111111111111",
   };
 
