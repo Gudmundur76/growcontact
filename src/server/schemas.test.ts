@@ -27,7 +27,7 @@ import {
   SeedSchema,
 } from "./interviews.functions";
 
-const UUID = "11111111-2222-3333-4444-555555555555";
+const UUID = "11111111-1111-4111-8111-111111111111";
 
 describe("admin schemas", () => {
   it("GrantSchema accepts a valid email", () => {
