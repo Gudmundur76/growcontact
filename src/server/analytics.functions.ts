@@ -89,7 +89,7 @@ export const getPredictiveAnalytics = createServerFn({ method: "GET" })
         .limit(1)
         .maybeSingle();
       if (cached?.payload) {
-        return { ...(cached.payload as PredictiveAnalytics), cached: true };
+        return { ...(cached.payload as unknown as PredictiveAnalytics), cached: true };
       }
     }
 
@@ -240,7 +240,7 @@ export const getPredictiveAnalytics = createServerFn({ method: "GET" })
     await supabase.from("analytics_forecasts").insert({
       user_id: userId,
       kind: "time_to_hire",
-      payload: payload as unknown as Record<string, unknown>,
+      payload: payload as unknown as never,
       expires_at: new Date(Date.now() + CACHE_TTL_MS).toISOString(),
     });
 
