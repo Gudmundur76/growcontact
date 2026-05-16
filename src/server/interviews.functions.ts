@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { createRecallBot, leaveRecallBot, detectPlatform } from "./recall.server";
 import { generateScorecard } from "./interview-ai.server";
 import { dbError } from "./db-errors";
+import { autoNotifyScorecardTeams } from "./notify-teams.server";
 
 // ---------- In-memory rate limiter ----------
 // Best-effort per-instance throttle. Acceptable for abuse prevention; resets on cold start.
@@ -174,7 +175,7 @@ export const finalizeScorecard = createServerFn({ method: "POST" })
       rubric,
     });
 
-    await supabaseAdmin.from("interview_scorecards").upsert(
+    const { data: upserted } = await supabaseAdmin.from("interview_scorecards").upsert(
       {
         session_id: session.id,
         summary: card.summary,
@@ -186,7 +187,14 @@ export const finalizeScorecard = createServerFn({ method: "POST" })
         follow_ups: card.follow_ups,
       },
       { onConflict: "session_id" },
-    );
+    ).select("id").maybeSingle();
+
+    if (upserted?.id) {
+      // Fire-and-forget Teams notification for users who activated the connector.
+      autoNotifyScorecardTeams({ userId, scorecardId: upserted.id }).catch((e) =>
+        console.error("autoNotifyScorecardTeams error", e),
+      );
+    }
 
     return { ok: true, scorecard: card };
   });
