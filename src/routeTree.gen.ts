@@ -56,6 +56,7 @@ import { Route as AdminRolesRouteImport } from './routes/admin/roles'
 import { Route as AdminEmailsRouteImport } from './routes/admin/emails'
 import { Route as AdminContactsRouteImport } from './routes/admin/contacts'
 import { Route as AdminBlogRouteImport } from './routes/admin/blog'
+import { Route as AccountIntegrationsRouteImport } from './routes/account.integrations'
 import { Route as AccountApiKeysRouteImport } from './routes/account.api-keys'
 import { Route as AccountApiDocsRouteImport } from './routes/account.api-docs'
 import { Route as ShareScorecardTokenRouteImport } from './routes/share.scorecard.$token'
@@ -308,6 +309,11 @@ const AdminBlogRoute = AdminBlogRouteImport.update({
   path: '/blog',
   getParentRoute: () => AdminRoute,
 } as any)
+const AccountIntegrationsRoute = AccountIntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => AccountRoute,
+} as any)
 const AccountApiKeysRoute = AccountApiKeysRouteImport.update({
   id: '/api-keys',
   path: '/api-keys',
@@ -424,6 +430,7 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/account/api-docs': typeof AccountApiDocsRoute
   '/account/api-keys': typeof AccountApiKeysRoute
+  '/account/integrations': typeof AccountIntegrationsRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/emails': typeof AdminEmailsRoute
@@ -487,6 +494,7 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/account/api-docs': typeof AccountApiDocsRoute
   '/account/api-keys': typeof AccountApiKeysRoute
+  '/account/integrations': typeof AccountIntegrationsRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/emails': typeof AdminEmailsRoute
@@ -553,6 +561,7 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/account/api-docs': typeof AccountApiDocsRoute
   '/account/api-keys': typeof AccountApiKeysRoute
+  '/account/integrations': typeof AccountIntegrationsRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/emails': typeof AdminEmailsRoute
@@ -620,6 +629,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/account/api-docs'
     | '/account/api-keys'
+    | '/account/integrations'
     | '/admin/blog'
     | '/admin/contacts'
     | '/admin/emails'
@@ -683,6 +693,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/account/api-docs'
     | '/account/api-keys'
+    | '/account/integrations'
     | '/admin/blog'
     | '/admin/contacts'
     | '/admin/emails'
@@ -748,6 +759,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/account/api-docs'
     | '/account/api-keys'
+    | '/account/integrations'
     | '/admin/blog'
     | '/admin/contacts'
     | '/admin/emails'
@@ -1169,6 +1181,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBlogRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/account/integrations': {
+      id: '/account/integrations'
+      path: '/integrations'
+      fullPath: '/account/integrations'
+      preLoaderRoute: typeof AccountIntegrationsRouteImport
+      parentRoute: typeof AccountRoute
+    }
     '/account/api-keys': {
       id: '/account/api-keys'
       path: '/api-keys'
@@ -1287,11 +1306,13 @@ declare module '@tanstack/react-router' {
 interface AccountRouteChildren {
   AccountApiDocsRoute: typeof AccountApiDocsRoute
   AccountApiKeysRoute: typeof AccountApiKeysRoute
+  AccountIntegrationsRoute: typeof AccountIntegrationsRoute
 }
 
 const AccountRouteChildren: AccountRouteChildren = {
   AccountApiDocsRoute: AccountApiDocsRoute,
   AccountApiKeysRoute: AccountApiKeysRoute,
+  AccountIntegrationsRoute: AccountIntegrationsRoute,
 }
 
 const AccountRouteWithChildren =
