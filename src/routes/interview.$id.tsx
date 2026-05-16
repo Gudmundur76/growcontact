@@ -1207,3 +1207,24 @@ function ListEditor({
     </div>
   );
 }
+
+function PushScorecardToAshbyButton({ scorecardId }: { scorecardId: string }) {
+  const push = useServerFn(pushScorecardToAshby);
+  const [busy, setBusy] = useState(false);
+  async function onClick() {
+    setBusy(true);
+    try {
+      await push({ data: { scorecardId } });
+      toast.success("Pushed to Ashby");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to push to Ashby");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Button variant="outline" size="sm" onClick={onClick} disabled={busy}>
+      <Briefcase className="size-4" /> {busy ? "Pushing…" : "Push to Ashby"}
+    </Button>
+  );
+}
