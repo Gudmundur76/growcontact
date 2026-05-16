@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { Briefcase, CheckCircle2, AlertCircle, ExternalLink, Loader2 } from "lucide-react";
+import { Briefcase, CheckCircle2, AlertCircle, ExternalLink, Loader2, Slack, Webhook, Leaf } from "lucide-react";
 import {
   getAshbyConnection,
   connectAshby,
@@ -19,6 +19,17 @@ import {
   setAshbyEnabled,
   listAshbySyncLog,
 } from "@/lib/ashby.functions";
+import {
+  listConnections,
+  setProviderEnabled,
+  disconnectProvider,
+  listProviderSyncLog,
+  connectGreenhouse,
+  connectSlack,
+  connectWebhook,
+  sendWebhookTest,
+  type ProviderKey,
+} from "@/lib/integrations.functions";
 
 export const Route = createFileRoute("/account/integrations")({
   head: () => ({
@@ -50,11 +61,14 @@ function AccountIntegrationsPage() {
             workspace needs. Credentials stay private to your account.
           </p>
         </div>
-        {user && <AshbyCard />}
-        <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-card/30 p-6 text-sm text-muted-foreground">
-          More ATS connectors (Greenhouse, Lever) coming soon.{" "}
-          <Link to="/contact" className="text-primary hover:underline">Request one</Link>.
-        </div>
+        {user && (
+          <div className="space-y-6">
+            <AshbyCard />
+            <GreenhouseCard />
+            <SlackCard />
+            <WebhookCard />
+          </div>
+        )}
       </main>
       <Footer />
     </div>
