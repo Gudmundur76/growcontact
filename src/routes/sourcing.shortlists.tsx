@@ -334,3 +334,24 @@ function PushCandidateGreenhouseBtn({ candidateId }: { candidateId: string }) {
     </Button>
   );
 }
+
+function PushCandidateHubspotBtn({ candidateId }: { candidateId: string }) {
+  const push = useServerFn(pushCandidateToHubspot);
+  const [busy, setBusy] = useState(false);
+  async function onClick() {
+    setBusy(true);
+    try {
+      const r = await push({ data: { candidateId } });
+      toast.success(r.externalId ? `Pushed to HubSpot (${r.externalId})` : "Pushed to HubSpot");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to push");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Button size="sm" variant="outline" onClick={onClick} disabled={busy} className="gap-1.5">
+      <Building2 className="h-3.5 w-3.5" /> {busy ? "Pushing…" : "HubSpot"}
+    </Button>
+  );
+}
