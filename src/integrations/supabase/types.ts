@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_forecasts: {
+        Row: {
+          entity_id: string | null
+          expires_at: string
+          generated_at: string
+          id: string
+          kind: string
+          payload: Json
+          user_id: string
+        }
+        Insert: {
+          entity_id?: string | null
+          expires_at?: string
+          generated_at?: string
+          id?: string
+          kind: string
+          payload?: Json
+          user_id: string
+        }
+        Update: {
+          entity_id?: string | null
+          expires_at?: string
+          generated_at?: string
+          id?: string
+          kind?: string
+          payload?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author: string
@@ -460,6 +490,119 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      screening_screeners: {
+        Row: {
+          created_at: string
+          description: string | null
+          format: string
+          id: string
+          is_active: boolean
+          name: string
+          questions: Json
+          role_title: string | null
+          rubric: Json
+          share_expires_at: string | null
+          share_token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          format?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          questions?: Json
+          role_title?: string | null
+          rubric?: Json
+          share_expires_at?: string | null
+          share_token?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          format?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          questions?: Json
+          role_title?: string | null
+          rubric?: Json
+          share_expires_at?: string | null
+          share_token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      screening_submissions: {
+        Row: {
+          ai_concerns: Json
+          ai_recommendation: string | null
+          ai_score: number | null
+          ai_strengths: Json
+          ai_summary: string | null
+          answers: Json
+          candidate_email: string | null
+          candidate_name: string
+          error_message: string | null
+          id: string
+          scored_at: string | null
+          screener_id: string
+          status: string
+          submitted_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_concerns?: Json
+          ai_recommendation?: string | null
+          ai_score?: number | null
+          ai_strengths?: Json
+          ai_summary?: string | null
+          answers?: Json
+          candidate_email?: string | null
+          candidate_name: string
+          error_message?: string | null
+          id?: string
+          scored_at?: string | null
+          screener_id: string
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_concerns?: Json
+          ai_recommendation?: string | null
+          ai_score?: number | null
+          ai_strengths?: Json
+          ai_summary?: string | null
+          answers?: Json
+          candidate_email?: string | null
+          candidate_name?: string
+          error_message?: string | null
+          id?: string
+          scored_at?: string | null
+          screener_id?: string
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "screening_submissions_screener_id_fkey"
+            columns: ["screener_id"]
+            isOneToOne: false
+            referencedRelation: "screening_screeners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sourcing_candidates: {
         Row: {

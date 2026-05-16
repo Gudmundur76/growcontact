@@ -1,48 +1,79 @@
-# Dark Hero Landing Page
+# Close the gap with grow.contact
 
-Build a dark-themed landing page with a hero section, looping background video, and brand marquee, following the exact spec provided.
+Three workstreams, executed in order. Each ships independently so you can preview as we go.
 
-## Setup
-- Install `@fontsource/geist-sans` (weights 400/500/600/700 imported in `src/styles.css`).
-- Add a placeholder `src/assets/logo.png` (simple generated mark) for the navbar.
+---
 
-## Theme & Tokens (`src/styles.css`)
-- Replace current oklch tokens with the HSL spec provided (background, foreground, card, primary purple `262 83% 58%`, etc.).
-- Add `--hero-heading` and `--hero-sub` tokens.
-- Map all tokens through `@theme inline` so Tailwind v4 utilities (`bg-background`, `text-hero-sub`, etc.) work.
-- Add `text-hero-heading` / `text-hero-sub` color utilities.
-- Add `@layer utilities` `.liquid-glass` class with the gradient border `::before` pseudo-element exactly as specified.
-- Define `@keyframes marquee` (0% → -50% translateX) and `animate-marquee` 20s linear infinite via `@theme` animation extension.
-- Set body font stack to `'Geist Sans', 'Inter', system-ui, sans-serif`.
+## 1. Marketing parity (small, fast)
 
-Note: project uses Tailwind v4 (CSS-first, no `tailwind.config.ts`). Color groups + animation will be registered via `@theme` in `styles.css` — equivalent to the requested config.
+Update the public site to match grow.contact copy and tiers.
 
-## Button Variants (`src/components/ui/button.tsx`)
-Add to existing CVA variants:
-- `hero`: solid primary, rounded-full, px-6 py-3.
-- `heroSecondary`: `liquid-glass` + rounded-full + hover bg-white/5.
+- `/pricing` — three tiers exactly as advertised:
+  - **Startup $499/mo** — up to 3 active roles, AI sourcing & async screening, Interview Copilot (5/mo), basic analytics, email support
+  - **Growth $1,499/mo** — up to 15 roles, everything in Startup, unlimited Copilot, predictive analytics, ATS integrations, Slack, priority support (marked "Most popular")
+  - **Enterprise — Custom** — unlimited roles, SSO/SAML, custom AI calibration, dedicated CSM, SLA, custom contracts
+- Landing page stats strip: `3× faster time-to-hire · 60% recruiter cost saved · 94% screening accuracy · 12mo retention predicted`
+- Landing customer logos: Vortex, Nimbus, Prysma, Cirrus, Kynder, Halcyn (marquee), plus testimonial section: Acme Corp, Velocity AI, Stackr, Meridian, Pluto HQ with the three quotes from the site.
+- Add the **four-module solution section** (Sourcing / Async Screening / Interview Copilot / Predictive Analytics) with the marketing bullet points.
 
-## Components
-- `src/components/landing/Navbar.tsx` — logo (left), centered nav buttons (Features ▾, Solutions, Plans, Learning ▾) using lucide `ChevronDown`, Sign Up button (heroSecondary, sm). Followed by a 1px gradient divider.
-- `src/components/landing/HeroSection.tsx` — wraps Navbar + centered content. Headline "Grow" at 230px with the specified linear-gradient text fill, subtext two lines, CTA "Schedule a Consult" (heroSecondary, custom padding).
-- `src/components/landing/SocialProofSection.tsx` — full-width section with:
-  - `<video>` autoplay/muted/playsInline, absolute cover, starts at `opacity: 0`.
-  - rAF loop reading `currentTime`/`duration` to fade in over first 0.5s and fade out over last 0.5s.
-  - `onEnded` → opacity 0 → 100ms timeout → reset `currentTime=0` and `play()`.
-  - Top/bottom gradient overlays from `background`.
-  - Content layer: 40-height spacer, then marquee row at `max-w-5xl` with left label "Relied on by brands / across the globe" and right side scrolling logos (Vortex, Nimbus, Prysma, Cirrus, Kynder, Halcyn — duplicated). Each logo = 24px liquid-glass square with first letter + brand name.
+## 2. Async Screening module
 
-## Page (`src/routes/index.tsx`)
-Replace the placeholder with:
-```tsx
-<>
-  <HeroSection />
-  <SocialProofSection />
-</>
-```
-Update route `head()` title/description to match the landing page.
+New `/screening` area with end-to-end flow.
 
-## Technical Notes
-- Tailwind v4 has no `tailwind.config.ts` in this project; the requested keyframes, color groups, and animations are added in `styles.css` via `@theme` + `@keyframes` (functionally identical).
-- General Sans isn't in @fontsource bundle requested; the headline will declare `'General Sans', sans-serif` in inline style as specified — falls back to Geist/system if unavailable. (Can add via CDN if you want guaranteed loading — let me know.)
-- Video fade loop uses a single rAF tied to component lifecycle, cleaned up on unmount.
+User stories:
+- Recruiter creates a "screener" tied to a role (questions + rubric + format: text or video).
+- Recruiter shares a public link `/screen/$token` with a candidate.
+- Candidate answers without logging in (anonymous, token-gated).
+- AI scores each response against the rubric and produces a summary + recommendation.
+- Recruiter sees a ranked list of submissions per screener.
+
+Tables (new):
+- `screening_screeners` — per user_id: name, role_title, format (text|video), questions (jsonb), rubric (jsonb), share_token, expires_at
+- `screening_submissions` — per screener_id: candidate_name, candidate_email, answers (jsonb), ai_score, ai_summary, ai_recommendation, status (pending|scored|reviewed), submitted_at
+- All RLS scoped to `user_id` on screeners; submissions joined through screeners.
+
+Server (TanStack server functions in `src/server/screening.functions.ts`):
+- `createScreener`, `updateScreener`, `listScreeners`, `getScreener`
+- Public `submitScreening({ token, candidate, answers })` (no auth, validates token)
+- `scoreSubmission` — calls Lovable AI (`google/gemini-3-flash-preview`) with rubric + answers, stores structured result via tool calling
+- `listSubmissions(screenerId)` ranked by ai_score
+
+Routes:
+- `/screening` (index — list screeners + create)
+- `/screening/$id` (detail — questions, rubric, share link, ranked submissions)
+- `/screen/$token` (public candidate form — text answers v1; video noted as v2)
+
+Note: Video recording is heavier; v1 ships **text + code challenge formats**, with video as a follow-up so you have a working module today.
+
+## 3. Predictive Analytics module
+
+New `/analytics` dashboard with three forecasts.
+
+Inputs we already have: `interview_sessions`, `interview_scorecards`, `sourcing_sends`, `sourcing_searches`. We'll seed predictions from these signals via Lovable AI.
+
+Server function `getPredictiveAnalytics()`:
+- **Time-to-hire forecast** per active role — based on session count, scorecard recommendations, outreach volume in last 30 days.
+- **Offer-acceptance probability** per candidate with a scorecard — derived from scorecard rating, recommendation, role seniority.
+- **12-month retention risk** per hire — from rubric coverage + competency scores.
+- Implementation: a single AI call per panel with a JSON schema (tool calling), cached for 1h in a new `analytics_forecasts` table to avoid hammering the gateway.
+
+Tables (new):
+- `analytics_forecasts` — kind (time_to_hire|offer_acceptance|retention), entity_id, payload (jsonb), generated_at, expires_at
+
+Routes:
+- `/analytics` — three panels with forecast tiles, list of candidates per panel, "Refresh forecast" button (rate-limited to 1/hr per user).
+
+## Execution order
+
+1. Migration: `screening_screeners`, `screening_submissions`, `analytics_forecasts` (with RLS).
+2. Marketing parity (Pricing + landing stats/logos/testimonials + four-module section).
+3. Async Screening: server functions → recruiter UI → public candidate form → AI scoring.
+4. Predictive Analytics: server function with cache → dashboard UI.
+5. Verify each workstream in the preview before moving on.
+
+## Out of scope (flagging now)
+
+- Video screening capture (browser MediaRecorder + storage upload) — v2.
+- ATS integrations (Greenhouse, Lever) — keep as marketing bullet, no code yet.
+- Actually charging $499/$1,499 — pricing is display-only unless you want me to wire Stripe.
+- SSO/SAML provisioning — Enterprise marketing only.
