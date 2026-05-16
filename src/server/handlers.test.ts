@@ -11,9 +11,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { runWithStartContext } from "@tanstack/start-storage-context";
 
-const TEST_USER_ID = "11111111-1111-1111-1111-111111111111";
-const UUID_A = "22222222-2222-2222-2222-222222222222";
-const UUID_B = "33333333-3333-3333-3333-333333333333";
+const TEST_USER_ID = "11111111-1111-4111-8111-111111111111";
+const UUID_A = "22222222-2222-4222-8222-222222222222";
+const UUID_B = "33333333-3333-4333-8333-333333333333";
 
 type Resp = { data: any; error: any };
 type Responses = Record<string, Resp>;
@@ -23,7 +23,7 @@ const { mockState, makeClient } = vi.hoisted(() => {
   const state: { responses: Responses; calls: CallLog; userId: string } = {
     responses: {},
     calls: [],
-    userId: "11111111-1111-1111-1111-111111111111",
+    userId: "11111111-1111-4111-8111-111111111111",
   };
 
   function resolveFor(table: string, method: string): Resp {
