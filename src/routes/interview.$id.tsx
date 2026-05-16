@@ -58,7 +58,7 @@ type EventRow = {
   created_at: string;
 };
 type ScorecardRow = {
-  id: string;
+  id?: string;
   summary: string;
   overall_rating: number | null;
   recommendation: string | null;
@@ -917,7 +917,7 @@ function LiveInterviewPage() {
                     <Mail className="size-4" /> Email link
                   </Button>
                 )}
-                <PushScorecardToAshbyButton scorecardId={scorecard.id} />
+                {scorecard.id && <PushScorecardToAshbyButton scorecardId={scorecard.id} />}
               </div>
             </div>
             {session.share_token && (
