@@ -29,7 +29,7 @@ import {
 import { createScreener, listScreeners } from "@/server/screening.functions";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/screening")({
+export const Route = createFileRoute("/screening/")({
   head: () => ({
     meta: [{ title: "Async Screening — Grow" }, { name: "robots", content: "noindex" }],
   }),
