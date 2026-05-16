@@ -1,49 +1,58 @@
 import { Check } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 
 const plans = [
   {
-    name: "Starter",
+    name: "Startup",
     price: "$499",
     cadence: "/ month",
-    description: "For early teams making their first 1–5 hires.",
+    description: "For lean teams making their first 5–10 hires.",
     features: [
-      "AI Sourcing — 200 candidates / mo",
-      "Async screening interviews",
-      "Shared pipeline & scorecards",
+      "Up to 3 active roles",
+      "AI sourcing & async screening",
+      "Interview Copilot (5 interviews/mo)",
+      "Basic analytics dashboard",
       "Email support",
     ],
-    cta: "Start free trial",
+    cta: "Get started",
+    href: "/signup" as const,
     highlighted: false,
   },
   {
     name: "Growth",
-    price: "$2,000",
+    price: "$1,499",
     cadence: "/ month",
-    description: "Replaces a senior recruiter at ~$180k / yr.",
+    description: "For scaling teams hiring across multiple functions.",
     features: [
-      "Unlimited AI Sourcing",
-      "Interview Copilot (Zoom/Meet/Teams)",
-      "Predictive analytics dashboard",
-      "ATS sync (Greenhouse, Ashby, Lever)",
-      "Priority Slack support",
+      "Up to 15 active roles",
+      "Everything in Startup",
+      "Unlimited Interview Copilot",
+      "Predictive analytics",
+      "ATS integrations",
+      "Slack notifications",
+      "Priority support",
     ],
-    cta: "Book a demo",
+    cta: "Start free trial",
+    href: "/signup" as const,
     highlighted: true,
   },
   {
-    name: "Scale",
+    name: "Enterprise",
     price: "Custom",
     cadence: "",
-    description: "For multi-team orgs with global hiring.",
+    description: "For high-volume teams with custom security and compliance needs.",
     features: [
+      "Unlimited roles",
       "Everything in Growth",
-      "Custom models on your pipeline",
-      "SSO, SCIM & audit logs",
-      "Dedicated talent strategist",
-      "99.9% SLA",
+      "SSO / SAML",
+      "Custom AI calibration",
+      "Dedicated CSM",
+      "SLA + uptime guarantee",
+      "Custom contracts",
     ],
     cta: "Talk to sales",
+    href: "/contact" as const,
     highlighted: false,
   },
 ];
@@ -98,10 +107,11 @@ export function PricingSection() {
               </ul>
 
               <Button
+                asChild
                 variant={plan.highlighted ? "hero" : "heroSecondary"}
                 className="mt-10 w-full justify-center"
               >
-                {plan.cta}
+                <Link to={plan.href}>{plan.cta}</Link>
               </Button>
             </div>
           ))}

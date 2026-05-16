@@ -33,6 +33,7 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SourcingIndexRouteImport } from './routes/sourcing.index'
+import { Route as ScreeningIndexRouteImport } from './routes/screening.index'
 import { Route as InterviewIndexRouteImport } from './routes/interview.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
@@ -183,6 +184,11 @@ const SourcingIndexRoute = SourcingIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SourcingRoute,
+} as any)
+const ScreeningIndexRoute = ScreeningIndexRouteImport.update({
+  id: '/screening/',
+  path: '/screening/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const InterviewIndexRoute = InterviewIndexRouteImport.update({
   id: '/interview/',
@@ -382,6 +388,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/interview/': typeof InterviewIndexRoute
+  '/screening/': typeof ScreeningIndexRoute
   '/sourcing/': typeof SourcingIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
@@ -436,6 +443,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/interview': typeof InterviewIndexRoute
+  '/screening': typeof ScreeningIndexRoute
   '/sourcing': typeof SourcingIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
@@ -493,6 +501,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/interview/': typeof InterviewIndexRoute
+  '/screening/': typeof ScreeningIndexRoute
   '/sourcing/': typeof SourcingIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/recall-webhook': typeof ApiPublicRecallWebhookRoute
@@ -551,6 +560,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/blog/'
     | '/interview/'
+    | '/screening/'
     | '/sourcing/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
@@ -605,6 +615,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/blog'
     | '/interview'
+    | '/screening'
     | '/sourcing'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
@@ -661,6 +672,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/blog/'
     | '/interview/'
+    | '/screening/'
     | '/sourcing/'
     | '/api/public/contact'
     | '/api/public/recall-webhook'
@@ -708,6 +720,7 @@ export interface RootRouteChildren {
   InterviewRubricsRoute: typeof InterviewRubricsRoute
   BlogIndexRoute: typeof BlogIndexRoute
   InterviewIndexRoute: typeof InterviewIndexRoute
+  ScreeningIndexRoute: typeof ScreeningIndexRoute
   ApiPublicContactRoute: typeof ApiPublicContactRoute
   ApiPublicRecallWebhookRoute: typeof ApiPublicRecallWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -892,6 +905,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/sourcing/'
       preLoaderRoute: typeof SourcingIndexRouteImport
       parentRoute: typeof SourcingRoute
+    }
+    '/screening/': {
+      id: '/screening/'
+      path: '/screening'
+      fullPath: '/screening/'
+      preLoaderRoute: typeof ScreeningIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/interview/': {
       id: '/interview/'
@@ -1177,6 +1197,7 @@ const rootRouteChildren: RootRouteChildren = {
   InterviewRubricsRoute: InterviewRubricsRoute,
   BlogIndexRoute: BlogIndexRoute,
   InterviewIndexRoute: InterviewIndexRoute,
+  ScreeningIndexRoute: ScreeningIndexRoute,
   ApiPublicContactRoute: ApiPublicContactRoute,
   ApiPublicRecallWebhookRoute: ApiPublicRecallWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
@@ -1195,3 +1216,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
