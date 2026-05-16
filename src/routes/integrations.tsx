@@ -266,7 +266,7 @@ function IntegrationsPage() {
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <Button asChild variant="hero" className="rounded-full">
-                <Link to="/contact">Talk to us</Link>
+                <Link to="/account/integrations">Activate integrations</Link>
               </Button>
               <Button asChild variant="heroSecondary" className="rounded-full">
                 <Link to="/api-docs">View API docs</Link>
