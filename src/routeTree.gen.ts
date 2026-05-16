@@ -29,6 +29,7 @@ import { Route as CustomersRouteImport } from './routes/customers'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as CareersRouteImport } from './routes/careers'
+import { Route as ApiDocsRouteImport } from './routes/api-docs'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
@@ -55,6 +56,7 @@ import { Route as AdminRolesRouteImport } from './routes/admin/roles'
 import { Route as AdminEmailsRouteImport } from './routes/admin/emails'
 import { Route as AdminContactsRouteImport } from './routes/admin/contacts'
 import { Route as AdminBlogRouteImport } from './routes/admin/blog'
+import { Route as AccountApiKeysRouteImport } from './routes/account.api-keys'
 import { Route as ShareScorecardTokenRouteImport } from './routes/share.scorecard.$token'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicRecallWebhookRouteImport } from './routes/api/public/recall-webhook'
@@ -64,6 +66,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicV1HealthRouteImport } from './routes/api/public/v1/health'
 import { Route as ApiPublicScorecardTokenRouteImport } from './routes/api/public/scorecard.$token'
 import { Route as ApiPublicHooksSourcingAlertsRouteImport } from './routes/api/public/hooks/sourcing-alerts'
 import { Route as ApiPublicHooksGenerateBlogPostRouteImport } from './routes/api/public/hooks/generate-blog-post'
@@ -167,6 +170,11 @@ const ChangelogRoute = ChangelogRouteImport.update({
 const CareersRoute = CareersRouteImport.update({
   id: '/careers',
   path: '/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDocsRoute = ApiDocsRouteImport.update({
+  id: '/api-docs',
+  path: '/api-docs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnalyticsRoute = AnalyticsRouteImport.update({
@@ -299,6 +307,11 @@ const AdminBlogRoute = AdminBlogRouteImport.update({
   path: '/blog',
   getParentRoute: () => AdminRoute,
 } as any)
+const AccountApiKeysRoute = AccountApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
+  getParentRoute: () => AccountRoute,
+} as any)
 const ShareScorecardTokenRoute = ShareScorecardTokenRouteImport.update({
   id: '/share/scorecard/$token',
   path: '/share/scorecard/$token',
@@ -347,6 +360,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicV1HealthRoute = ApiPublicV1HealthRouteImport.update({
+  id: '/api/public/v1/health',
+  path: '/api/public/v1/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicScorecardTokenRoute = ApiPublicScorecardTokenRouteImport.update({
   id: '/api/public/scorecard/$token',
   path: '/api/public/scorecard/$token',
@@ -374,9 +392,10 @@ const ApiPublicHooksAutoPublishBlogPostRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
+  '/account': typeof AccountRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/analytics': typeof AnalyticsRoute
+  '/api-docs': typeof ApiDocsRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -397,6 +416,7 @@ export interface FileRoutesByFullPath {
   '/sourcing': typeof SourcingRouteWithChildren
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/account/api-keys': typeof AccountApiKeysRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/emails': typeof AdminEmailsRoute
@@ -426,6 +446,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
   '/api/public/hooks/sourcing-alerts': typeof ApiPublicHooksSourcingAlertsRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
+  '/api/public/v1/health': typeof ApiPublicV1HealthRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -435,8 +456,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
+  '/account': typeof AccountRouteWithChildren
   '/analytics': typeof AnalyticsRoute
+  '/api-docs': typeof ApiDocsRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -456,6 +478,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/account/api-keys': typeof AccountApiKeysRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/emails': typeof AdminEmailsRoute
@@ -485,6 +508,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
   '/api/public/hooks/sourcing-alerts': typeof ApiPublicHooksSourcingAlertsRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
+  '/api/public/v1/health': typeof ApiPublicV1HealthRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -495,9 +519,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
+  '/account': typeof AccountRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/analytics': typeof AnalyticsRoute
+  '/api-docs': typeof ApiDocsRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -518,6 +543,7 @@ export interface FileRoutesById {
   '/sourcing': typeof SourcingRouteWithChildren
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/account/api-keys': typeof AccountApiKeysRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/emails': typeof AdminEmailsRoute
@@ -547,6 +573,7 @@ export interface FileRoutesById {
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
   '/api/public/hooks/sourcing-alerts': typeof ApiPublicHooksSourcingAlertsRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
+  '/api/public/v1/health': typeof ApiPublicV1HealthRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -561,6 +588,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/analytics'
+    | '/api-docs'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -581,6 +609,7 @@ export interface FileRouteTypes {
     | '/sourcing'
     | '/terms'
     | '/unsubscribe'
+    | '/account/api-keys'
     | '/admin/blog'
     | '/admin/contacts'
     | '/admin/emails'
@@ -610,6 +639,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-blog-post'
     | '/api/public/hooks/sourcing-alerts'
     | '/api/public/scorecard/$token'
+    | '/api/public/v1/health'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -621,6 +651,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/analytics'
+    | '/api-docs'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -640,6 +671,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
+    | '/account/api-keys'
     | '/admin/blog'
     | '/admin/contacts'
     | '/admin/emails'
@@ -669,6 +701,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-blog-post'
     | '/api/public/hooks/sourcing-alerts'
     | '/api/public/scorecard/$token'
+    | '/api/public/v1/health'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -681,6 +714,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/analytics'
+    | '/api-docs'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -701,6 +735,7 @@ export interface FileRouteTypes {
     | '/sourcing'
     | '/terms'
     | '/unsubscribe'
+    | '/account/api-keys'
     | '/admin/blog'
     | '/admin/contacts'
     | '/admin/emails'
@@ -730,6 +765,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-blog-post'
     | '/api/public/hooks/sourcing-alerts'
     | '/api/public/scorecard/$token'
+    | '/api/public/v1/health'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -740,9 +776,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AccountRoute: typeof AccountRoute
+  AccountRoute: typeof AccountRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
   AnalyticsRoute: typeof AnalyticsRoute
+  ApiDocsRoute: typeof ApiDocsRoute
   CareersRoute: typeof CareersRoute
   ChangelogRoute: typeof ChangelogRoute
   ContactRoute: typeof ContactRoute
@@ -781,6 +818,7 @@ export interface RootRouteChildren {
   ApiPublicHooksGenerateBlogPostRoute: typeof ApiPublicHooksGenerateBlogPostRoute
   ApiPublicHooksSourcingAlertsRoute: typeof ApiPublicHooksSourcingAlertsRoute
   ApiPublicScorecardTokenRoute: typeof ApiPublicScorecardTokenRoute
+  ApiPublicV1HealthRoute: typeof ApiPublicV1HealthRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -928,6 +966,13 @@ declare module '@tanstack/react-router' {
       path: '/careers'
       fullPath: '/careers'
       preLoaderRoute: typeof CareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api-docs': {
+      id: '/api-docs'
+      path: '/api-docs'
+      fullPath: '/api-docs'
+      preLoaderRoute: typeof ApiDocsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/analytics': {
@@ -1112,6 +1157,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBlogRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/account/api-keys': {
+      id: '/account/api-keys'
+      path: '/api-keys'
+      fullPath: '/account/api-keys'
+      preLoaderRoute: typeof AccountApiKeysRouteImport
+      parentRoute: typeof AccountRoute
+    }
     '/share/scorecard/$token': {
       id: '/share/scorecard/$token'
       path: '/share/scorecard/$token'
@@ -1175,6 +1227,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/health': {
+      id: '/api/public/v1/health'
+      path: '/api/public/v1/health'
+      fullPath: '/api/public/v1/health'
+      preLoaderRoute: typeof ApiPublicV1HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/scorecard/$token': {
       id: '/api/public/scorecard/$token'
       path: '/api/public/scorecard/$token'
@@ -1205,6 +1264,17 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AccountRouteChildren {
+  AccountApiKeysRoute: typeof AccountApiKeysRoute
+}
+
+const AccountRouteChildren: AccountRouteChildren = {
+  AccountApiKeysRoute: AccountApiKeysRoute,
+}
+
+const AccountRouteWithChildren =
+  AccountRoute._addFileChildren(AccountRouteChildren)
 
 interface AdminRouteChildren {
   AdminBlogRoute: typeof AdminBlogRoute
@@ -1249,9 +1319,10 @@ const SourcingRouteWithChildren = SourcingRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AccountRoute: AccountRoute,
+  AccountRoute: AccountRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
   AnalyticsRoute: AnalyticsRoute,
+  ApiDocsRoute: ApiDocsRoute,
   CareersRoute: CareersRoute,
   ChangelogRoute: ChangelogRoute,
   ContactRoute: ContactRoute,
@@ -1291,6 +1362,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksGenerateBlogPostRoute: ApiPublicHooksGenerateBlogPostRoute,
   ApiPublicHooksSourcingAlertsRoute: ApiPublicHooksSourcingAlertsRoute,
   ApiPublicScorecardTokenRoute: ApiPublicScorecardTokenRoute,
+  ApiPublicV1HealthRoute: ApiPublicV1HealthRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,

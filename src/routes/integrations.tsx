@@ -269,7 +269,7 @@ function IntegrationsPage() {
                 <Link to="/contact">Talk to us</Link>
               </Button>
               <Button asChild variant="heroSecondary" className="rounded-full">
-                <Link to="/dashboard">View API docs</Link>
+                <Link to="/api-docs">View API docs</Link>
               </Button>
             </div>
           </div>
