@@ -135,7 +135,7 @@ export const updateScreener = createServerFn({ method: "POST" })
 
     const { error } = await supabase
       .from("screening_screeners")
-      .update(patch)
+      .update(patch as never)
       .eq("id", data.id)
       .eq("user_id", userId);
     if (error) throw dbError(error, "screening.update");
