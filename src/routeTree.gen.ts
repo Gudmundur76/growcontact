@@ -55,6 +55,7 @@ import { Route as AdminRolesRouteImport } from './routes/admin/roles'
 import { Route as AdminEmailsRouteImport } from './routes/admin/emails'
 import { Route as AdminContactsRouteImport } from './routes/admin/contacts'
 import { Route as AdminBlogRouteImport } from './routes/admin/blog'
+import { Route as AccountApiKeysRouteImport } from './routes/account.api-keys'
 import { Route as ShareScorecardTokenRouteImport } from './routes/share.scorecard.$token'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicRecallWebhookRouteImport } from './routes/api/public/recall-webhook'
@@ -300,6 +301,11 @@ const AdminBlogRoute = AdminBlogRouteImport.update({
   path: '/blog',
   getParentRoute: () => AdminRoute,
 } as any)
+const AccountApiKeysRoute = AccountApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
+  getParentRoute: () => AccountRoute,
+} as any)
 const ShareScorecardTokenRoute = ShareScorecardTokenRouteImport.update({
   id: '/share/scorecard/$token',
   path: '/share/scorecard/$token',
@@ -380,7 +386,7 @@ const ApiPublicHooksAutoPublishBlogPostRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
+  '/account': typeof AccountRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/analytics': typeof AnalyticsRoute
   '/careers': typeof CareersRoute
@@ -403,6 +409,7 @@ export interface FileRoutesByFullPath {
   '/sourcing': typeof SourcingRouteWithChildren
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/account/api-keys': typeof AccountApiKeysRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/emails': typeof AdminEmailsRoute
@@ -442,7 +449,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
+  '/account': typeof AccountRouteWithChildren
   '/analytics': typeof AnalyticsRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
@@ -463,6 +470,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/account/api-keys': typeof AccountApiKeysRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/emails': typeof AdminEmailsRoute
@@ -503,7 +511,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
+  '/account': typeof AccountRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/analytics': typeof AnalyticsRoute
   '/careers': typeof CareersRoute
@@ -526,6 +534,7 @@ export interface FileRoutesById {
   '/sourcing': typeof SourcingRouteWithChildren
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/account/api-keys': typeof AccountApiKeysRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/contacts': typeof AdminContactsRoute
   '/admin/emails': typeof AdminEmailsRoute
@@ -590,6 +599,7 @@ export interface FileRouteTypes {
     | '/sourcing'
     | '/terms'
     | '/unsubscribe'
+    | '/account/api-keys'
     | '/admin/blog'
     | '/admin/contacts'
     | '/admin/emails'
@@ -650,6 +660,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
+    | '/account/api-keys'
     | '/admin/blog'
     | '/admin/contacts'
     | '/admin/emails'
@@ -712,6 +723,7 @@ export interface FileRouteTypes {
     | '/sourcing'
     | '/terms'
     | '/unsubscribe'
+    | '/account/api-keys'
     | '/admin/blog'
     | '/admin/contacts'
     | '/admin/emails'
@@ -752,7 +764,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AccountRoute: typeof AccountRoute
+  AccountRoute: typeof AccountRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
   AnalyticsRoute: typeof AnalyticsRoute
   CareersRoute: typeof CareersRoute
@@ -1125,6 +1137,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBlogRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/account/api-keys': {
+      id: '/account/api-keys'
+      path: '/api-keys'
+      fullPath: '/account/api-keys'
+      preLoaderRoute: typeof AccountApiKeysRouteImport
+      parentRoute: typeof AccountRoute
+    }
     '/share/scorecard/$token': {
       id: '/share/scorecard/$token'
       path: '/share/scorecard/$token'
@@ -1226,6 +1245,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AccountRouteChildren {
+  AccountApiKeysRoute: typeof AccountApiKeysRoute
+}
+
+const AccountRouteChildren: AccountRouteChildren = {
+  AccountApiKeysRoute: AccountApiKeysRoute,
+}
+
+const AccountRouteWithChildren =
+  AccountRoute._addFileChildren(AccountRouteChildren)
+
 interface AdminRouteChildren {
   AdminBlogRoute: typeof AdminBlogRoute
   AdminContactsRoute: typeof AdminContactsRoute
@@ -1269,7 +1299,7 @@ const SourcingRouteWithChildren = SourcingRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AccountRoute: AccountRoute,
+  AccountRoute: AccountRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
   AnalyticsRoute: AnalyticsRoute,
   CareersRoute: CareersRoute,
