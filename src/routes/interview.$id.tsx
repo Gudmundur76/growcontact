@@ -31,9 +31,12 @@ import {
   Pencil,
   RefreshCw,
   Mail,
+  Briefcase,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useServerFn } from "@tanstack/react-start";
+import { pushScorecardToAshby } from "@/lib/ashby.functions";
 
 type SessionRow = {
   id: string;
@@ -55,6 +58,7 @@ type EventRow = {
   created_at: string;
 };
 type ScorecardRow = {
+  id?: string;
   summary: string;
   overall_rating: number | null;
   recommendation: string | null;
@@ -206,7 +210,7 @@ function LiveInterviewPage() {
         supabase
           .from("interview_scorecards")
           .select(
-            "summary, overall_rating, recommendation, strengths, concerns, competencies, follow_ups",
+            "id, summary, overall_rating, recommendation, strengths, concerns, competencies, follow_ups",
           )
           .eq("session_id", id)
           .maybeSingle(),
@@ -913,6 +917,7 @@ function LiveInterviewPage() {
                     <Mail className="size-4" /> Email link
                   </Button>
                 )}
+                {scorecard.id && <PushScorecardToAshbyButton scorecardId={scorecard.id} />}
               </div>
             </div>
             {session.share_token && (
@@ -1200,5 +1205,26 @@ function ListEditor({
         <Plus className="size-4" /> Add
       </Button>
     </div>
+  );
+}
+
+function PushScorecardToAshbyButton({ scorecardId }: { scorecardId: string }) {
+  const push = useServerFn(pushScorecardToAshby);
+  const [busy, setBusy] = useState(false);
+  async function onClick() {
+    setBusy(true);
+    try {
+      await push({ data: { scorecardId } });
+      toast.success("Pushed to Ashby");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to push to Ashby");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Button variant="outline" size="sm" onClick={onClick} disabled={busy}>
+      <Briefcase className="size-4" /> {busy ? "Pushing…" : "Push to Ashby"}
+    </Button>
   );
 }
