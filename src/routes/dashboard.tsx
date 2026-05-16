@@ -8,8 +8,10 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { getDashboardOverview } from "@/server/dashboard.functions";
+import { getDashboardOverview, type DashboardRange } from "@/server/dashboard.functions";
 import { Search, Users, Calendar, Mail, FileText, ArrowRight, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -30,9 +32,10 @@ function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const fetchOverview = useSF(getDashboardOverview);
+  const [range, setRange] = useState<DashboardRange>("7d");
   const { data, isLoading, error } = useQuery({
-    queryKey: ["dashboard-overview", user?.id],
-    queryFn: () => fetchOverview(),
+    queryKey: ["dashboard-overview", user?.id, range],
+    queryFn: () => fetchOverview({ data: { range } }),
     enabled: !!user,
   });
 
@@ -51,11 +54,12 @@ function DashboardPage() {
     (user?.user_metadata?.name as string | undefined) ?? displayEmail.split("@")[0] ?? "there";
 
   const kpis = data?.kpis;
+  const rangeLabel = range === "7d" ? "7d" : range === "30d" ? "30d" : "all time";
   const kpiCards = [
     { label: "Open searches", value: kpis?.openSearches ?? 0, icon: Search, to: "/sourcing/searches" as const },
     { label: "Shortlisted candidates", value: kpis?.shortlistedCandidates ?? 0, hint: `${kpis?.shortlists ?? 0} shortlists`, icon: Users, to: "/sourcing/shortlists" as const },
     { label: "Upcoming interviews", value: kpis?.upcomingInterviews ?? 0, icon: Calendar, to: "/interview" as const },
-    { label: "Outreach (7d)", value: kpis?.outreachLast7d ?? 0, icon: Mail, to: "/sourcing/activity" as const },
+    { label: `Outreach (${rangeLabel})`, value: kpis?.outreachInRange ?? 0, icon: Mail, to: "/sourcing/activity" as const },
   ];
 
   return (
@@ -83,6 +87,28 @@ function DashboardPage() {
               <Button variant="heroSecondary" onClick={() => navigate({ to: "/sourcing" })}>
                 AI Sourcing
               </Button>
+            </div>
+          </div>
+
+          {/* Range selector */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs uppercase tracking-wider text-muted-foreground">Range</span>
+            <div className="inline-flex rounded-full border border-white/10 bg-card/40 p-1">
+              {(["7d", "30d", "all"] as const).map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRange(r)}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-xs font-medium transition",
+                    range === r
+                      ? "bg-foreground text-background"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {r === "all" ? "All time" : r === "7d" ? "Last 7 days" : "Last 30 days"}
+                </button>
+              ))}
             </div>
           </div>
 
