@@ -64,6 +64,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicV1HealthRouteImport } from './routes/api/public/v1/health'
 import { Route as ApiPublicScorecardTokenRouteImport } from './routes/api/public/scorecard.$token'
 import { Route as ApiPublicHooksSourcingAlertsRouteImport } from './routes/api/public/hooks/sourcing-alerts'
 import { Route as ApiPublicHooksGenerateBlogPostRouteImport } from './routes/api/public/hooks/generate-blog-post'
@@ -347,6 +348,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicV1HealthRoute = ApiPublicV1HealthRouteImport.update({
+  id: '/api/public/v1/health',
+  path: '/api/public/v1/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicScorecardTokenRoute = ApiPublicScorecardTokenRouteImport.update({
   id: '/api/public/scorecard/$token',
   path: '/api/public/scorecard/$token',
@@ -426,6 +432,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
   '/api/public/hooks/sourcing-alerts': typeof ApiPublicHooksSourcingAlertsRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
+  '/api/public/v1/health': typeof ApiPublicV1HealthRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -485,6 +492,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
   '/api/public/hooks/sourcing-alerts': typeof ApiPublicHooksSourcingAlertsRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
+  '/api/public/v1/health': typeof ApiPublicV1HealthRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -547,6 +555,7 @@ export interface FileRoutesById {
   '/api/public/hooks/generate-blog-post': typeof ApiPublicHooksGenerateBlogPostRoute
   '/api/public/hooks/sourcing-alerts': typeof ApiPublicHooksSourcingAlertsRoute
   '/api/public/scorecard/$token': typeof ApiPublicScorecardTokenRoute
+  '/api/public/v1/health': typeof ApiPublicV1HealthRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -610,6 +619,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-blog-post'
     | '/api/public/hooks/sourcing-alerts'
     | '/api/public/scorecard/$token'
+    | '/api/public/v1/health'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -669,6 +679,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-blog-post'
     | '/api/public/hooks/sourcing-alerts'
     | '/api/public/scorecard/$token'
+    | '/api/public/v1/health'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -730,6 +741,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/generate-blog-post'
     | '/api/public/hooks/sourcing-alerts'
     | '/api/public/scorecard/$token'
+    | '/api/public/v1/health'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -781,6 +793,7 @@ export interface RootRouteChildren {
   ApiPublicHooksGenerateBlogPostRoute: typeof ApiPublicHooksGenerateBlogPostRoute
   ApiPublicHooksSourcingAlertsRoute: typeof ApiPublicHooksSourcingAlertsRoute
   ApiPublicScorecardTokenRoute: typeof ApiPublicScorecardTokenRoute
+  ApiPublicV1HealthRoute: typeof ApiPublicV1HealthRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -1175,6 +1188,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/v1/health': {
+      id: '/api/public/v1/health'
+      path: '/api/public/v1/health'
+      fullPath: '/api/public/v1/health'
+      preLoaderRoute: typeof ApiPublicV1HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/scorecard/$token': {
       id: '/api/public/scorecard/$token'
       path: '/api/public/scorecard/$token'
@@ -1291,6 +1311,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksGenerateBlogPostRoute: ApiPublicHooksGenerateBlogPostRoute,
   ApiPublicHooksSourcingAlertsRoute: ApiPublicHooksSourcingAlertsRoute,
   ApiPublicScorecardTokenRoute: ApiPublicScorecardTokenRoute,
+  ApiPublicV1HealthRoute: ApiPublicV1HealthRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
