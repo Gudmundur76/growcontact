@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery, useServerFn } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn as useSF } from "@tanstack/react-start";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
