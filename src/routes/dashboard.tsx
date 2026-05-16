@@ -1,4 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn as useSF } from "@tanstack/react-start";
 import { Navbar } from "@/components/landing/Navbar";
@@ -10,10 +12,14 @@ import { toast } from "sonner";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { getDashboardOverview, type DashboardRange } from "@/server/dashboard.functions";
 import { Search, Users, Calendar, Mail, FileText, ArrowRight, Loader2 } from "lucide-react";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 
+const dashboardSearchSchema = z.object({
+  range: fallback(z.enum(["7d", "30d", "all"]), "7d").default("7d"),
+});
+
 export const Route = createFileRoute("/dashboard")({
+  validateSearch: zodValidator(dashboardSearchSchema),
   head: () => ({
     meta: [{ title: "Dashboard — Grow" }, { name: "robots", content: "noindex" }],
   }),
@@ -32,7 +38,9 @@ function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const fetchOverview = useSF(getDashboardOverview);
-  const [range, setRange] = useState<DashboardRange>("7d");
+  const { range } = Route.useSearch();
+  const setRange = (r: DashboardRange) =>
+    navigate({ to: "/dashboard", search: { range: r }, replace: true });
   const { data, isLoading, error } = useQuery({
     queryKey: ["dashboard-overview", user?.id, range],
     queryFn: () => fetchOverview({ data: { range } }),
