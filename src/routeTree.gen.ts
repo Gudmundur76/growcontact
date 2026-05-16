@@ -22,6 +22,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as InterviewCopilotRouteImport } from './routes/interview-copilot'
+import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CustomersRouteImport } from './routes/customers'
@@ -131,6 +132,11 @@ const LoginRoute = LoginRouteImport.update({
 const InterviewCopilotRoute = InterviewCopilotRouteImport.update({
   id: '/interview-copilot',
   path: '/interview-copilot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationsRoute = IntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -377,6 +383,7 @@ export interface FileRoutesByFullPath {
   '/customers': typeof CustomersRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/integrations': typeof IntegrationsRoute
   '/interview-copilot': typeof InterviewCopilotRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
@@ -436,6 +443,7 @@ export interface FileRoutesByTo {
   '/customers': typeof CustomersRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/integrations': typeof IntegrationsRoute
   '/interview-copilot': typeof InterviewCopilotRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
@@ -496,6 +504,7 @@ export interface FileRoutesById {
   '/customers': typeof CustomersRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/integrations': typeof IntegrationsRoute
   '/interview-copilot': typeof InterviewCopilotRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
@@ -558,6 +567,7 @@ export interface FileRouteTypes {
     | '/customers'
     | '/dashboard'
     | '/forgot-password'
+    | '/integrations'
     | '/interview-copilot'
     | '/login'
     | '/pricing'
@@ -617,6 +627,7 @@ export interface FileRouteTypes {
     | '/customers'
     | '/dashboard'
     | '/forgot-password'
+    | '/integrations'
     | '/interview-copilot'
     | '/login'
     | '/pricing'
@@ -676,6 +687,7 @@ export interface FileRouteTypes {
     | '/customers'
     | '/dashboard'
     | '/forgot-password'
+    | '/integrations'
     | '/interview-copilot'
     | '/login'
     | '/pricing'
@@ -737,6 +749,7 @@ export interface RootRouteChildren {
   CustomersRoute: typeof CustomersRoute
   DashboardRoute: typeof DashboardRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  IntegrationsRoute: typeof IntegrationsRoute
   InterviewCopilotRoute: typeof InterviewCopilotRoute
   LoginRoute: typeof LoginRoute
   PricingRoute: typeof PricingRoute
@@ -866,6 +879,13 @@ declare module '@tanstack/react-router' {
       path: '/interview-copilot'
       fullPath: '/interview-copilot'
       preLoaderRoute: typeof InterviewCopilotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integrations': {
+      id: '/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof IntegrationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -1238,6 +1258,7 @@ const rootRouteChildren: RootRouteChildren = {
   CustomersRoute: CustomersRoute,
   DashboardRoute: DashboardRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  IntegrationsRoute: IntegrationsRoute,
   InterviewCopilotRoute: InterviewCopilotRoute,
   LoginRoute: LoginRoute,
   PricingRoute: PricingRoute,
@@ -1279,12 +1300,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

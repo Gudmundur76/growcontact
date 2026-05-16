@@ -15,7 +15,8 @@ type FooterLink = {
     | "/contact"
     | "/privacy"
     | "/terms"
-    | "/security";
+    | "/security"
+    | "/integrations";
 };
 
 const columns: { title: string; links: FooterLink[] }[] = [
@@ -24,7 +25,7 @@ const columns: { title: string; links: FooterLink[] }[] = [
     links: [
       { label: "Features" },
       { label: "Pricing", to: "/pricing" },
-      { label: "Integrations" },
+      { label: "Integrations", to: "/integrations" },
       { label: "Changelog", to: "/changelog" },
     ],
   },

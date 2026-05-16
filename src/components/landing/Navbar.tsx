@@ -25,7 +25,8 @@ type NavTo =
   | "/careers"
   | "/sourcing"
   | "/screening"
-  | "/analytics";
+  | "/analytics"
+  | "/integrations";
 
 const links: { label: string; to: NavTo }[] = [
   { label: "AI Sourcing", to: "/sourcing" },
@@ -33,6 +34,7 @@ const links: { label: string; to: NavTo }[] = [
   { label: "Interview Copilot", to: "/interview-copilot" as NavTo },
   { label: "Analytics", to: "/analytics" },
   { label: "Pricing", to: "/pricing" },
+  { label: "Integrations", to: "/integrations" },
   { label: "Customers", to: "/customers" },
   { label: "Blog", to: "/blog" },
   { label: "About", to: "/about" },
