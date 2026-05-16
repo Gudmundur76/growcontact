@@ -26,7 +26,7 @@ export const Route = createFileRoute("/pricing")({
   component: PricingPage,
 });
 
-type Tier = "Starter" | "Growth" | "Scale";
+type Tier = "Startup" | "Growth" | "Enterprise";
 
 const compareGroups: {
   group: string;
@@ -37,28 +37,28 @@ const compareGroups: {
     rows: [
       {
         feature: "Candidates surfaced / month",
-        values: { Starter: "200", Growth: "Unlimited", Scale: "Unlimited" },
+        values: { Startup: "200", Growth: "Unlimited", Enterprise: "Unlimited" },
       },
-      { feature: "Retention-aware ranking", values: { Starter: false, Growth: true, Scale: true } },
+      { feature: "Retention-aware ranking", values: { Startup: false, Growth: true, Enterprise: true } },
       {
         feature: "Outbound sequences",
-        values: { Starter: "Single-step", Growth: "Branching", Scale: "Branching + A/B" },
+        values: { Startup: "Single-step", Growth: "Branching", Enterprise: "Branching + A/B" },
       },
-      { feature: "Custom sourcing models", values: { Starter: false, Growth: false, Scale: true } },
+      { feature: "Custom sourcing models", values: { Startup: false, Growth: false, Enterprise: true } },
     ],
   },
   {
     group: "Interview Copilot",
     rows: [
-      { feature: "Live transcription", values: { Starter: false, Growth: true, Scale: true } },
-      { feature: "Real-time scorecards", values: { Starter: false, Growth: true, Scale: true } },
+      { feature: "Live transcription", values: { Startup: false, Growth: true, Enterprise: true } },
+      { feature: "Real-time scorecards", values: { Startup: false, Growth: true, Enterprise: true } },
       {
         feature: "Calibration drift alerts",
-        values: { Starter: false, Growth: true, Scale: true },
+        values: { Startup: false, Growth: true, Enterprise: true },
       },
       {
         feature: "Panel debrief synthesis",
-        values: { Starter: false, Growth: false, Scale: true },
+        values: { Startup: false, Growth: false, Enterprise: true },
       },
     ],
   },
@@ -67,26 +67,26 @@ const compareGroups: {
     rows: [
       {
         feature: "ATS sync (Greenhouse, Ashby, Lever)",
-        values: { Starter: false, Growth: true, Scale: true },
+        values: { Startup: false, Growth: true, Enterprise: true },
       },
-      { feature: "SAML SSO + SCIM", values: { Starter: false, Growth: false, Scale: true } },
+      { feature: "SAML SSO + SCIM", values: { Startup: false, Growth: false, Enterprise: true } },
       {
         feature: "Audit logs & data residency",
-        values: { Starter: false, Growth: false, Scale: true },
+        values: { Startup: false, Growth: false, Enterprise: true },
       },
-      { feature: "Customer-managed keys", values: { Starter: false, Growth: false, Scale: true } },
+      { feature: "Customer-managed keys", values: { Startup: false, Growth: false, Enterprise: true } },
     ],
   },
   {
     group: "Support",
     rows: [
-      { feature: "Email support", values: { Starter: true, Growth: true, Scale: true } },
-      { feature: "Priority Slack channel", values: { Starter: false, Growth: true, Scale: true } },
+      { feature: "Email support", values: { Startup: true, Growth: true, Enterprise: true } },
+      { feature: "Priority Slack channel", values: { Startup: false, Growth: true, Enterprise: true } },
       {
         feature: "Dedicated success engineer",
-        values: { Starter: false, Growth: false, Scale: true },
+        values: { Startup: false, Growth: false, Enterprise: true },
       },
-      { feature: "99.9% uptime SLA", values: { Starter: false, Growth: false, Scale: true } },
+      { feature: "99.9% uptime SLA", values: { Startup: false, Growth: false, Enterprise: true } },
     ],
   },
 ];
@@ -156,9 +156,9 @@ function PricingPage() {
           <div className="liquid-glass overflow-hidden rounded-3xl bg-card/40">
             <div className="hidden grid-cols-[1.6fr_1fr_1fr_1fr] gap-4 border-b border-white/5 px-8 py-5 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground md:grid">
               <div>Feature</div>
-              <div className="text-center">Starter</div>
+              <div className="text-center">Startup</div>
               <div className="text-center">Growth</div>
-              <div className="text-center">Scale</div>
+              <div className="text-center">Enterprise</div>
             </div>
 
             {compareGroups.map((g) => (
@@ -174,7 +174,7 @@ function PricingPage() {
                     <div className="col-span-2 font-medium text-foreground md:col-span-1">
                       {row.feature}
                     </div>
-                    {(["Starter", "Growth", "Scale"] as Tier[]).map((tier) => (
+                    {(["Startup", "Growth", "Enterprise"] as Tier[]).map((tier) => (
                       <div key={tier} className="flex items-center gap-2 md:justify-center">
                         <span className="text-xs uppercase tracking-wider text-muted-foreground md:hidden">
                           {tier}:
