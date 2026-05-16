@@ -31,9 +31,12 @@ import {
   Pencil,
   RefreshCw,
   Mail,
+  Briefcase,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useServerFn } from "@tanstack/react-start";
+import { pushScorecardToAshby } from "@/lib/ashby.functions";
 
 type SessionRow = {
   id: string;
@@ -913,6 +916,7 @@ function LiveInterviewPage() {
                     <Mail className="size-4" /> Email link
                   </Button>
                 )}
+                <PushScorecardToAshbyButton scorecardId={scorecard.id} />
               </div>
             </div>
             {session.share_token && (
