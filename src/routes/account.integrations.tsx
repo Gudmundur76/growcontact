@@ -339,7 +339,7 @@ function ProviderShell({
   const disconnect = useServerFn(disconnectProvider);
 
   const all = useQuery({ queryKey: ["integrations"], queryFn: () => fetchAll() });
-  const c = all.data?.connections.find((x: ConnRow) => x.provider === provider) as ConnRow | undefined;
+  const c = all.data?.connections.find((x: any) => x.provider === provider) as ConnRow | undefined;
 
   const log = useQuery({
     queryKey: ["integration-log", provider],
