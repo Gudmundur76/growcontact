@@ -11,7 +11,21 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { Briefcase, CheckCircle2, AlertCircle, ExternalLink, Loader2, Slack, Webhook, Leaf, MessageSquare } from "lucide-react";
+import {
+  Briefcase,
+  CheckCircle2,
+  AlertCircle,
+  ExternalLink,
+  Loader2,
+  Slack,
+  Webhook,
+  Leaf,
+  MessageSquare,
+  Building2,
+  FileText,
+  Sheet,
+  Hash,
+} from "lucide-react";
 import {
   getAshbyConnection,
   connectAshby,
@@ -29,6 +43,10 @@ import {
   connectWebhook,
   sendWebhookTest,
   connectTeams,
+  connectHubspot,
+  connectNotion,
+  connectSheets,
+  connectDiscord,
   type ProviderKey,
 } from "@/lib/integrations.functions";
 
@@ -66,8 +84,12 @@ function AccountIntegrationsPage() {
           <div className="space-y-6">
             <AshbyCard />
             <GreenhouseCard />
+            <HubspotCard />
             <SlackCard />
             <TeamsCard />
+            <DiscordCard />
+            <NotionCard />
+            <SheetsCard />
             <WebhookCard />
           </div>
         )}
