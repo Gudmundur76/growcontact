@@ -33,12 +33,13 @@ import {
   Mail,
   Briefcase,
   Slack,
+  MessageSquare,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useServerFn } from "@tanstack/react-start";
 import { pushScorecardToAshby } from "@/lib/ashby.functions";
-import { notifyScorecardSlack } from "@/lib/integrations.functions";
+import { notifyScorecardSlack, notifyScorecardTeams } from "@/lib/integrations.functions";
 
 type SessionRow = {
   id: string;
@@ -921,6 +922,7 @@ function LiveInterviewPage() {
                 )}
                 {scorecard.id && <PushScorecardToAshbyButton scorecardId={scorecard.id} />}
                 {scorecard.id && <NotifyScorecardSlackButton scorecardId={scorecard.id} />}
+                {scorecard.id && <NotifyScorecardTeamsButton scorecardId={scorecard.id} />}
               </div>
             </div>
             {session.share_token && (
