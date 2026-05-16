@@ -58,6 +58,7 @@ type EventRow = {
   created_at: string;
 };
 type ScorecardRow = {
+  id: string;
   summary: string;
   overall_rating: number | null;
   recommendation: string | null;
@@ -209,7 +210,7 @@ function LiveInterviewPage() {
         supabase
           .from("interview_scorecards")
           .select(
-            "summary, overall_rating, recommendation, strengths, concerns, competencies, follow_ups",
+            "id, summary, overall_rating, recommendation, strengths, concerns, competencies, follow_ups",
           )
           .eq("session_id", id)
           .maybeSingle(),
