@@ -29,6 +29,7 @@ import { Route as CustomersRouteImport } from './routes/customers'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as CareersRouteImport } from './routes/careers'
+import { Route as ApiDocsRouteImport } from './routes/api-docs'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
@@ -169,6 +170,11 @@ const ChangelogRoute = ChangelogRouteImport.update({
 const CareersRoute = CareersRouteImport.update({
   id: '/careers',
   path: '/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDocsRoute = ApiDocsRouteImport.update({
+  id: '/api-docs',
+  path: '/api-docs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnalyticsRoute = AnalyticsRouteImport.update({
@@ -389,6 +395,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/analytics': typeof AnalyticsRoute
+  '/api-docs': typeof ApiDocsRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -451,6 +458,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/account': typeof AccountRouteWithChildren
   '/analytics': typeof AnalyticsRoute
+  '/api-docs': typeof ApiDocsRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -514,6 +522,7 @@ export interface FileRoutesById {
   '/account': typeof AccountRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/analytics': typeof AnalyticsRoute
+  '/api-docs': typeof ApiDocsRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -579,6 +588,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/analytics'
+    | '/api-docs'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -641,6 +651,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/analytics'
+    | '/api-docs'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -703,6 +714,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/analytics'
+    | '/api-docs'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -767,6 +779,7 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
   AnalyticsRoute: typeof AnalyticsRoute
+  ApiDocsRoute: typeof ApiDocsRoute
   CareersRoute: typeof CareersRoute
   ChangelogRoute: typeof ChangelogRoute
   ContactRoute: typeof ContactRoute
@@ -953,6 +966,13 @@ declare module '@tanstack/react-router' {
       path: '/careers'
       fullPath: '/careers'
       preLoaderRoute: typeof CareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api-docs': {
+      id: '/api-docs'
+      path: '/api-docs'
+      fullPath: '/api-docs'
+      preLoaderRoute: typeof ApiDocsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/analytics': {
@@ -1302,6 +1322,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
   AnalyticsRoute: AnalyticsRoute,
+  ApiDocsRoute: ApiDocsRoute,
   CareersRoute: CareersRoute,
   ChangelogRoute: ChangelogRoute,
   ContactRoute: ContactRoute,
