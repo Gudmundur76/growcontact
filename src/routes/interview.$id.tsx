@@ -1254,3 +1254,24 @@ function NotifyScorecardSlackButton({ scorecardId }: { scorecardId: string }) {
     </Button>
   );
 }
+
+function NotifyScorecardTeamsButton({ scorecardId }: { scorecardId: string }) {
+  const notify = useServerFn(notifyScorecardTeams);
+  const [busy, setBusy] = useState(false);
+  async function onClick() {
+    setBusy(true);
+    try {
+      await notify({ data: { scorecardId } });
+      toast.success("Posted to Microsoft Teams");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to post to Teams");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Button variant="outline" size="sm" onClick={onClick} disabled={busy}>
+      <MessageSquare className="size-4" /> {busy ? "Posting…" : "Post to Teams"}
+    </Button>
+  );
+}
