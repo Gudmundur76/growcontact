@@ -24,7 +24,9 @@ const { mockState, makeClient } = vi.hoisted(() => {
   const state: { responses: Responses; calls: CallLog; userId: string } = {
     responses: {},
     calls: [],
-    userId: TEST_UUIDS.user,
+    // NOTE: vi.hoisted() runs before module imports, so TEST_UUIDS is not in
+    // scope here. Keep this literal in sync with TEST_UUIDS.user.
+    userId: "11111111-1111-4111-8111-111111111111",
   };
 
   function resolveFor(table: string, method: string): Resp {
