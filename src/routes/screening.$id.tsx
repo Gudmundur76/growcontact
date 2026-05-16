@@ -9,7 +9,7 @@ import { getScreener, rescoreSubmission, markReviewed, updateScreener } from "@/
 import { ArrowLeft, Copy, Loader2, RefreshCcw, Check } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/screening/")({
+export const Route = createFileRoute("/screening/$id")({
   head: () => ({ meta: [{ title: "Screener — Grow" }, { name: "robots", content: "noindex" }] }),
   component: () => (
     <ProtectedRoute>

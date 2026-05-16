@@ -41,6 +41,8 @@ import { Route as SourcingShortlistsRouteImport } from './routes/sourcing.shortl
 import { Route as SourcingSequencesRouteImport } from './routes/sourcing.sequences'
 import { Route as SourcingSearchesRouteImport } from './routes/sourcing.searches'
 import { Route as SourcingActivityRouteImport } from './routes/sourcing.activity'
+import { Route as ScreeningIdRouteImport } from './routes/screening.$id'
+import { Route as ScreenTokenRouteImport } from './routes/screen.$token'
 import { Route as InterviewRubricsRouteImport } from './routes/interview.rubrics'
 import { Route as InterviewNewRouteImport } from './routes/interview.new'
 import { Route as InterviewIdRouteImport } from './routes/interview.$id'
@@ -225,6 +227,16 @@ const SourcingActivityRoute = SourcingActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => SourcingRoute,
 } as any)
+const ScreeningIdRoute = ScreeningIdRouteImport.update({
+  id: '/screening/$id',
+  path: '/screening/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScreenTokenRoute = ScreenTokenRouteImport.update({
+  id: '/screen/$token',
+  path: '/screen/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InterviewRubricsRoute = InterviewRubricsRouteImport.update({
   id: '/interview/rubrics',
   path: '/interview/rubrics',
@@ -381,6 +393,8 @@ export interface FileRoutesByFullPath {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/screen/$token': typeof ScreenTokenRoute
+  '/screening/$id': typeof ScreeningIdRoute
   '/sourcing/activity': typeof SourcingActivityRoute
   '/sourcing/searches': typeof SourcingSearchesRoute
   '/sourcing/sequences': typeof SourcingSequencesRoute
@@ -436,6 +450,8 @@ export interface FileRoutesByTo {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/screen/$token': typeof ScreenTokenRoute
+  '/screening/$id': typeof ScreeningIdRoute
   '/sourcing/activity': typeof SourcingActivityRoute
   '/sourcing/searches': typeof SourcingSearchesRoute
   '/sourcing/sequences': typeof SourcingSequencesRoute
@@ -494,6 +510,8 @@ export interface FileRoutesById {
   '/interview/$id': typeof InterviewIdRoute
   '/interview/new': typeof InterviewNewRoute
   '/interview/rubrics': typeof InterviewRubricsRoute
+  '/screen/$token': typeof ScreenTokenRoute
+  '/screening/$id': typeof ScreeningIdRoute
   '/sourcing/activity': typeof SourcingActivityRoute
   '/sourcing/searches': typeof SourcingSearchesRoute
   '/sourcing/sequences': typeof SourcingSequencesRoute
@@ -553,6 +571,8 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/screen/$token'
+    | '/screening/$id'
     | '/sourcing/activity'
     | '/sourcing/searches'
     | '/sourcing/sequences'
@@ -608,6 +628,8 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/screen/$token'
+    | '/screening/$id'
     | '/sourcing/activity'
     | '/sourcing/searches'
     | '/sourcing/sequences'
@@ -665,6 +687,8 @@ export interface FileRouteTypes {
     | '/interview/$id'
     | '/interview/new'
     | '/interview/rubrics'
+    | '/screen/$token'
+    | '/screening/$id'
     | '/sourcing/activity'
     | '/sourcing/searches'
     | '/sourcing/sequences'
@@ -718,6 +742,8 @@ export interface RootRouteChildren {
   InterviewIdRoute: typeof InterviewIdRoute
   InterviewNewRoute: typeof InterviewNewRoute
   InterviewRubricsRoute: typeof InterviewRubricsRoute
+  ScreenTokenRoute: typeof ScreenTokenRoute
+  ScreeningIdRoute: typeof ScreeningIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
   InterviewIndexRoute: typeof InterviewIndexRoute
   ScreeningIndexRoute: typeof ScreeningIndexRoute
@@ -962,6 +988,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SourcingActivityRouteImport
       parentRoute: typeof SourcingRoute
     }
+    '/screening/$id': {
+      id: '/screening/$id'
+      path: '/screening/$id'
+      fullPath: '/screening/$id'
+      preLoaderRoute: typeof ScreeningIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/screen/$token': {
+      id: '/screen/$token'
+      path: '/screen/$token'
+      fullPath: '/screen/$token'
+      preLoaderRoute: typeof ScreenTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/interview/rubrics': {
       id: '/interview/rubrics'
       path: '/interview/rubrics'
@@ -1195,6 +1235,8 @@ const rootRouteChildren: RootRouteChildren = {
   InterviewIdRoute: InterviewIdRoute,
   InterviewNewRoute: InterviewNewRoute,
   InterviewRubricsRoute: InterviewRubricsRoute,
+  ScreenTokenRoute: ScreenTokenRoute,
+  ScreeningIdRoute: ScreeningIdRoute,
   BlogIndexRoute: BlogIndexRoute,
   InterviewIndexRoute: InterviewIndexRoute,
   ScreeningIndexRoute: ScreeningIndexRoute,
