@@ -32,6 +32,7 @@ import {
   RefreshCw,
   Mail,
   Briefcase,
+  Slack,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -1227,6 +1228,27 @@ function PushScorecardToAshbyButton({ scorecardId }: { scorecardId: string }) {
   return (
     <Button variant="outline" size="sm" onClick={onClick} disabled={busy}>
       <Briefcase className="size-4" /> {busy ? "Pushing…" : "Push to Ashby"}
+    </Button>
+  );
+}
+
+function NotifyScorecardSlackButton({ scorecardId }: { scorecardId: string }) {
+  const notify = useServerFn(notifyScorecardSlack);
+  const [busy, setBusy] = useState(false);
+  async function onClick() {
+    setBusy(true);
+    try {
+      await notify({ data: { scorecardId } });
+      toast.success("Posted to Slack");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to post to Slack");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Button variant="outline" size="sm" onClick={onClick} disabled={busy}>
+      <Slack className="size-4" /> {busy ? "Posting…" : "Post to Slack"}
     </Button>
   );
 }
