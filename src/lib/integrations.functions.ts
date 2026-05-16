@@ -2,8 +2,25 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type ProviderKey = "greenhouse" | "slack" | "webhook" | "teams";
-const PROVIDER = z.enum(["greenhouse", "slack", "webhook", "teams"]);
+export type ProviderKey =
+  | "greenhouse"
+  | "slack"
+  | "webhook"
+  | "teams"
+  | "hubspot"
+  | "notion"
+  | "sheets"
+  | "discord";
+const PROVIDER = z.enum([
+  "greenhouse",
+  "slack",
+  "webhook",
+  "teams",
+  "hubspot",
+  "notion",
+  "sheets",
+  "discord",
+]);
 
 // ---------- Helpers ----------
 
@@ -452,4 +469,251 @@ export const notifyScorecardTeams = createServerFn({ method: "POST" })
       await markSynced(supabase, "teams", msg);
       throw new Error(msg);
     }
+  });
+// ---------- HubSpot CRM ----------
+// Uses a Private App access token (Bearer). Pushes candidates as contacts.
+
+const HUBSPOT_BASE = "https://api.hubapi.com";
+
+async function hubspot(token: string, path: string, init: RequestInit = {}) {
+  const res = await fetch(`${HUBSPOT_BASE}${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      ...(init.headers || {}),
+    },
+  });
+  const text = await res.text();
+  let json: any = null;
+  try { json = text ? JSON.parse(text) : null; } catch { /* noop */ }
+  if (!res.ok) {
+    const msg = json?.message || text || `HubSpot ${path} failed (${res.status})`;
+    throw new Error(typeof msg === "string" ? msg : JSON.stringify(msg));
+  }
+  return json;
+}
+
+export const connectHubspot = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({
+      token: z.string().trim().min(20).max(300),
+      pipelineLabel: z.string().trim().max(80).optional(),
+    }).parse,
+  )
+  .handler(async ({ data, context }) => {
+    await hubspot(data.token, "/crm/v3/owners?limit=1");
+    const { error } = await context.supabase
+      .from("integration_connections")
+      .upsert(
+        {
+          user_id: context.userId,
+          provider: "hubspot",
+          enabled: true,
+          credentials: { token: data.token },
+          settings: { pipelineLabel: data.pipelineLabel ?? null },
+          last_error: null,
+        },
+        { onConflict: "user_id,provider" },
+      );
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const pushCandidateToHubspot = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ candidateId: z.string().uuid() }).parse)
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const conn = await loadConn(supabase, "hubspot");
+    const token = (conn.credentials as any)?.token;
+    if (!token) throw new Error("HubSpot token missing — reconnect.");
+
+    const { data: cand, error } = await supabase
+      .from("sourcing_candidates")
+      .select("id, name, email, headline, location, profile_url")
+      .eq("id", data.candidateId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!cand) throw new Error("Candidate not found.");
+
+    const [first, ...rest] = (cand.name || "").split(" ");
+    const properties: Record<string, string> = {
+      firstname: first || cand.name,
+      lastname: rest.join(" ") || "",
+      jobtitle: cand.headline ?? "",
+      website: cand.profile_url ?? "",
+      city: cand.location ?? "",
+      hs_lead_status: "NEW",
+    };
+    if (cand.email) properties.email = cand.email;
+
+    try {
+      const result = await hubspot(token, "/crm/v3/objects/contacts", {
+        method: "POST",
+        body: JSON.stringify({ properties }),
+      });
+      const externalId = result?.id ? String(result.id) : null;
+      await logSync(supabase, userId, "hubspot", "candidate", cand.id, externalId, "success", null, result);
+      await markSynced(supabase, "hubspot", null);
+      return { ok: true, externalId };
+    } catch (e: any) {
+      const msg = e?.message ?? String(e);
+      await logSync(supabase, userId, "hubspot", "candidate", cand.id, null, "error", msg, null);
+      await markSynced(supabase, "hubspot", msg);
+      throw new Error(msg);
+    }
+  });
+
+// ---------- Notion ----------
+// Internal Integration Token + a target Database ID. Each published scorecard
+// creates a page in that database (auto-notify wired server-side).
+
+const NOTION_BASE = "https://api.notion.com/v1";
+const NOTION_VERSION = "2022-06-28";
+
+async function notion(token: string, path: string, init: RequestInit = {}) {
+  const res = await fetch(`${NOTION_BASE}${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Notion-Version": NOTION_VERSION,
+      "Content-Type": "application/json",
+      ...(init.headers || {}),
+    },
+  });
+  const text = await res.text();
+  let json: any = null;
+  try { json = text ? JSON.parse(text) : null; } catch { /* noop */ }
+  if (!res.ok) {
+    const msg = json?.message || text || `Notion ${path} failed (${res.status})`;
+    throw new Error(typeof msg === "string" ? msg : JSON.stringify(msg));
+  }
+  return json;
+}
+
+export const connectNotion = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({
+      token: z.string().trim().min(20).max(300),
+      databaseId: z.string().trim().min(20).max(64),
+    }).parse,
+  )
+  .handler(async ({ data, context }) => {
+    const dbId = data.databaseId.replace(/-/g, "");
+    // Validate token + database access
+    await notion(data.token, `/databases/${dbId}`);
+    const { error } = await context.supabase
+      .from("integration_connections")
+      .upsert(
+        {
+          user_id: context.userId,
+          provider: "notion",
+          enabled: true,
+          credentials: { token: data.token },
+          settings: { databaseId: dbId },
+          last_error: null,
+        },
+        { onConflict: "user_id,provider" },
+      );
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// ---------- Google Sheets (via Apps Script Web App) ----------
+// Per-user OAuth to Google is too heavy here — users deploy a 5-line Apps
+// Script that appends rows, and paste the Web App URL. We POST JSON; the
+// script writes to their sheet.
+
+const SHEETS_URL_RE = /^https:\/\/script\.google\.com\/(macros|a\/macros)\/[^/]+\/s\/[A-Za-z0-9_-]+\/exec\b/;
+
+async function postSheets(url: string, payload: unknown) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    redirect: "follow",
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Google Sheets script failed (${res.status}): ${body.slice(0, 200)}`);
+  }
+}
+
+export const connectSheets = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({
+      url: z.string().url().regex(SHEETS_URL_RE, "Must be a Google Apps Script Web App URL"),
+      sheetLabel: z.string().trim().max(80).optional(),
+    }).parse,
+  )
+  .handler(async ({ data, context }) => {
+    await postSheets(data.url, {
+      event: "connection.test",
+      at: new Date().toISOString(),
+      row: ["Grow connection test", new Date().toISOString()],
+    });
+    const { error } = await context.supabase
+      .from("integration_connections")
+      .upsert(
+        {
+          user_id: context.userId,
+          provider: "sheets",
+          enabled: true,
+          credentials: {},
+          settings: { url: data.url, sheetLabel: data.sheetLabel ?? null },
+          last_error: null,
+        },
+        { onConflict: "user_id,provider" },
+      );
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// ---------- Discord (incoming webhook) ----------
+
+const DISCORD_WEBHOOK_RE =
+  /^https:\/\/(discord|discordapp)\.com\/api\/webhooks\/\d+\/[A-Za-z0-9_-]+/i;
+
+async function postDiscord(webhookUrl: string, content: string) {
+  const res = await fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content: content.slice(0, 1900) }),
+  });
+  if (!res.ok && res.status !== 204) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Discord webhook failed (${res.status}): ${body}`);
+  }
+}
+
+export const connectDiscord = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({
+      webhookUrl: z.string().url().regex(DISCORD_WEBHOOK_RE, "Must be a Discord webhook URL"),
+      channelLabel: z.string().trim().max(80).optional(),
+    }).parse,
+  )
+  .handler(async ({ data, context }) => {
+    await postDiscord(data.webhookUrl, "✨ Grow connected to this channel. You'll see scorecard updates here.");
+    const { error } = await context.supabase
+      .from("integration_connections")
+      .upsert(
+        {
+          user_id: context.userId,
+          provider: "discord",
+          enabled: true,
+          credentials: { webhookUrl: data.webhookUrl },
+          settings: { channelLabel: data.channelLabel ?? null },
+          last_error: null,
+        },
+        { onConflict: "user_id,provider" },
+      );
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });

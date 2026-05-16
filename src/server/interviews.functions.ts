@@ -6,6 +6,7 @@ import { createRecallBot, leaveRecallBot, detectPlatform } from "./recall.server
 import { generateScorecard } from "./interview-ai.server";
 import { dbError } from "./db-errors";
 import { autoNotifyScorecardTeams } from "./notify-teams.server";
+import { autoNotifyScorecardAll } from "./notify-scorecard.server";
 
 // ---------- In-memory rate limiter ----------
 // Best-effort per-instance throttle. Acceptable for abuse prevention; resets on cold start.
@@ -193,6 +194,10 @@ export const finalizeScorecard = createServerFn({ method: "POST" })
       // Fire-and-forget Teams notification for users who activated the connector.
       autoNotifyScorecardTeams({ userId, scorecardId: upserted.id }).catch((e) =>
         console.error("autoNotifyScorecardTeams error", e),
+      );
+      // Notion / Discord / Sheets fan-out for users who activated any of them.
+      autoNotifyScorecardAll({ userId, scorecardId: upserted.id }).catch((e) =>
+        console.error("autoNotifyScorecardAll error", e),
       );
     }
 

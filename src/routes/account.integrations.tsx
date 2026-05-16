@@ -11,7 +11,21 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { Briefcase, CheckCircle2, AlertCircle, ExternalLink, Loader2, Slack, Webhook, Leaf, MessageSquare } from "lucide-react";
+import {
+  Briefcase,
+  CheckCircle2,
+  AlertCircle,
+  ExternalLink,
+  Loader2,
+  Slack,
+  Webhook,
+  Leaf,
+  MessageSquare,
+  Building2,
+  FileText,
+  Sheet,
+  Hash,
+} from "lucide-react";
 import {
   getAshbyConnection,
   connectAshby,
@@ -29,6 +43,10 @@ import {
   connectWebhook,
   sendWebhookTest,
   connectTeams,
+  connectHubspot,
+  connectNotion,
+  connectSheets,
+  connectDiscord,
   type ProviderKey,
 } from "@/lib/integrations.functions";
 
@@ -66,8 +84,12 @@ function AccountIntegrationsPage() {
           <div className="space-y-6">
             <AshbyCard />
             <GreenhouseCard />
+            <HubspotCard />
             <SlackCard />
             <TeamsCard />
+            <DiscordCard />
+            <NotionCard />
+            <SheetsCard />
             <WebhookCard />
           </div>
         )}
@@ -798,6 +820,330 @@ function TeamsCard() {
             {connectMut.isPending ? (
               <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying…</>
             ) : "Activate Microsoft Teams"}
+          </Button>
+        </>
+      }
+      connectedDetails={(c) =>
+        c.settings?.channelLabel ? (
+          <p className="text-xs text-muted-foreground">
+            Channel: <span className="text-foreground">{c.settings.channelLabel}</span>
+          </p>
+        ) : null
+      }
+    />
+  );
+}
+function HubspotCard() {
+  const qc = useQueryClient();
+  const connect = useServerFn(connectHubspot);
+  const [token, setToken] = useState("");
+  const [pipelineLabel, setPipelineLabel] = useState("");
+  const connectMut = useMutation({
+    mutationFn: async () =>
+      connect({ data: { token: token.trim(), pipelineLabel: pipelineLabel.trim() || undefined } }),
+    onSuccess: () => {
+      toast.success("HubSpot connected");
+      setToken("");
+      qc.invalidateQueries({ queryKey: ["integrations"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to connect HubSpot"),
+  });
+  return (
+    <ProviderShell
+      provider="hubspot"
+      title="HubSpot CRM"
+      category="CRM"
+      icon={<Building2 className="h-5 w-5" />}
+      description="Push shortlisted candidates into HubSpot as contacts. Activation is per-user with your own Private App access token."
+      notConnectedChildren={
+        <>
+          <div className="rounded-lg border border-white/5 bg-background/60 p-4 text-xs text-muted-foreground">
+            In HubSpot:{" "}
+            <span className="text-foreground">Settings → Integrations → Private Apps → Create</span>.
+            Grant <span className="text-foreground">crm.objects.contacts.write</span> and{" "}
+            <span className="text-foreground">crm.objects.owners.read</span> scopes.{" "}
+            <a
+              href="https://developers.hubspot.com/docs/api/private-apps"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-primary hover:underline"
+            >
+              Docs <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+          <div className="grid gap-3">
+            <div>
+              <Label htmlFor="hs-token">Private App access token</Label>
+              <Input
+                id="hs-token"
+                type="password"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                placeholder="pat-na1-…"
+                autoComplete="off"
+              />
+            </div>
+            <div>
+              <Label htmlFor="hs-pipeline">Pipeline label (optional)</Label>
+              <Input
+                id="hs-pipeline"
+                value={pipelineLabel}
+                onChange={(e) => setPipelineLabel(e.target.value)}
+                placeholder="Sourcing — Engineering"
+              />
+            </div>
+          </div>
+          <Button
+            onClick={() => connectMut.mutate()}
+            disabled={connectMut.isPending || token.trim().length < 20}
+          >
+            {connectMut.isPending ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying…</>
+            ) : "Activate HubSpot"}
+          </Button>
+        </>
+      }
+      connectedDetails={(c) =>
+        c.settings?.pipelineLabel ? (
+          <p className="text-xs text-muted-foreground">
+            Pipeline: <span className="text-foreground">{c.settings.pipelineLabel}</span>
+          </p>
+        ) : null
+      }
+    />
+  );
+}
+
+function NotionCard() {
+  const qc = useQueryClient();
+  const connect = useServerFn(connectNotion);
+  const [token, setToken] = useState("");
+  const [databaseId, setDatabaseId] = useState("");
+  const connectMut = useMutation({
+    mutationFn: async () =>
+      connect({ data: { token: token.trim(), databaseId: databaseId.trim() } }),
+    onSuccess: () => {
+      toast.success("Notion connected");
+      setToken("");
+      setDatabaseId("");
+      qc.invalidateQueries({ queryKey: ["integrations"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to connect Notion"),
+  });
+  return (
+    <ProviderShell
+      provider="notion"
+      title="Notion"
+      category="Knowledge"
+      icon={<FileText className="h-5 w-5" />}
+      description="Create a Notion page in your hiring database every time a scorecard is published. Per-user activation with your own Internal Integration token."
+      notConnectedChildren={
+        <>
+          <div className="rounded-lg border border-white/5 bg-background/60 p-4 text-xs text-muted-foreground">
+            Create an Internal Integration at{" "}
+            <span className="text-foreground">notion.so/profile/integrations</span>, then open your
+            hiring database → <span className="text-foreground">… → Connections → invite your
+            integration</span>. Copy the database ID from its URL.{" "}
+            <a
+              href="https://developers.notion.com/docs/create-a-notion-integration"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-primary hover:underline"
+            >
+              Docs <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+          <div className="grid gap-3">
+            <div>
+              <Label htmlFor="notion-token">Integration token</Label>
+              <Input
+                id="notion-token"
+                type="password"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                placeholder="secret_… or ntn_…"
+                autoComplete="off"
+              />
+            </div>
+            <div>
+              <Label htmlFor="notion-db">Database ID</Label>
+              <Input
+                id="notion-db"
+                value={databaseId}
+                onChange={(e) => setDatabaseId(e.target.value)}
+                placeholder="32-char ID from the database URL"
+              />
+            </div>
+          </div>
+          <Button
+            onClick={() => connectMut.mutate()}
+            disabled={connectMut.isPending || token.trim().length < 20 || databaseId.trim().length < 20}
+          >
+            {connectMut.isPending ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying…</>
+            ) : "Activate Notion"}
+          </Button>
+        </>
+      }
+      connectedDetails={(c) =>
+        c.settings?.databaseId ? (
+          <p className="break-all text-xs text-muted-foreground">
+            Database: <span className="text-foreground">{c.settings.databaseId}</span>
+          </p>
+        ) : null
+      }
+    />
+  );
+}
+
+function SheetsCard() {
+  const qc = useQueryClient();
+  const connect = useServerFn(connectSheets);
+  const [url, setUrl] = useState("");
+  const [sheetLabel, setSheetLabel] = useState("");
+  const connectMut = useMutation({
+    mutationFn: async () =>
+      connect({ data: { url: url.trim(), sheetLabel: sheetLabel.trim() || undefined } }),
+    onSuccess: () => {
+      toast.success("Google Sheets connected — sent a test row");
+      setUrl("");
+      qc.invalidateQueries({ queryKey: ["integrations"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to connect Google Sheets"),
+  });
+  const valid = /^https:\/\/script\.google\.com\/(macros|a\/macros)\/[^/]+\/s\/[A-Za-z0-9_-]+\/exec\b/.test(
+    url.trim(),
+  );
+  return (
+    <ProviderShell
+      provider="sheets"
+      title="Google Sheets"
+      category="Spreadsheet"
+      icon={<Sheet className="h-5 w-5" />}
+      description="Append a row to your sheet every time a scorecard is published. Uses a 5-line Apps Script Web App you deploy from your own Google account — no OAuth, no admin install."
+      notConnectedChildren={
+        <>
+          <div className="rounded-lg border border-white/5 bg-background/60 p-4 text-xs text-muted-foreground">
+            <p className="mb-2 text-foreground">Apps Script (Extensions → Apps Script):</p>
+            <pre className="overflow-x-auto rounded bg-background/80 p-2 text-[11px] leading-snug">
+{`function doPost(e){
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const body = JSON.parse(e.postData.contents);
+  sheet.appendRow(body.row || []);
+  return ContentService.createTextOutput("ok");
+}`}
+            </pre>
+            <p className="mt-2">
+              Deploy → New deployment → <span className="text-foreground">Web app</span>, run as
+              you, access <span className="text-foreground">Anyone</span>. Paste the{" "}
+              <code>/exec</code> URL below.
+            </p>
+          </div>
+          <div className="grid gap-3">
+            <div>
+              <Label htmlFor="sheets-url">Web App URL</Label>
+              <Input
+                id="sheets-url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://script.google.com/macros/s/…/exec"
+                autoComplete="off"
+              />
+            </div>
+            <div>
+              <Label htmlFor="sheets-label">Sheet label (optional)</Label>
+              <Input
+                id="sheets-label"
+                value={sheetLabel}
+                onChange={(e) => setSheetLabel(e.target.value)}
+                placeholder="Hiring tracker"
+              />
+            </div>
+          </div>
+          <Button onClick={() => connectMut.mutate()} disabled={connectMut.isPending || !valid}>
+            {connectMut.isPending ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying…</>
+            ) : "Activate Google Sheets"}
+          </Button>
+        </>
+      }
+      connectedDetails={(c) =>
+        c.settings?.sheetLabel ? (
+          <p className="text-xs text-muted-foreground">
+            Sheet: <span className="text-foreground">{c.settings.sheetLabel}</span>
+          </p>
+        ) : null
+      }
+    />
+  );
+}
+
+function DiscordCard() {
+  const qc = useQueryClient();
+  const connect = useServerFn(connectDiscord);
+  const [webhookUrl, setWebhookUrl] = useState("");
+  const [channelLabel, setChannelLabel] = useState("");
+  const connectMut = useMutation({
+    mutationFn: async () =>
+      connect({ data: { webhookUrl: webhookUrl.trim(), channelLabel: channelLabel.trim() || undefined } }),
+    onSuccess: () => {
+      toast.success("Discord connected — sent a test message");
+      setWebhookUrl("");
+      qc.invalidateQueries({ queryKey: ["integrations"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to connect Discord"),
+  });
+  const valid = /^https:\/\/(discord|discordapp)\.com\/api\/webhooks\/\d+\/[A-Za-z0-9_-]+/i.test(
+    webhookUrl.trim(),
+  );
+  return (
+    <ProviderShell
+      provider="discord"
+      title="Discord"
+      category="Notifications"
+      icon={<Hash className="h-5 w-5" />}
+      description="Post a message to a Discord channel every time a scorecard is published. Uses an Incoming Webhook — no bot install required."
+      notConnectedChildren={
+        <>
+          <div className="rounded-lg border border-white/5 bg-background/60 p-4 text-xs text-muted-foreground">
+            In Discord: open the channel →{" "}
+            <span className="text-foreground">Edit Channel → Integrations → Webhooks → New Webhook</span>,
+            copy the URL.{" "}
+            <a
+              href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-primary hover:underline"
+            >
+              Docs <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+          <div className="grid gap-3">
+            <div>
+              <Label htmlFor="discord-url">Webhook URL</Label>
+              <Input
+                id="discord-url"
+                type="password"
+                value={webhookUrl}
+                onChange={(e) => setWebhookUrl(e.target.value)}
+                placeholder="https://discord.com/api/webhooks/…"
+                autoComplete="off"
+              />
+            </div>
+            <div>
+              <Label htmlFor="discord-label">Channel label (optional)</Label>
+              <Input
+                id="discord-label"
+                value={channelLabel}
+                onChange={(e) => setChannelLabel(e.target.value)}
+                placeholder="#hiring"
+              />
+            </div>
+          </div>
+          <Button onClick={() => connectMut.mutate()} disabled={connectMut.isPending || !valid}>
+            {connectMut.isPending ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying…</>
+            ) : "Activate Discord"}
           </Button>
         </>
       }

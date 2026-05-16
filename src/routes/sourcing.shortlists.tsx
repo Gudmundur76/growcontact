@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, Download, Video, Users, Search, Briefcase, Leaf } from "lucide-react";
+import { Trash2, Plus, Download, Video, Users, Search, Briefcase, Leaf, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { pushCandidateToAshby } from "@/lib/ashby.functions";
-import { pushCandidateToGreenhouse } from "@/lib/integrations.functions";
+import { pushCandidateToGreenhouse, pushCandidateToHubspot } from "@/lib/integrations.functions";
 import {
   listShortlists,
   upsertShortlist,
@@ -280,6 +280,7 @@ function ShortlistsPage() {
                 </Button>
                 <PushCandidateAshbyBtn candidateId={m.candidate.id} />
                 <PushCandidateGreenhouseBtn candidateId={m.candidate.id} />
+                <PushCandidateHubspotBtn candidateId={m.candidate.id} />
                 <Button size="icon" variant="ghost" onClick={() => removeMember(m.id)}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -330,6 +331,27 @@ function PushCandidateGreenhouseBtn({ candidateId }: { candidateId: string }) {
   return (
     <Button size="sm" variant="outline" onClick={onClick} disabled={busy} className="gap-1.5">
       <Leaf className="h-3.5 w-3.5" /> {busy ? "Pushing…" : "Greenhouse"}
+    </Button>
+  );
+}
+
+function PushCandidateHubspotBtn({ candidateId }: { candidateId: string }) {
+  const push = useServerFn(pushCandidateToHubspot);
+  const [busy, setBusy] = useState(false);
+  async function onClick() {
+    setBusy(true);
+    try {
+      const r = await push({ data: { candidateId } });
+      toast.success(r.externalId ? `Pushed to HubSpot (${r.externalId})` : "Pushed to HubSpot");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to push");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Button size="sm" variant="outline" onClick={onClick} disabled={busy} className="gap-1.5">
+      <Building2 className="h-3.5 w-3.5" /> {busy ? "Pushing…" : "HubSpot"}
     </Button>
   );
 }
