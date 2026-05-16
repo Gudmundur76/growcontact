@@ -731,3 +731,83 @@ function WebhookCard() {
     />
   );
 }
+
+function TeamsCard() {
+  const qc = useQueryClient();
+  const connect = useServerFn(connectTeams);
+  const [webhookUrl, setWebhookUrl] = useState("");
+  const [channelLabel, setChannelLabel] = useState("");
+  const connectMut = useMutation({
+    mutationFn: async () =>
+      connect({ data: { webhookUrl: webhookUrl.trim(), channelLabel: channelLabel.trim() || undefined } }),
+    onSuccess: () => {
+      toast.success("Microsoft Teams connected — sent a test message");
+      setWebhookUrl("");
+      qc.invalidateQueries({ queryKey: ["integrations"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed to connect Teams"),
+  });
+  const valid = /^https:\/\/[a-z0-9-]+\.webhook\.office\.com\/(webhookb2|workflows)\//i.test(
+    webhookUrl.trim(),
+  );
+  return (
+    <ProviderShell
+      provider="teams"
+      title="Microsoft Teams"
+      category="Notifications"
+      icon={<MessageSquare className="h-5 w-5" />}
+      description="Post a card to a Teams channel every time a scorecard is published. Uses an Incoming Webhook or Workflows URL — no tenant-wide install required."
+      notConnectedChildren={
+        <>
+          <div className="rounded-lg border border-white/5 bg-background/60 p-4 text-xs text-muted-foreground">
+            In Teams, open the target channel →{" "}
+            <span className="text-foreground">Workflows → Post to a channel when a webhook request is received</span>{" "}
+            (or the classic Incoming Webhook connector), then paste the generated URL below.{" "}
+            <a
+              href="https://learn.microsoft.com/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-primary hover:underline"
+            >
+              Docs <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+          <div className="grid gap-3">
+            <div>
+              <Label htmlFor="teams-url">Webhook URL</Label>
+              <Input
+                id="teams-url"
+                type="password"
+                value={webhookUrl}
+                onChange={(e) => setWebhookUrl(e.target.value)}
+                placeholder="https://<tenant>.webhook.office.com/webhookb2/…"
+                autoComplete="off"
+              />
+            </div>
+            <div>
+              <Label htmlFor="teams-label">Channel label (optional)</Label>
+              <Input
+                id="teams-label"
+                value={channelLabel}
+                onChange={(e) => setChannelLabel(e.target.value)}
+                placeholder="Hiring / Engineering"
+              />
+            </div>
+          </div>
+          <Button onClick={() => connectMut.mutate()} disabled={connectMut.isPending || !valid}>
+            {connectMut.isPending ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying…</>
+            ) : "Activate Microsoft Teams"}
+          </Button>
+        </>
+      }
+      connectedDetails={(c) =>
+        c.settings?.channelLabel ? (
+          <p className="text-xs text-muted-foreground">
+            Channel: <span className="text-foreground">{c.settings.channelLabel}</span>
+          </p>
+        ) : null
+      }
+    />
+  );
+}
