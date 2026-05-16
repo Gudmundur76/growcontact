@@ -33,12 +33,13 @@ import {
   Mail,
   Briefcase,
   Slack,
+  MessageSquare,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useServerFn } from "@tanstack/react-start";
 import { pushScorecardToAshby } from "@/lib/ashby.functions";
-import { notifyScorecardSlack } from "@/lib/integrations.functions";
+import { notifyScorecardSlack, notifyScorecardTeams } from "@/lib/integrations.functions";
 
 type SessionRow = {
   id: string;
@@ -921,6 +922,7 @@ function LiveInterviewPage() {
                 )}
                 {scorecard.id && <PushScorecardToAshbyButton scorecardId={scorecard.id} />}
                 {scorecard.id && <NotifyScorecardSlackButton scorecardId={scorecard.id} />}
+                {scorecard.id && <NotifyScorecardTeamsButton scorecardId={scorecard.id} />}
               </div>
             </div>
             {session.share_token && (
@@ -1249,6 +1251,27 @@ function NotifyScorecardSlackButton({ scorecardId }: { scorecardId: string }) {
   return (
     <Button variant="outline" size="sm" onClick={onClick} disabled={busy}>
       <Slack className="size-4" /> {busy ? "Posting…" : "Post to Slack"}
+    </Button>
+  );
+}
+
+function NotifyScorecardTeamsButton({ scorecardId }: { scorecardId: string }) {
+  const notify = useServerFn(notifyScorecardTeams);
+  const [busy, setBusy] = useState(false);
+  async function onClick() {
+    setBusy(true);
+    try {
+      await notify({ data: { scorecardId } });
+      toast.success("Posted to Microsoft Teams");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to post to Teams");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Button variant="outline" size="sm" onClick={onClick} disabled={busy}>
+      <MessageSquare className="size-4" /> {busy ? "Posting…" : "Post to Teams"}
     </Button>
   );
 }

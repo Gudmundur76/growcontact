@@ -2,8 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type ProviderKey = "greenhouse" | "slack" | "webhook";
-const PROVIDER = z.enum(["greenhouse", "slack", "webhook"]);
+export type ProviderKey = "greenhouse" | "slack" | "webhook" | "teams";
+const PROVIDER = z.enum(["greenhouse", "slack", "webhook", "teams"]);
 
 // ---------- Helpers ----------
 
@@ -346,6 +346,110 @@ export const sendWebhookTest = createServerFn({ method: "POST" })
       const msg = e?.message ?? String(e);
       await logSync(supabase, userId, "webhook", "test", null, null, "error", msg, null);
       await markSynced(supabase, "webhook", msg);
+      throw new Error(msg);
+    }
+  });
+
+// ---------- Microsoft Teams (Incoming Webhook / Workflows) ----------
+// Accepts both classic Office 365 connector webhooks and Workflows webhook URLs.
+const TEAMS_WEBHOOK_RE =
+  /^https:\/\/[a-z0-9-]+\.webhook\.office\.com\/(webhookb2|workflows)\//i;
+
+async function postTeams(webhookUrl: string, title: string, text: string) {
+  // MessageCard payload — accepted by both classic webhooks and Workflows.
+  const payload = {
+    "@type": "MessageCard",
+    "@context": "https://schema.org/extensions",
+    summary: title,
+    themeColor: "0EA5E9",
+    title,
+    text,
+  };
+  const res = await fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Teams webhook failed (${res.status}): ${body}`);
+  }
+}
+
+export const connectTeams = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({
+      webhookUrl: z
+        .string()
+        .url()
+        .regex(TEAMS_WEBHOOK_RE, "Must be a Microsoft Teams Incoming Webhook or Workflows URL"),
+      channelLabel: z.string().trim().max(80).optional(),
+    }).parse,
+  )
+  .handler(async ({ data, context }) => {
+    await postTeams(
+      data.webhookUrl,
+      "Grow connected",
+      "Grow is now connected to this channel. You'll see scorecard updates here.",
+    );
+    const { error } = await context.supabase
+      .from("integration_connections")
+      .upsert(
+        {
+          user_id: context.userId,
+          provider: "teams",
+          enabled: true,
+          credentials: { webhookUrl: data.webhookUrl },
+          settings: { channelLabel: data.channelLabel ?? null },
+          last_error: null,
+        },
+        { onConflict: "user_id,provider" },
+      );
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const notifyScorecardTeams = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ scorecardId: z.string().uuid() }).parse)
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const conn = await loadConn(supabase, "teams");
+    const webhookUrl = (conn.credentials as any)?.webhookUrl;
+    if (!webhookUrl) throw new Error("Teams webhook missing — reconnect.");
+
+    const { data: sc, error } = await supabase
+      .from("interview_scorecards")
+      .select("id, session_id, summary, overall_rating, recommendation")
+      .eq("id", data.scorecardId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!sc) throw new Error("Scorecard not found.");
+    const { data: session } = await supabase
+      .from("interview_sessions")
+      .select("candidate_name, role_title")
+      .eq("id", sc.session_id)
+      .maybeSingle();
+
+    const title = `New scorecard — ${session?.candidate_name ?? "Candidate"}${
+      session?.role_title ? ` (${session.role_title})` : ""
+    }`;
+    const lines = [
+      sc.overall_rating != null ? `**Rating:** ${sc.overall_rating}/5` : null,
+      sc.recommendation ? `**Recommendation:** ${sc.recommendation}` : null,
+      sc.summary ? String(sc.summary).slice(0, 600) : null,
+    ].filter(Boolean).join("\n\n");
+
+    try {
+      await postTeams(webhookUrl, title, lines || "Scorecard published.");
+      await logSync(supabase, userId, "teams", "scorecard", sc.id, null, "success", null, { title });
+      await markSynced(supabase, "teams", null);
+      return { ok: true };
+    } catch (e: any) {
+      const msg = e?.message ?? String(e);
+      await logSync(supabase, userId, "teams", "scorecard", sc.id, null, "error", msg, null);
+      await markSynced(supabase, "teams", msg);
       throw new Error(msg);
     }
   });
