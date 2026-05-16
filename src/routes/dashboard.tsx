@@ -92,6 +92,12 @@ function DashboardPage() {
               <Button variant="hero" onClick={() => navigate({ to: "/interview/new" })}>
                 New interview
               </Button>
+              <Button variant="heroSecondary" onClick={() => navigate({ to: "/screening" })}>
+                Screening
+              </Button>
+              <Button variant="heroSecondary" onClick={() => navigate({ to: "/analytics" })}>
+                Analytics
+              </Button>
               <Button variant="heroSecondary" onClick={() => navigate({ to: "/sourcing" })}>
                 AI Sourcing
               </Button>

@@ -17,16 +17,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-type NavTo = "/pricing" | "/customers" | "/blog" | "/about" | "/careers" | "/sourcing";
+type NavTo =
+  | "/pricing"
+  | "/customers"
+  | "/blog"
+  | "/about"
+  | "/careers"
+  | "/sourcing"
+  | "/screening"
+  | "/analytics";
 
 const links: { label: string; to: NavTo }[] = [
   { label: "AI Sourcing", to: "/sourcing" },
+  { label: "Screening", to: "/screening" },
   { label: "Interview Copilot", to: "/interview-copilot" as NavTo },
+  { label: "Analytics", to: "/analytics" },
   { label: "Pricing", to: "/pricing" },
   { label: "Customers", to: "/customers" },
   { label: "Blog", to: "/blog" },
   { label: "About", to: "/about" },
-  { label: "Careers", to: "/careers" },
 ];
 
 export function Navbar() {
